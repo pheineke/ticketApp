@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Light/dark is picked by the values-night override of these two. -->
+    <style name="Platform.MyVrn" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Platform.MyVrn.Dialog" parent="android:Theme.Material.Light.Dialog.Alert" />
+
+    <style name="Base.MyVrn" parent="Platform.MyVrn">
+        <!-- Surface: what shows behind the bars when drawn edge to edge (Android 15+). -->
+        <item name="android:windowBackground">@color/surface</item>
+        <item name="android:colorBackground">@color/bg</item>
+        <item name="android:textColorPrimary">@color/text_heading</item>
+        <item name="android:textColorSecondary">@color/text_muted</item>
+        <item name="android:textColorHint">@color/text_muted</item>
+        <item name="android:colorPrimary">?attr/brand</item>
+        <item name="android:colorPrimaryDark">?attr/brandDark</item>
+        <item name="android:colorAccent">?attr/brand</item>
+        <item name="android:colorControlActivated">?attr/brand</item>
+        <!-- Android 5.x can't draw dark status bar icons, so keep it dark there (BaseActivity lightens it on 6+). -->
+        <item name="android:statusBarColor">?attr/brandDark</item>
+        <item name="android:alertDialogTheme">@style/Dialog.MyVrn</item>
+    </style>
+
+    <style name="Theme.MyVrn.Lite" parent="Base.MyVrn">
+        <item name="brand">@color/lite_brand</item>
+        <item name="brandDark">@color/lite_brand_dark</item>
+        <item name="brandSoft">@color/lite_brand_soft</item>
+        <item name="brandInk">@color/lite_brand_ink</item>
+        <item name="accentText">@color/lite_accent_text</item>
+    </style>
+
+    <style name="Theme.MyVrn.Vrn" parent="Base.MyVrn">
+        <item name="brand">@color/vrn_brand</item>
+        <item name="brandDark">@color/vrn_brand_dark</item>
+        <item name="brandSoft">@color/vrn_brand_soft</item>
+        <item name="brandInk">@color/vrn_brand_ink</item>
+        <item name="accentText">@color/vrn_accent_text</item>
+    </style>
+
+    <!-- Applied on top of the activity theme, so the palette attributes resolve here too. -->
+    <style name="Dialog.MyVrn" parent="Platform.MyVrn.Dialog">
+        <item name="android:colorAccent">?attr/brandInk</item>
+    </style>
+</resources>

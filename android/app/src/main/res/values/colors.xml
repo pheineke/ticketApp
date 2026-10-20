@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Design tokens from the VRN ClientTheme (Mode 0), as in webapp/static/style.css. -->
+<resources>
+    <color name="bg">#f4f4f4</color>
+    <color name="surface">#ffffff</color>
+    <color name="text">#414141</color>
+    <color name="text_heading">#d9000000</color>
+    <color name="text_muted">#767676</color>
+    <color name="divider">#14050505</color>
+    <color name="hover">#eeeeee</color>
+    <color name="success">#389e0d</color>
+    <color name="success_soft">#2452c41a</color>
+    <color name="warning">#d46b08</color>
+    <color name="warning_soft">#24fa8c16</color>
+    <color name="error">#f5222d</color>
+    <color name="error_soft">#1af5222d</color>
+    <color name="code_bg">#f0f2f5</color>
+    <color name="scrim">#66000000</color>
+    <!-- The barcode always sits on white so it scans in dark mode too. -->
+    <color name="code_paper">#ffffff</color>
+
+    <!-- Palettes (Settings > Farben): "myVRN Lite" red and "VRN Original" blue/navy. -->
+    <color name="lite_brand">#d80019</color>
+    <color name="lite_brand_dark">#59000a</color>
+    <color name="lite_brand_soft">#1fd80019</color>
+    <color name="lite_brand_ink">#d80019</color>
+    <color name="lite_accent_text">#59000a</color>
+    <color name="vrn_brand">#0098d8</color>
+    <color name="vrn_brand_dark">#002d59</color>
+    <color name="vrn_brand_soft">#1f0098d8</color>
+    <color name="vrn_brand_ink">#0098d8</color>
+    <color name="vrn_accent_text">#002d59</color>
+</resources>

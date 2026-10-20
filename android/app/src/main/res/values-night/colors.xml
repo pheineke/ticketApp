@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Dark theme (ClientTheme Mode 1). -->
+<resources>
+    <color name="bg">#272727</color>
+    <color name="surface">#414141</color>
+    <color name="text">#ffffff</color>
+    <color name="text_heading">#ffffff</color>
+    <color name="text_muted">#aaaaaa</color>
+    <color name="divider">#1affffff</color>
+    <color name="hover">#4a4a4a</color>
+    <color name="success">#73d13d</color>
+    <color name="warning">#ffa940</color>
+    <color name="error">#ff6b6b</color>
+    <color name="code_bg">#1e1e1e</color>
+
+    <color name="lite_brand_soft">#29ff6b78</color>
+    <color name="lite_brand_ink">#ff6b78</color>
+    <color name="lite_accent_text">#ffffff</color>
+    <color name="vrn_brand_soft">#294dbbe8</color>
+    <color name="vrn_brand_ink">#4dbbe8</color>
+    <color name="vrn_accent_text">#ffffff</color>
+</resources>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/app_bar"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/app_bar"
+    android:background="@drawable/bg_bar_bottom"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingStart="8dp"
+    android:paddingEnd="8dp">
+
+    <ImageButton
+        android:id="@+id/nav_button"
+        style="@style/IconButton"
+        android:contentDescription="@string/menu"
+        android:src="@drawable/ic_menu" />
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_weight="1"
+        android:ellipsize="end"
+        android:fontFamily="sans-serif-medium"
+        android:singleLine="true"
+        android:textColor="?attr/accentText"
+        android:textSize="19sp" />
+
+    <TextView
+        android:id="@+id/debug_flag"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_dbg_flag"
+        android:fontFamily="sans-serif-medium"
+        android:letterSpacing="0.05"
+        android:paddingStart="6dp"
+        android:paddingTop="2dp"
+        android:paddingEnd="6dp"
+        android:paddingBottom="2dp"
+        android:text="@string/debug_flag"
+        android:textColor="@color/warning"
+        android:textSize="11sp"
+        android:visibility="gone" />
+
+    <ImageButton
+        android:id="@+id/action"
+        style="@style/IconButton"
+        android:contentDescription="@string/refresh"
+        android:src="@drawable/ic_refresh"
+        android:visibility="gone" />
+</LinearLayout>

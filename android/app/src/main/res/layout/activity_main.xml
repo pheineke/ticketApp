@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <include layout="@layout/app_bar" />
+
+        <FrameLayout
+            android:id="@+id/pages"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@color/bg" />
+
+        <LinearLayout
+            android:id="@+id/tab_bar"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/tab_bar"
+            android:background="@drawable/bg_bar_top"
+            android:orientation="horizontal">
+
+            <include android:id="@+id/tab_tickets" layout="@layout/tab" />
+            <include android:id="@+id/tab_account" layout="@layout/tab" />
+            <include android:id="@+id/tab_settings" layout="@layout/tab" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Home navigator (drawer) -->
+    <View
+        android:id="@+id/scrim"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/scrim"
+        android:visibility="gone" />
+
+    <ScrollView
+        android:id="@+id/drawer"
+        android:layout_width="@dimen/drawer_width"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:background="@color/surface"
+        android:elevation="16dp"
+        android:visibility="invisible">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:id="@+id/drawer_brand"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingStart="18dp"
+                android:paddingTop="22dp"
+                android:paddingEnd="18dp"
+                android:paddingBottom="22dp">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:adjustViewBounds="true"
+                    android:contentDescription="@string/app_name"
+                    android:src="@drawable/vrn_logo_white" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="@string/app_name"
+                    android:textColor="@android:color/white"
+                    android:textSize="17sp" />
+
+                <TextView
+                    android:id="@+id/drawer_state"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:textColor="#d9ffffff"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <include android:id="@+id/nav_tickets" layout="@layout/nav_row" />
+            <include android:id="@+id/nav_account" layout="@layout/nav_row" />
+            <include android:id="@+id/nav_settings" layout="@layout/nav_row" />
+            <include android:id="@+id/nav_help" layout="@layout/nav_row" />
+            <include android:id="@+id/nav_privacy" layout="@layout/nav_row" />
+            <include android:id="@+id/nav_imprint" layout="@layout/nav_row" />
+        </LinearLayout>
+    </ScrollView>
+</FrameLayout>

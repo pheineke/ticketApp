@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="radius">4dp</dimen>
+    <dimen name="page_pad">12dp</dimen>
+    <dimen name="app_bar">56dp</dimen>
+    <dimen name="tab_bar">60dp</dimen>
+    <dimen name="drawer_width">300dp</dimen>
+</resources>

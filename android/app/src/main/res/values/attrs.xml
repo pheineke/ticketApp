@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Palette colours, set by Theme.MyVrn.Lite / Theme.MyVrn.Vrn (and their night variants). -->
+    <attr name="brand" format="color" />
+    <attr name="brandDark" format="color" />
+    <attr name="brandSoft" format="color" />
+    <!-- Brand colour for text and icons on surfaces (lighter in dark mode). -->
+    <attr name="brandInk" format="color" />
+    <!-- Headings and the app bar title (brand dark, white in dark mode). -->
+    <attr name="accentText" format="color" />
+</resources>

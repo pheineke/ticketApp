@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Platform.MyVrn" parent="android:Theme.Material.NoActionBar" />
+    <style name="Platform.MyVrn.Dialog" parent="android:Theme.Material.Dialog.Alert" />
+</resources>

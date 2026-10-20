@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Themed icon (Android 13+): the VRN CI hexagon, centred in the adaptive icon's safe zone. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+  <group
+      android:scaleX="0.774"
+      android:scaleY="0.774"
+      android:translateX="30"
+      android:translateY="30">
+    <path
+        android:fillColor="#000000"
+        android:pathData="m53.167,31.017 l8.867,-15.508 -8.867,-15.509h-17.734l-8.867,15.508h17.734zM26.6,15.508h-17.734l-8.866,15.509 8.866,15.508h17.734l-8.867,-15.508zM44.333,46.491h-17.733l8.866,15.509h17.7l8.867,-15.508 -8.867,-15.475z" />
+  </group>
+</vector>

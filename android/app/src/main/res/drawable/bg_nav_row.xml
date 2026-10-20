@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Drawer row: hairline at the bottom, hover colour when selected or pressed. -->
+<ripple xmlns:android="http://schemas.android.com/apk/res/android" android:color="@color/hover">
+    <item>
+        <selector>
+            <item android:state_selected="true">
+                <layer-list>
+                    <item><shape><solid android:color="@color/divider" /></shape></item>
+                    <item android:bottom="1dp"><shape><solid android:color="@color/hover" /></shape></item>
+                </layer-list>
+            </item>
+            <item>
+                <layer-list>
+                    <item><shape><solid android:color="@color/divider" /></shape></item>
+                    <item android:bottom="1dp"><shape><solid android:color="@color/surface" /></shape></item>
+                </layer-list>
+            </item>
+        </selector>
+    </item>
+</ripple>

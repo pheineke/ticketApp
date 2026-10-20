@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">myVRN Lite</string>
+
+    <!-- Shell -->
+    <string name="tab_tickets">Tickets</string>
+    <string name="tab_account">Konto</string>
+    <string name="tab_settings">Einstellen</string>
+    <string name="title_tickets">Tickets</string>
+    <string name="title_account">Konto</string>
+    <string name="title_settings">Einstellungen</string>
+    <string name="title_ticket">Ticketdetails</string>
+    <string name="menu">Menü</string>
+    <string name="back">Zurück</string>
+    <string name="refresh">Aktualisieren</string>
+    <string name="debug_flag">DEBUG</string>
+    <string name="drawer_logged_in">angemeldet</string>
+    <string name="drawer_logged_out">nicht angemeldet</string>
+    <string name="nav_tickets">Meine Tickets</string>
+    <string name="nav_tickets_sub">Meine aktuell gültigen Tickets.</string>
+    <string name="nav_account">VRN Konto</string>
+    <string name="nav_account_sub">Meine Benutzerdaten und Login.</string>
+    <string name="nav_settings">Einstellungen</string>
+    <string name="nav_settings_sub">Meine individuellen Einstellungen.</string>
+    <string name="nav_help">Hilfe &amp; Kontakt</string>
+    <string name="nav_privacy">Datenschutz &amp; AGB</string>
+    <string name="nav_imprint">Impressum</string>
+    <string name="no_browser">Kein Browser installiert.</string>
+
+    <!-- Tickets -->
+    <string name="tickets_logged_out">Dir werden Tickets nicht angezeigt? Überprüfe in deinem Konto, ob du eingeloggt bist.</string>
+    <string name="tickets_load_failed">Tickets konnten nicht geladen werden: %1$s</string>
+    <string name="tickets_empty">Hier werden dir Tickets angezeigt, die du gekauft hast.</string>
+    <string name="tickets_none_valid">Du hast aktuell kein gültiges Ticket.</string>
+    <string name="tickets_loading">Tickets werden geladen …</string>
+    <plurals name="tickets_hidden">
+        <item quantity="one">%d älteres Ticket ausgeblendet · im Debug-Modus sichtbar</item>
+        <item quantity="other">%d ältere Tickets ausgeblendet · im Debug-Modus sichtbar</item>
+    </plurals>
+    <string name="offline_banner">Offline · Stand %1$s</string>
+    <string name="offline_logged_out">Nicht angemeldet · Offline-Kopie vom %1$s</string>
+    <string name="retry">Erneut versuchen</string>
+    <string name="group_current">Aktuell gültig</string>
+    <string name="group_future">Zukünftig gültig</string>
+    <string name="group_quota">Guthaben</string>
+    <string name="group_expired">Abgelaufen</string>
+    <string name="group_unknown">Ohne Gültigkeitsdatum</string>
+    <string name="group_debug">%1$s (%2$d) · Debug %3$s</string>
+    <string name="meta_current">Gültig bis %1$s</string>
+    <string name="meta_future">%1$s – %2$s</string>
+    <string name="meta_quota">%1$s von %2$s genutzt</string>
+    <string name="meta_expired">Abgelaufen am %1$s</string>
+    <string name="meta_unknown">Gültigkeit unbekannt · Id %1$s</string>
+    <string name="chip_current">Gültig</string>
+    <string name="chip_future">ab %1$s</string>
+    <string name="chip_quota">Guthaben</string>
+    <string name="chip_expired">Abgelaufen</string>
+    <string name="chip_unknown">\?</string>
+
+    <!-- Ticket detail -->
+    <string name="ticket_sub_current">Gültig bis %1$s</string>
+    <string name="ticket_sub_future">Gültig ab %1$s</string>
+    <string name="ticket_sub_expired">Abgelaufen am %1$s</string>
+    <string name="ticket_sub_area">" · %1$s"</string>
+    <string name="ticket_sub_price">" · Preisstufe %1$s"</string>
+    <string name="ticket_not_found">Ticket nicht gefunden. Bitte die Ticketliste aktualisieren.</string>
+    <string name="ticket_code">Ticket QR Code</string>
+    <string name="ticket_code_spin">Antippen zum Drehen</string>
+    <string name="ticket_code_loading">QR Code wird geladen …</string>
+    <string name="ticket_offline_copy">Offline-Kopie vom %1$s</string>
+    <string name="no_qr">Kein QR Code verfügbar.</string>
+    <string name="render_failed">Darstellung fehlgeschlagen: %1$s</string>
+    <string name="svg_unsupported">SVG-Codes werden nicht unterstützt.</string>
+    <string name="counter_info">Was bedeutet der Zähler?</string>
+    <string name="counter_info_text">Der Zähler läuft seit dem Öffnen des Tickets hoch. So kann das Kontrollpersonal ein live angezeigtes Ticket von einem Screenshot unterscheiden.</string>
+    <string name="understood">Verstanden</string>
+    <string name="kv_holder">Ticketinhaber</string>
+    <string name="kv_dob">Geburtsdatum</string>
+    <string name="kv_validity">Gültigkeit</string>
+    <string name="kv_number">Ticketnummer</string>
+    <string name="validity_range">%1$s – %2$s</string>
+
+    <!-- Account -->
+    <string name="hello">Hallo!</string>
+    <string name="hello_name">Hallo %1$s!</string>
+    <string name="my_account">Mein Konto</string>
+    <string name="kv_address">Adresse</string>
+    <string name="kv_phone">Telefon</string>
+    <string name="profile_failed">Profildaten konnten nicht geladen werden.</string>
+    <string name="profile_failed_status">Profildaten konnten nicht geladen werden (%1$s).</string>
+    <string name="remember_active">Angemeldet bleiben ist auf diesem Gerät aktiv.</string>
+    <string name="remember_inactive">Du wirst abgemeldet, sobald die App beendet wird.</string>
+    <string name="logout">Abmelden</string>
+    <string name="change_login">Login Daten ändern</string>
+    <string name="email">E-Mail</string>
+    <string name="password">Passwort</string>
+    <string name="required">(erforderlich)</string>
+    <string name="show_password">Passwort anzeigen</string>
+    <string name="remember_me">Angemeldet bleiben</string>
+    <string name="login">Einloggen</string>
+    <string name="logging_in">Anmelden …</string>
+    <string name="forgot_password">Passwort vergessen?</string>
+    <string name="code_title">Bestätigungscode</string>
+    <string name="code_sent">Wir haben dir einen Code an %1$s geschickt.</string>
+    <string name="code_hint">Code</string>
+    <string name="confirm">Bestätigen</string>
+    <string name="cancel">Abbrechen</string>
+    <string name="err_fill_in">Bitte E-Mail und Passwort eingeben.</string>
+    <string name="err_credentials">E-Mail oder Passwort ist falsch.</string>
+    <string name="err_locked">Dein Konto ist gesperrt.</string>
+    <string name="err_not_activated">Dein Konto ist noch nicht aktiviert.</string>
+    <string name="err_login">Login fehlgeschlagen: %1$s</string>
+    <string name="err_code">Code abgelehnt: %1$s</string>
+    <string name="err_network">Keine Verbindung zum VRN-Server.</string>
+    <string name="err_session_expired">Deine Anmeldung ist abgelaufen. Bitte melde dich erneut an.</string>
+
+    <!-- Settings -->
+    <string name="sec_appearance">Darstellung</string>
+    <string name="theme_system">System</string>
+    <string name="theme_light">Hell</string>
+    <string name="theme_dark">Dunkel</string>
+    <string name="sec_colors">Farben</string>
+    <string name="palette_lite">myVRN Lite</string>
+    <string name="palette_vrn">VRN Original</string>
+    <string name="palette_hint">myVRN Lite: Rot · VRN Original: Blau/Navy wie in der offiziellen App.</string>
+    <string name="sec_offline">Offline</string>
+    <string name="offline_title">Tickets offline speichern</string>
+    <string name="offline_desc">Speichert gültige Tickets inkl. QR-Code auf diesem Gerät, damit sie ohne Netz angezeigt werden können.</string>
+    <string name="offline_none">Keine Offline-Daten auf diesem Gerät.</string>
+    <plurals name="offline_state">
+        <item quantity="one">%1$d Ticket gespeichert · Stand %2$s</item>
+        <item quantity="other">%1$d Tickets gespeichert · Stand %2$s</item>
+    </plurals>
+    <string name="offline_clear">Offline-Daten löschen</string>
+    <string name="sec_dev">Entwickler</string>
+    <string name="debug_title">Debug-Modus</string>
+    <string name="debug_desc">Zeigt Rohdaten der API, Token-Details und Barcode-Optionen in den Ansichten.</string>
+    <string name="footer">myVRN Lite %1$s · inoffizieller Client</string>
+
+    <!-- Debug panels -->
+    <string name="dbg_panel">DEBUG · %1$s</string>
+    <string name="dbg_not_loaded">Noch nicht geladen.</string>
+    <plurals name="dbg_orders_status">
+        <item quantity="one">%1$s · %2$d Bestellung</item>
+        <item quantity="other">%1$s · %2$d Bestellungen</item>
+    </plurals>
+    <string name="dbg_barcode_status">Shop/QRCode → %1$s · Ticket-Id %2$s · Typ %3$s</string>
+    <string name="dbg_ticket_raw">Ticketdaten (ListOrdersV2)</string>
+    <string name="dbg_source">Quelle: %1$s</string>
+    <string name="dbg_b64">base64 als Bytes</string>
+    <string name="dbg_token_status">Status</string>
+    <string name="dbg_token_valid">gültig</string>
+    <string name="dbg_token_expired">abgelaufen</string>
+    <string name="dbg_token_expires">Läuft ab in</string>
+    <string name="dbg_seconds">%1$d s</string>
+    <string name="dbg_scope">Scope</string>
+    <string name="dbg_refresh_token">Refresh-Token</string>
+    <string name="dbg_yes">ja</string>
+    <string name="dbg_no">nein</string>
+    <string name="dbg_token_refresh">Token erneuern</string>
+    <string name="dbg_claims_access">Access-Token Claims (unverifiziert)</string>
+    <string name="dbg_claims_id">ID-Token Claims</string>
+</resources>
