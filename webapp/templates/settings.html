@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+{% import "_macros.html" as m with context %}
+{% block content %}
+{% if note %}<div class="alert ok">{{ note }}</div>{% endif %}
+
+<h2>Darstellung</h2>
+<div class="panel">
+  <form method="post" action="{{ url_for('settings') }}" class="seg" role="group" aria-label="Design"><input type="hidden" name="_csrf" value="{{ csrf_token }}">
+    {% for key, label in [('system', 'System'), ('light', 'Hell'), ('dark', 'Dunkel')] %}
+      <button type="submit" name="theme" value="{{ key }}" class="{{ 'on' if theme == key }}">{{ label }}</button>
+    {% endfor %}
+  </form>
+</div>
+
+<h2>Farben</h2>
+<div class="panel">
+  <form method="post" action="{{ url_for('settings') }}" class="seg" role="group" aria-label="Farbschema"><input type="hidden" name="_csrf" value="{{ csrf_token }}">
+    {% for key, label in [('lite', 'myVRN Lite'), ('vrn', 'VRN Original')] %}
+      <button type="submit" name="palette" value="{{ key }}" class="{{ 'on' if palette == key }}">{{ label }}</button>
+    {% endfor %}
+  </form>
+  <div class="hint">myVRN Lite: Rot · VRN Original: Blau/Navy wie in der offiziellen App.</div>
+</div>
+
+<h2>Offline</h2>
+<div class="panel">
+  <form method="post" action="{{ url_for('settings') }}" class="setting"><input type="hidden" name="_csrf" value="{{ csrf_token }}">
+    <div class="grow">
+      <div class="t">Tickets offline speichern</div>
+      <div class="s">Speichert gültige Tickets inkl. QR-Code auf diesem Gerät, damit sie ohne Netz angezeigt werden können.</div>
+    </div>
+    <button type="submit" name="offline" value="{{ '0' if offline_on else '1' }}" class="switch{{ ' on' if offline_on }}"
+            role="switch" aria-checked="{{ 'true' if offline_on else 'false' }}" aria-label="Tickets offline speichern"></button>
+  </form>
+  <div class="hint" id="offline-state">Keine Offline-Daten auf diesem Gerät.</div>
+  <button class="btn small outline" type="button" id="offline-clear">Offline-Daten löschen</button>
+</div>
+
+<h2>Entwickler</h2>
+<div class="panel">
+  <form method="post" action="{{ url_for('settings') }}" class="setting"><input type="hidden" name="_csrf" value="{{ csrf_token }}">
+    <div class="grow">
+      <div class="t">Debug-Modus</div>
+      <div class="s">Zeigt Rohdaten, Token, alternative Logins, Konfiguration und einen Request-Probe in den Ansichten.</div>
+    </div>
+    <button type="submit" name="debug" value="{{ '0' if debug else '1' }}" class="switch{{ ' on' if debug }}"
+            role="switch" aria-checked="{{ 'true' if debug else 'false' }}" aria-label="Debug-Modus"></button>
+  </form>
+</div>
+
+{% if public_mode %}
+  {% call m.debug_panel('LAN-Tools') %}
+    <div class="hint">Request-Probe, OIDC-Konfiguration und Remote-WebView sind im öffentlichen Modus deaktiviert
+      (<code>PUBLIC_MODE=0</code> nur im vertrauenswürdigen Heimnetz).</div>
+  {% endcall %}
+{% else %}
+{% call m.debug_panel('OIDC-Konfiguration') %}
+  <div id="config"></div>
+  <form method="post" action="{{ url_for('discover') }}"><input type="hidden" name="_csrf" value="{{ csrf_token }}">
+    <button class="btn small outline" type="submit">Discovery-Dokument laden ↻</button>
+  </form>
+  <form method="post" action="{{ url_for('config') }}"><input type="hidden" name="_csrf" value="{{ csrf_token }}">
+    {% for key, labeltext in [
+        ('base','Base URL'),('authorize_path','Authorize path'),('token_path','Token path'),
+        ('discovery_path','Discovery path'),('client_id','client_id'),('redirect_uri','redirect_uri'),
+        ('scope','scope'),('organization','organization'),('client_usage','clientUsage'),
+        ('app_type','appType'),('prompt','prompt'),('ui_locales','ui_locales')] %}
+      <div class="field"><label for="{{ key }}">{{ labeltext }}</label>
+        <input type="text" id="{{ key }}" name="{{ key }}" value="{{ cfg[key] }}"></div>
+    {% endfor %}
+    <button class="btn small" type="submit">Speichern</button>
+  </form>
+  {% if session_discovery %}<pre>{{ session_discovery|pretty }}</pre>{% endif %}
+{% endcall %}
+
+{% call m.debug_panel('Request-Probe', open=true) %}
+  <div id="probe"></div>
+  <form method="post" action="{{ url_for('probe') }}"><input type="hidden" name="_csrf" value="{{ csrf_token }}">
+    <div class="row">
+      <select name="method" style="max-width:90px"><option>GET</option><option>POST</option></select>
+      <input type="url" name="url" placeholder="https://shop.myvrn.de/..." style="flex:1">
+    </div>
+    <textarea name="body" placeholder='JSON-Body (optional), z. B. {"Id": 123}' style="margin-top:8px"></textarea>
+    <button class="btn small" type="submit" style="margin-top:6px">Mit Bearer-Token senden</button>
+  </form>
+  <div class="row">
+    {% for meth, url in suggestions %}
+      <form method="post" action="{{ url_for('probe') }}"><input type="hidden" name="_csrf" value="{{ csrf_token }}">
+        <input type="hidden" name="method" value="{{ meth }}"><input type="hidden" name="url" value="{{ url }}">
+        <button class="btn small outline" type="submit">{{ meth }} {{ url.split('.de/')[1][:38] }}</button>
+      </form>
+    {% endfor %}
+  </div>
+  {% if probe %}
+    <div class="hint">{{ probe.status }}</div>
+    <pre>{{ probe.request }}</pre>
+    <pre>{{ probe.json|pretty if probe.json is defined else probe.text }}</pre>
+  {% endif %}
+{% endcall %}
+
+{% endif %}
+
+<p class="center hint" style="margin-top:24px">myVRN Lite · inoffizieller Entwicklungs-Client</p>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='ticket.js') }}"></script>
+<script>
+  (function () {
+    var state = document.getElementById("offline-state");
+    function show() {
+      var s = VRN.loadOffline();
+      if (s && s.tickets) {
+        var d = new Date(s.savedAt);
+        state.textContent = s.tickets.length + " Ticket(s) gespeichert · Stand " + d.toLocaleString("de-DE");
+      } else {
+        state.textContent = "Keine Offline-Daten auf diesem Gerät.";
+      }
+    }
+    {% if not offline_on %}VRN.clearOffline();{% endif %}
+    document.getElementById("offline-clear").onclick = function () { VRN.clearOffline(); show(); };
+    show();
+  })();
+</script>
+{% endblock %}

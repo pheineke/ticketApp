@@ -1,0 +1,31 @@
+services:
+  vrn-oidc:
+    build: .
+    image: vrn-oidc-helper
+    container_name: vrn-oidc-helper
+    # Only reachable from this machine: the Cloudflare tunnel (vrn.heineke.cc ->
+    # localhost:8783) is the public entry point. For LAN-only development use
+    # PUBLIC_MODE=0 and "8783:8080" (plus "8784:6080" for the remote WebView).
+    ports:
+      - "127.0.0.1:8783:8080"
+    env_file: .env          # FLASK_SECRET, ACCESS_PASSWORD (not in git)
+    volumes:
+      # Persistent logins ("Angemeldet bleiben"): encrypted refresh tokens, see remember.py.
+      - ./data:/data
+    environment:
+      VRN_BASE: "https://shop.myvrn.de"
+      VRN_CLIENT_ID: "vrn"
+      VRN_REDIRECT_URI: "vrn://oauth/callback"
+      VRN_SCOPE: "ticketing offline_access"
+      # Public hardening: no request probe / config editor / remote WebView,
+      # Secure cookies, trust one proxy hop (cloudflared) for client IP + scheme.
+      PUBLIC_MODE: "1"
+      COOKIE_SECURE: "1"
+      TRUSTED_PROXIES: "1"
+    shm_size: "512mb"   # Chromium needs more than Docker's 64 MB default (LAN mode only)
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request;urllib.request.urlopen('http://127.0.0.1:8080/healthz')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3

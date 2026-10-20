@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% import "_macros.html" as m with context %}
+{% block actions %}
+  {% if meta.logged_in %}<a class="iconbtn" href="{{ url_for('account', reload=1) }}" aria-label="Aktualisieren" title="Aktualisieren">↻</a>{% endif %}
+{% endblock %}
+{% block content %}
+{% if error %}<div class="alert bad">{{ error }}</div>{% endif %}
+
+{% if meta.logged_in %}
+  {% set p = profile or {} %}
+  {% set full_name = [p.title or '', p.first or '', p.last or '']|join(' ')|trim %}
+  {% set email = p.email or meta.claims.get('email') %}
+  <h1 class="hello">Hallo{% if p.first %} {{ p.first }}{% endif %}!</h1>
+  <div class="panel profile-card">
+    <span class="avatar" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><path d="M12 12a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9Zm0 2.25c-3 0-9 1.5-9 4.5V21h18v-2.25c0-3-6-4.5-9-4.5Z"/></svg>
+    </span>
+    <div class="grow">
+      <div class="pname">{{ full_name or email or 'Mein Konto' }}</div>
+      {% if email %}<div class="pmail">{{ email }}</div>{% endif %}
+    </div>
+  </div>
+
+  {% if p.dob or p.street or p.city or p.phone %}
+  <div class="panel">
+    <table class="kv">
+      {% if p.dob %}<tr><td>Geburtsdatum</td><td>{{ p.dob|dt(false) }}</td></tr>{% endif %}
+      {% if p.street or p.city %}<tr><td>Adresse</td><td>{{ p.street or '' }}<br>{{ p.zip or '' }} {{ p.city or '' }}</td></tr>{% endif %}
+      {% if p.phone %}<tr><td>Telefon</td><td>{{ p.phone }}</td></tr>{% endif %}
+    </table>
+  </div>
+  {% endif %}
+  {% if not profile %}<div class="alert info">Profildaten konnten nicht geladen werden{% if profile_rec.calls %} ({{ profile_rec.calls[-1].status }}){% endif %}.</div>{% endif %}
+  <p class="hint center">{% if remembered %}Angemeldet bleiben ist auf diesem Gerät aktiv.{% else %}Du wirst nach einiger Zeit automatisch abgemeldet.{% endif %}</p>
+  <form method="post" action="{{ url_for('logout') }}"><input type="hidden" name="_csrf" value="{{ csrf_token }}"><button class="btn outline" type="submit">Abmelden</button></form>
+  <p class="center hint"><a href="https://shop.myvrn.de/authentication/private?organization=vrn&client=vrn" target="_blank" rel="noopener">Login Daten ändern ↗</a></p>
+
+  {% call m.debug_panel('Token', open=true) %}
+    <table class="kv">
+      <tr><td>Status</td><td>{% if meta.expired %}abgelaufen{% else %}gültig{% endif %}</td></tr>
+      <tr><td>Läuft ab in</td><td>{{ meta.remaining if meta.remaining is not none else '—' }} s</td></tr>
+      <tr><td>Scope</td><td>{{ meta.scope or '—' }}</td></tr>
+      <tr><td>Refresh-Token</td><td>{{ 'ja' if meta.has_refresh else 'nein' }}</td></tr>
+      {% if meta.claims.get('sub') %}<tr><td>sub</td><td>{{ meta.claims.get('sub') }}</td></tr>{% endif %}
+    </table>
+    <form method="post" action="{{ url_for('refresh') }}"><input type="hidden" name="_csrf" value="{{ csrf_token }}"><button class="btn small" type="submit">↻ Token erneuern</button></form>
+    <label class="lbl">Access-Token Claims (unverifiziert)</label><pre>{{ meta.claims|pretty }}</pre>
+    {% if meta.id_claims %}<label class="lbl">ID-Token Claims</label><pre>{{ meta.id_claims|pretty }}</pre>{% endif %}
+  {% endcall %}
+  {% call m.debug_panel('Profil') %}
+    <div class="hint">Quelle: {{ profile_rec.source or '—' }}</div>
+    {% for c in profile_rec.calls or [] %}
+      <div class="hint">{{ c.status }}</div>
+      <pre>{{ c.request }}</pre>
+      <pre>{{ c.json|pretty if c.json is defined else c.text }}</pre>
+    {% else %}<div class="hint">Noch nicht geladen.</div>{% endfor %}
+  {% endcall %}
+
+{% elif need_code %}
+  <div class="panel">
+    <h3>Bestätigungscode</h3>
+    <p class="hint">Wir haben dir einen Code an {% if email %}<b>{{ email }}</b>{% else %}deine E-Mail-Adresse{% endif %} geschickt.</p>
+    <form method="post" action="{{ url_for('login_direct_code') }}"><input type="hidden" name="_csrf" value="{{ csrf_token }}">
+      <div class="field"><input type="text" name="code" inputmode="numeric" autocomplete="one-time-code" placeholder="Code" required autofocus></div>
+      <button class="btn" type="submit">Bestätigen</button>
+    </form>
+    <form method="post" action="{{ url_for('login_cancel') }}" style="margin-top:10px"><input type="hidden" name="_csrf" value="{{ csrf_token }}"><button class="btn outline" type="submit">Abbrechen</button></form>
+  </div>
+
+{% else %}
+  <div class="center" style="padding:18px 0 22px">
+    <img class="only-light" src="{{ icon('vrn_logo.svg') }}" alt="VRN" style="height:52px">
+    <img class="only-dark" src="{{ url_for('static', filename='icons/vrn_logo_dark.svg') }}" alt="VRN" style="height:52px">
+  </div>
+  <form method="post" action="{{ url_for('login_direct') }}"><input type="hidden" name="_csrf" value="{{ csrf_token }}">
+    <div class="field"><label for="email">E-Mail <small>(erforderlich)</small></label>
+      <input type="email" id="email" name="email" value="{{ email or '' }}" autocomplete="username" placeholder="E-Mail" required></div>
+    <div class="field"><label for="password">Passwort <small>(erforderlich)</small></label>
+      <div class="pw"><input type="password" id="password" name="password" autocomplete="current-password" placeholder="Passwort" required>
+        <button type="button" onclick="var i=document.getElementById('password');i.type=i.type==='password'?'text':'password'">👁</button></div></div>
+    <label class="row" style="gap:8px;margin:0 0 14px"><input type="checkbox" name="remember" value="1" checked style="width:auto"> Angemeldet bleiben</label>
+    <button class="btn" type="submit">Einloggen</button>
+  </form>
+  <p class="center"><a href="https://shop.myvrn.de/authentication/forgot-password?organization=vrn&client=vrn" target="_blank" rel="noopener">Passwort vergessen?</a></p>
+{% endif %}
+
+{% if not meta.logged_in %}
+  {% call m.debug_panel('Alternative Logins') %}
+    {% if not public_mode %}
+    <form method="post" action="{{ url_for('login_remote') }}"><input type="hidden" name="_csrf" value="{{ csrf_token }}">
+      <button class="btn outline" type="submit">Remote WebView (Chromium + noVNC)</button>
+    </form>
+    <div class="hint">Emuliert die Android-WebView der App auf dem Pi; der vrn://-Callback wird automatisch abgefangen.</div>
+    {% endif %}
+    <div id="manual">
+      <label class="lbl">Manuell (Link öffnen, Callback einfügen)</label>
+      <form method="post" action="{{ url_for('login_start') }}"><input type="hidden" name="_csrf" value="{{ csrf_token }}"><button class="btn small outline" type="submit">① Login-Link erzeugen</button></form>
+      {% if pending_url %}
+        <p class="hint">② Auf einem Handy ohne myVRN-App öffnen und einloggen: <a href="{{ pending_url }}" target="_blank" rel="noopener">Login-Seite ↗</a></p>
+        <pre>{{ pending_url }}</pre>
+        <form method="post" action="{{ url_for('login_complete') }}" style="margin-top:8px"><input type="hidden" name="_csrf" value="{{ csrf_token }}">
+          <textarea name="callback" placeholder="vrn://oauth/callback?code=...&state=...">{{ callback_value or '' }}</textarea>
+          <button class="btn small" type="submit" style="margin-top:6px">③ Code einlösen</button>
+        </form>
+      {% endif %}
+    </div>
+  {% endcall %}
+{% endif %}
+{% endblock %}
+{% block scripts %}
+{% if request.args.get('loggedout') %}
+<script src="{{ url_for('static', filename='ticket.js') }}"></script>
+<script>VRN.clearOffline();</script>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% import "_macros.html" as m with context %}
+{% block actions %}<a class="iconbtn" href="{{ url_for('ticket_detail', tid=t.id, reload=1) }}" aria-label="Neu laden" title="Neu laden">↻</a>{% endblock %}
+{% block content %}
+<div class="ticket-detail">
+  <div class="head">
+    <div class="name">{{ t.name }}</div>
+    <div class="sub">
+      {% if t.group == 'expired' %}Abgelaufen am {{ t.valid_to|dt }}{% elif t.group == 'future' %}Gültig ab {{ t.valid_from|dt }}{% else %}Gültig bis {{ t.valid_to|dt }}{% endif %}
+      {% if t.area %} · {{ t.area }}{% endif %}{% if t.price_level %} · Preisstufe {{ t.price_level }}{% endif %}
+    </div>
+  </div>
+
+  {% if qr.code_data %}
+    <div class="codebox" id="codebox" role="button" tabindex="0" aria-label="Code drehen" title="Antippen zum Drehen">
+      {% if qr.kind in ('png', 'jpeg') %}
+        <img class="code-el" alt="Ticket QR Code" src="data:image/{{ qr.kind }};base64,{{ qr.code_data }}">
+      {% elif qr.kind == 'svg' %}
+        <img class="code-el" alt="Ticket QR Code" src="data:image/svg+xml;base64,{{ qr.code_data }}">
+      {% else %}
+        <canvas id="bc" class="code-el" aria-label="Ticket QR Code"></canvas>
+      {% endif %}
+      <div class="codelabel" id="bcerr"></div>
+    </div>
+    <div class="counter"><span id="counter">00:00</span>
+      <button type="button" onclick="document.getElementById('sheet').hidden=false">Was bedeutet der Zähler? ⓘ</button></div>
+  {% else %}
+    <div class="alert bad">Kein QR Code verfügbar.{% if qr.error %} {{ qr.error }}{% endif %}</div>
+  {% endif %}
+
+  <table class="kv">
+    {% if t.holder %}<tr><td>Ticketinhaber</td><td>{{ t.holder }}</td></tr>{% endif %}
+    {% if t.dob %}<tr><td>Geburtsdatum</td><td>{{ t.dob|dt(false) }}</td></tr>{% endif %}
+    <tr><td>Gültigkeit</td><td>{{ t.valid_from|dt(false) }} – {{ t.valid_to|dt }}</td></tr>
+    {% if t.number %}<tr><td>Ticketnummer</td><td>{{ t.number }}</td></tr>{% endif %}
+  </table>
+
+  {% call m.debug_panel('Barcode') %}
+    {% if qr.code_data and qr.kind == 'data' %}
+      <div class="row">
+        <select id="sym" style="max-width:140px"><option value="azteccode">Aztec</option><option value="qrcode">QR</option></select>
+        <label class="row" style="gap:6px"><input type="checkbox" id="b64"> base64 → bytes</label>
+      </div>
+    {% endif %}
+    <div class="hint">Shop/QRCode → {{ qr.status }} · Ticket-Id {{ t.id }} · Typ {{ qr.kind }}</div>
+    <pre>{{ qr.request }}</pre>
+    <pre>{{ qr.json|pretty if qr.json is defined else qr.text }}</pre>
+  {% endcall %}
+  {% call m.debug_panel('Ticketdaten (ListOrdersV2)') %}
+    <pre>{{ t.raw|pretty }}</pre>
+  {% endcall %}
+</div>
+
+<div class="sheet" id="sheet" hidden>
+  <h3>Was bedeutet der Zähler?</h3>
+  <p>Der Zähler läuft seit dem Öffnen des Tickets hoch. So kann das Kontrollpersonal ein live angezeigtes Ticket von einem Screenshot unterscheiden.</p>
+  <button class="btn" type="button" onclick="document.getElementById('sheet').hidden=true">Verstanden</button>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{% if qr.code_data and qr.kind == 'data' %}<script src="{{ url_for('static', filename='vendor/bwip-js-min.js') }}"></script>{% endif %}
+<script src="{{ url_for('static', filename='ticket.js') }}"></script>
+<script>
+  VRN.countUp(document.getElementById("counter"));
+  VRN.spin(document.getElementById("codebox"));
+  VRN.wake();
+  {% if offline_on %}VRN.refreshOffline("{{ url_for('offline_data') }}");{% endif %}
+  {% if qr.code_data and qr.kind == 'data' %}
+  (function () {
+    var code = {{ qr.code_data|tojson }};
+    var sym = document.getElementById("sym"), b64 = document.getElementById("b64");
+    var err = document.getElementById("bcerr");
+    var opts = VRN.barcodeOpts(code);
+    if (sym) { sym.value = opts.sym; b64.checked = opts.b64; }
+    function draw() {
+      if (sym) { opts = { sym: sym.value, b64: b64.checked }; VRN.saveBarcodeOpts(opts); }
+      VRN.drawBarcode("bc", code, opts, err);
+    }
+    if (sym) { sym.onchange = draw; b64.onchange = draw; }
+    draw();
+  })();
+  {% endif %}
+</script>
+{% endblock %}

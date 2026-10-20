@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="de" data-palette="{{ palette }}"{% if theme != 'system' %} data-theme="{{ theme }}"{% endif %}>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="{{ '#0098d8' if palette == 'vrn' else '#d80019' }}">
+  <title>{% if title %}{{ title }} · {% endif %}myVRN Lite</title>
+  <meta name="application-name" content="myVRN Lite">
+  <meta name="apple-mobile-web-app-title" content="myVRN Lite">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="icon" href="{{ icon('icon-192.png') }}">
+  <link rel="apple-touch-icon" href="{{ icon('icon-192.png') }}">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="app">
+  {% if not hide_nav %}
+  <header class="appbar">
+    {% if back %}
+      <a class="iconbtn" href="{{ back }}" aria-label="Zurück">←</a>
+    {% else %}
+      <button class="iconbtn" type="button" aria-label="Menü" onclick="document.body.classList.add('nav-open')"><span class="ic menu"></span></button>
+    {% endif %}
+    <span class="title">{{ title or 'myVRN' }}</span>
+    {% if debug %}<span class="dbg-flag">DEBUG</span>{% endif %}
+    {% block actions %}{% endblock %}
+  </header>
+  {% endif %}
+
+  <main class="content">
+    {% block content %}{% endblock %}
+  </main>
+</div>
+
+{% if not hide_nav %}
+<div class="scrim" onclick="document.body.classList.remove('nav-open')"></div>
+<nav class="drawer" aria-label="Navigation">
+  <div class="brand">
+    <img src="{{ url_for('static', filename='icons/vrn_logo_dark.svg') }}" alt="VRN">
+    <div class="appname">myVRN Lite</div>
+    {% if meta.logged_in %}<small>angemeldet</small>{% else %}<small>nicht angemeldet</small>{% endif %}
+  </div>
+  <a class="navrow{{ ' on' if active == 'tickets' }}" href="{{ url_for('tickets') }}">
+    <img src="{{ icon('home_navigator_bulletin_board_page.svg') }}" alt="">
+    <div><div class="t">Meine Tickets</div><div class="s">Meine aktuell gültigen Tickets.</div></div></a>
+  <a class="navrow{{ ' on' if active == 'account' }}" href="{{ url_for('account') }}">
+    <img src="{{ icon('home_navigator_mobility_account_page.svg') }}" alt="">
+    <div><div class="t">VRN Konto</div><div class="s">Meine Benutzerdaten und Login.</div></div></a>
+  <a class="navrow{{ ' on' if active == 'settings' }}" href="{{ url_for('settings') }}">
+    <img src="{{ icon('home_navigator_settings_page.svg') }}" alt="">
+    <div><div class="t">Einstellungen</div><div class="s">Meine individuellen Einstellungen.</div></div></a>
+  <a class="navrow" href="https://www.vrn.de/service/kontakt/feedback/index.html" target="_blank" rel="noopener">
+    <img src="{{ icon('home_navigator_help_and_contact_page.svg') }}" alt="">
+    <div><div class="t">Hilfe &amp; Kontakt</div></div></a>
+  <a class="navrow" href="https://www.vrn.de/_inc/app/agb/" target="_blank" rel="noopener">
+    <img src="{{ icon('home_navigator_privacy_page.svg') }}" alt="">
+    <div><div class="t">Datenschutz &amp; AGB</div></div></a>
+  <a class="navrow" href="https://www.vrn.de/_inc/app/impressum/index.html" target="_blank" rel="noopener">
+    <img src="{{ icon('home_navigator_imprint_page.svg') }}" alt="">
+    <div><div class="t">Impressum</div></div></a>
+</nav>
+
+<nav class="tabbar" aria-label="Hauptnavigation">
+  <div class="inner">
+    <a class="{{ 'on' if active == 'tickets' }}" href="{{ url_for('tickets') }}"><span class="ic ticket"></span>Tickets</a>
+    <a class="{{ 'on' if active == 'account' }}" href="{{ url_for('account') }}"><span class="ic account"></span>Konto</a>
+    <a class="{{ 'on' if active == 'settings' }}" href="{{ url_for('settings') }}"><span class="ic gear"></span>Einstellen</a>
+  </div>
+</nav>
+{% endif %}
+{% block scripts %}{% endblock %}
+<script>
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", function () { navigator.serviceWorker.register("/sw.js").catch(function () {}); });
+  }
+</script>
+</body>
+</html>

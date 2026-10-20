@@ -1,0 +1,21 @@
+# Official APK (third-party, large) — analysed locally, never committed
+*.apk
+# Secrets and runtime data
+.env
+webapp/.env
+webapp/data/
+# Build / test leftovers
+__pycache__/
+*.pyc
+.build.log
+.ck
+.shot.png
+.venv/
+# Android
+.gradle/
+build/
+local.properties
+*.keystore
+*.jks
+.idea/
+*.iml

@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+<p class="hint">Chromium auf dem Pi, getarnt als Android-WebView der myVRN-App. Melde dich unten an — der
+  <code>vrn://oauth/callback</code> wird automatisch abgefangen.</p>
+<div id="status" class="alert info">Status: {{ status.state }} {{ status.detail }}</div>
+<iframe class="vnc" src="{{ vnc_url }}" title="Remote-Browser"></iframe>
+<p class="hint">Lädt nicht? <a href="{{ vnc_url }}" target="_blank" rel="noopener">Viewer in neuem Tab öffnen ↗</a></p>
+<form method="post" action="{{ url_for('login_remote_stop') }}"><input type="hidden" name="_csrf" value="{{ csrf_token }}"><button class="btn outline" type="submit">Abbrechen</button></form>
+{% endblock %}
+{% block scripts %}
+<script>
+  (function () {
+    var box = document.getElementById("status");
+    function poll() {
+      fetch("{{ url_for('login_remote_status') }}").then(function (r) { return r.json(); }).then(function (s) {
+        box.textContent = "Status: " + s.state + (s.detail ? " — " + s.detail : "");
+        box.className = "alert " + (s.state === "error" ? "bad" : s.state === "done" ? "ok" : "info");
+        if (s.state === "done") { location.href = "{{ url_for('tickets') }}"; return; }
+        if (s.state !== "error" && s.state !== "idle") setTimeout(poll, 1500);
+      }).catch(function () { setTimeout(poll, 3000); });
+    }
+    poll();
+  })();
+</script>
+{% endblock %}

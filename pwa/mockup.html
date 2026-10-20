@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>myVRN Lite Mockup</title>
+<style>
+  :root {
+    --vrn-blue: #0098d8; --vrn-navy: #002d59;
+    --bg: #f4f4f4; --surface: #ffffff; --text: #414141; --text-heading: rgba(0,0,0,.85);
+    --text-muted: #767676; --divider: rgba(5,5,5,.08); --hover: #eeeeee;
+    --success: #52c41a; --warning: #fa8c16; --error: #f5222d; --dticket: #fcbe00;
+    --radius: 4px; --pad: 16px;
+    --font: Roboto, -apple-system, "Segoe UI", "Noto Sans", Arial, sans-serif;
+    --page: #d9dde2;
+  }
+  :root[data-theme=dark] {
+    --bg: #272727; --surface: #414141; --text: #ffffff; --text-heading: #ffffff;
+    --text-muted: #aaaaaa; --divider: rgba(255,255,255,.1); --hover: #4a4a4a; --page: #181818;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); font: 14px/1.45 var(--font); color: var(--text); }
+  header.doc { max-width: 1500px; margin: 0 auto; padding: 20px 16px 4px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+  header.doc h1 { font-size: 18px; margin: 0; color: var(--text-heading); }
+  header.doc p { margin: 0; color: var(--text-muted); flex: 1 1 300px; }
+  header.doc button { font: inherit; padding: 6px 12px; border-radius: var(--radius); border: 1px solid var(--text-muted); background: var(--surface); color: var(--text); cursor: pointer; }
+  .screens { max-width: 1500px; margin: 0 auto; padding: 16px; display: flex; gap: 24px; flex-wrap: wrap; justify-content: center; }
+  figure { margin: 0; }
+  figcaption { text-align: center; color: var(--text-muted); font-size: 12px; margin-top: 8px; }
+
+  /* Phone */
+  .phone { width: 300px; height: 620px; background: var(--bg); border-radius: 26px; overflow: hidden;
+           box-shadow: 0 0 0 8px #111, 0 16px 40px rgba(0,0,0,.25); display: flex; flex-direction: column; position: relative; }
+  .status { height: 22px; background: var(--surface); font-size: 11px; display: flex; justify-content: space-between; padding: 3px 14px; color: var(--text); flex: none; }
+  .appbar { height: 52px; background: var(--surface); display: flex; align-items: center; gap: 12px; padding: 0 12px; border-bottom: 1px solid var(--divider); flex: none; }
+  .appbar .title { font-size: 18px; font-weight: 500; color: var(--vrn-navy); flex: 1; }
+  :root[data-theme=dark] .appbar .title { color: #fff; }
+  .content { flex: 1; overflow: hidden; padding: 12px; }
+  .tabbar { height: 56px; background: var(--surface); border-top: 1px solid var(--divider); display: flex; flex: none; }
+  .tabbar a { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-size: 11px; color: var(--text-muted); text-decoration: none; }
+  .tabbar a.on { color: var(--vrn-blue); font-weight: 500; }
+
+  /* Icons tinted via mask so they follow currentColor */
+  .ic { width: 24px; height: 24px; display: inline-block; background: currentColor; flex: none;
+        -webkit-mask: var(--src) center / contain no-repeat; mask: var(--src) center / contain no-repeat; }
+  .ic.menu    { --src: url(assets/icons/menu.svg); }
+  .ic.ticket  { --src: url(assets/icons/ticket.svg); }
+  .ic.account { --src: url(assets/icons/home_navigator_mobility_account_page.svg); }
+  .ic.gear    { --src: url(assets/icons/settings.svg); }
+  .ic.qr      { --src: url(assets/icons/qr_code.svg); }
+
+  /* Controls */
+  .btn { display: block; width: 100%; padding: 11px; border: 0; border-radius: var(--radius); background: var(--vrn-blue); color: #fff; font: 500 15px var(--font); text-align: center; }
+  .btn.outline { background: transparent; color: var(--vrn-blue); border: 1px solid var(--vrn-blue); }
+  .field { margin-bottom: 14px; }
+  .field label { display: block; font-size: 13px; margin-bottom: 4px; color: var(--text-heading); }
+  .field label small { color: var(--error); font-size: 11px; }
+  .input { width: 100%; padding: 9px 10px; border: 1px solid var(--text-muted); border-radius: var(--radius); background: var(--surface); color: var(--text-muted); font: 14px var(--font); }
+  .link { color: var(--vrn-blue); text-decoration: underline; font-size: 13px; }
+  .section { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--text-muted); margin: 14px 2px 6px; }
+  .section:first-child { margin-top: 2px; }
+
+  /* Ticket card */
+  .card { background: var(--surface); border: 1px solid var(--divider); border-radius: var(--radius); padding: 12px; display: flex; gap: 12px; align-items: center; margin-bottom: 8px; }
+  .card .logo { width: 40px; height: 40px; flex: none; display: grid; place-items: center; }
+  .card .logo img { width: 30px; }
+  .card .logo.round { border-radius: 50%; background: var(--vrn-blue); color: #fff; }
+  .card .name { font-size: 15px; font-weight: 600; color: var(--text-heading); }
+  .card .meta { font-size: 12px; color: var(--text-muted); }
+  .card .grow { flex: 1; min-width: 0; }
+  .chip { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 10px; white-space: nowrap; }
+  .chip.ok { background: rgba(82,196,26,.14); color: #389e0d; }
+  .chip.future { background: rgba(0,152,216,.12); color: var(--vrn-blue); }
+  .chip.old { background: var(--hover); color: var(--text-muted); }
+  .chev { color: var(--text-muted); font-size: 18px; }
+  .card.expired { opacity: .6; }
+
+  /* Ticket detail */
+  .detail { background: #fff; color: #414141; }
+  .detail .head { background: var(--vrn-blue); color: #fff; padding: 14px 16px; }
+  .detail .head .name { font-size: 18px; font-weight: 600; }
+  .detail .head .sub { font-size: 12px; opacity: .9; }
+  .qrwrap { padding: 16px 28px 6px; text-align: center; }
+  .qrwrap canvas { width: 100%; image-rendering: pixelated; }
+  .qrlabel { font-size: 11px; color: #767676; }
+  .counter { font: 600 22px/1 ui-monospace, "Roboto Mono", monospace; color: var(--vrn-navy); text-align: center; margin: 8px 0 2px; }
+  .counter small { font: 11px var(--font); color: #767676; display: block; margin-top: 3px; }
+  table.kv { width: calc(100% - 32px); margin: 10px 16px; border-collapse: collapse; font-size: 13px; }
+  table.kv td { padding: 6px 0; border-bottom: 1px solid rgba(5,5,5,.06); }
+  table.kv td:first-child { color: #767676; }
+  table.kv td:last-child { text-align: right; font-weight: 500; }
+
+  /* Navigator */
+  .navrow { display: flex; gap: 12px; align-items: center; padding: 10px 4px; border-bottom: 1px solid var(--divider); }
+  .navrow img { width: 36px; height: 36px; flex: none; }
+  :root[data-theme=dark] .navrow img { filter: invert(1) hue-rotate(180deg); }
+  .navrow .t { font-weight: 600; color: var(--text-heading); }
+  .navrow .s { font-size: 12px; color: var(--text-muted); }
+  .drawer-logo { padding: 18px 16px; background: linear-gradient(160deg, var(--vrn-blue), var(--vrn-navy)); }
+  .drawer-logo img { height: 34px; }
+
+  /* Splash / login */
+  .splash { background: linear-gradient(180deg, #0098d8, #002d59); display: grid; place-items: center; }
+  .splash img { width: 150px; }
+  .login-logo { text-align: center; padding: 18px 0 22px; }
+  .login-logo img { height: 46px; }
+  :root[data-theme=dark] .login-logo img { content: url(assets/icons/vrn_logo_dark.svg); }
+
+  .account-card { background: var(--surface); border: 1px solid var(--divider); border-radius: var(--radius); padding: 14px; margin-bottom: 12px; }
+  .account-card .k { font-size: 12px; color: var(--text-muted); }
+  .account-card .v { margin-bottom: 8px; color: var(--text-heading); }
+</style>
+</head>
+<body>
+<header class="doc">
+  <h1>myVRN Lite: layout mockup</h1>
+  <p>Colours, icons and texts from the APK and VRN theme tokens. Sample data only. Private use only.</p>
+  <button type="button" id="theme">Dark mode</button>
+</header>
+
+<main class="screens">
+
+  <!-- 1 Splash -->
+  <figure>
+    <div class="phone splash"><img src="assets/icons/vrn_logo_dark.svg" alt="VRN"></div>
+    <figcaption>Splash · gradient #0098d8 → #002d59</figcaption>
+  </figure>
+
+  <!-- 2 Login -->
+  <figure>
+    <div class="phone">
+      <div class="status"><span>9:41</span><span>▮▮▮ 87%</span></div>
+      <div class="appbar"><span class="title">Einloggen</span></div>
+      <div class="content" style="padding:16px">
+        <div class="login-logo"><img src="assets/icons/vrn_logo.svg" alt="VRN"></div>
+        <div class="field"><label>E-Mail <small>(erforderlich)</small></label><div class="input">E-Mail</div></div>
+        <div class="field"><label>Passwort <small>(erforderlich)</small></label><div class="input">Passwort</div></div>
+        <button class="btn" type="button">Einloggen</button>
+        <p style="text-align:center;margin:14px 0"><span class="link">Passwort vergessen?</span></p>
+        <button class="btn outline" type="button">Hochschul-Login</button>
+      </div>
+    </div>
+    <figcaption>Login · step 2 (email code) follows the same pattern</figcaption>
+  </figure>
+
+  <!-- 3 My tickets -->
+  <figure>
+    <div class="phone">
+      <div class="status"><span>9:41</span><span>▮▮▮ 87%</span></div>
+      <div class="appbar"><span class="ic menu"></span><span class="title">Tickets</span></div>
+      <div class="content">
+        <div class="section">Aktuell gültig</div>
+        <div class="card">
+          <div class="logo"><img src="assets/icons/deutschlandticket.svg" alt=""></div>
+          <div class="grow"><div class="name">Deutschlandticket</div><div class="meta">Gültig bis 31.10.2026, 23:59</div></div>
+          <span class="chip ok">Gültig</span><span class="chev">›</span>
+        </div>
+        <div class="section">Zukünftig gültig</div>
+        <div class="card">
+          <div class="logo"><img src="assets/icons/deutschlandticket.svg" alt=""></div>
+          <div class="grow"><div class="name">Deutschlandticket</div><div class="meta">01.11. – 30.11.2026</div></div>
+          <span class="chip future">ab 01.11.</span><span class="chev">›</span>
+        </div>
+        <div class="section">Abgelaufen</div>
+        <div class="card expired">
+          <div class="logo round"><span class="ic ticket" style="width:22px;height:22px"></span></div>
+          <div class="grow"><div class="name">Einzelfahrt · Preisstufe 2</div><div class="meta">12.10.2026, 08:14</div></div>
+          <span class="chip old">Abgelaufen</span>
+        </div>
+      </div>
+      <nav class="tabbar">
+        <a class="on"><span class="ic ticket"></span>Tickets</a>
+        <a><span class="ic account"></span>Konto</a>
+        <a><span class="ic gear"></span>Einstellen</a>
+      </nav>
+    </div>
+    <figcaption>My tickets · groups as in MyTicketsGroupType</figcaption>
+  </figure>
+
+  <!-- 4 Ticket detail -->
+  <figure>
+    <div class="phone detail">
+      <div class="status" style="background:#fff;color:#414141"><span>9:41</span><span>☀ max</span></div>
+      <div class="appbar" style="background:#fff;border-color:rgba(5,5,5,.08)"><span style="font-size:20px;color:#414141">←</span><span class="title" style="color:#002d59">Ticketdetails</span></div>
+      <div class="head">
+        <div class="name">Deutschlandticket</div>
+        <div class="sub">Gültig bis 31.10.2026, 23:59 · Deutschlandweit</div>
+      </div>
+      <div class="qrwrap"><canvas id="qr" width="33" height="33"></canvas><div class="qrlabel">Ticket QR Code (placeholder)</div></div>
+      <div class="counter" id="counter">00:00<small>seit Öffnen ⓘ</small></div>
+      <table class="kv">
+        <tr><td>Ticketinhaber</td><td>Max Mustermann</td></tr>
+        <tr><td>Geburtsdatum</td><td>01.01.2000</td></tr>
+        <tr><td>Gültig ab</td><td>01.10.2026</td></tr>
+        <tr><td>Ticketnummer</td><td>1234-5678</td></tr>
+      </table>
+    </div>
+    <figcaption>Ticket detail · always light, max brightness, count-up timer</figcaption>
+  </figure>
+
+  <!-- 5 Account -->
+  <figure>
+    <div class="phone">
+      <div class="status"><span>9:41</span><span>▮▮▮ 87%</span></div>
+      <div class="appbar"><span class="ic menu"></span><span class="title">Konto</span></div>
+      <div class="content">
+        <div class="account-card">
+          <div class="k">Eingeloggt als:</div><div class="v">max@example.org</div>
+          <div class="k">Name</div><div class="v">Max Mustermann</div>
+          <div class="k">Geburtsdatum</div><div class="v">01.01.2000</div>
+        </div>
+        <button class="btn outline" type="button">Abmelden</button>
+      </div>
+      <nav class="tabbar">
+        <a><span class="ic ticket"></span>Tickets</a>
+        <a class="on"><span class="ic account"></span>Konto</a>
+        <a><span class="ic gear"></span>Einstellen</a>
+      </nav>
+    </div>
+    <figcaption>Account</figcaption>
+  </figure>
+
+  <!-- 6 Navigator -->
+  <figure>
+    <div class="phone">
+      <div class="status"><span>9:41</span><span>▮▮▮ 87%</span></div>
+      <div class="drawer-logo"><img src="assets/icons/vrn_logo_dark.svg" alt="VRN"></div>
+      <div class="content">
+        <div class="navrow"><img src="assets/icons/home_navigator_bulletin_board_page.svg" alt=""><div><div class="t">Meine Tickets</div><div class="s">Meine aktuell gültigen Tickets.</div></div></div>
+        <div class="navrow"><img src="assets/icons/home_navigator_mobility_account_page.svg" alt=""><div><div class="t">VRN Konto</div><div class="s">Meine Benutzerdaten und Login.</div></div></div>
+        <div class="navrow"><img src="assets/icons/home_navigator_settings_page.svg" alt=""><div><div class="t">Einstellungen</div><div class="s">Meine individuellen Einstellungen.</div></div></div>
+        <div class="navrow"><img src="assets/icons/home_navigator_help_and_contact_page.svg" alt=""><div><div class="t">Hilfe &amp; Kontakt</div></div></div>
+        <div class="navrow"><img src="assets/icons/home_navigator_privacy_page.svg" alt=""><div><div class="t">Datenschutz &amp; AGB</div></div></div>
+        <div class="navrow"><img src="assets/icons/home_navigator_imprint_page.svg" alt=""><div><div class="t">Impressum</div></div></div>
+      </div>
+    </div>
+    <figcaption>Home navigator (sidebar)</figcaption>
+  </figure>
+</main>
+
+<script>
+  // Placeholder matrix with QR-style finder patterns, deliberately not a real code.
+  (function () {
+    const c = document.getElementById("qr"), x = c.getContext("2d"), n = 33;
+    x.fillStyle = "#fff"; x.fillRect(0, 0, n, n); x.fillStyle = "#000";
+    let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+    const finder = (ox, oy) => { for (let i = 0; i < 7; i++) for (let j = 0; j < 7; j++) {
+      const edge = i === 0 || i === 6 || j === 0 || j === 6, core = i > 1 && i < 5 && j > 1 && j < 5;
+      if (edge || core) x.fillRect(ox + i, oy + j, 1, 1); } };
+    for (let i = 2; i < n - 2; i++) for (let j = 2; j < n - 2; j++) {
+      const inFinder = (i < 11 && j < 11) || (i > n - 12 && j < 11) || (i < 11 && j > n - 12);
+      if (!inFinder && rnd() > .5) x.fillRect(i, j, 1, 1);
+    }
+    finder(2, 2); finder(n - 9, 2); finder(2, n - 9);
+  })();
+  // Count-up timer as in TicketDetailCountUpView.
+  (function () {
+    const el = document.getElementById("counter"), t0 = Date.now();
+    setInterval(() => {
+      const s = Math.floor((Date.now() - t0) / 1000);
+      el.firstChild.textContent = String(Math.floor(s / 60)).padStart(2, "0") + ":" + String(s % 60).padStart(2, "0");
+    }, 1000);
+  })();
+  document.getElementById("theme").onclick = function () {
+    const dark = document.documentElement.dataset.theme !== "dark";
+    document.documentElement.dataset.theme = dark ? "dark" : "light";
+    this.textContent = dark ? "Light mode" : "Dark mode";
+  };
+</script>
+</body>
+</html>

@@ -1,0 +1,247 @@
+/* myVRN Lite — tokens from the VRN ClientTheme (Mode 0/1) and the APK's assets. */
+:root {
+  --brand: #d80019;
+  --brand-dark: #59000a;
+  --bg: #f4f4f4;
+  --surface: #ffffff;
+  --text: #414141;
+  --text-heading: rgba(0, 0, 0, .85);
+  --text-muted: #767676;
+  --divider: rgba(5, 5, 5, .08);
+  --hover: #eeeeee;
+  --success: #389e0d;
+  --success-soft: rgba(82, 196, 26, .14);
+  --warning: #d46b08;
+  --warning-soft: rgba(250, 140, 22, .14);
+  --error: #f5222d;
+  --error-soft: rgba(245, 34, 45, .1);
+  --brand-soft: rgba(216, 0, 25, .12);
+  --brand-ink: #d80019;      /* brand red for text/icons on surfaces */
+  --code-bg: #f0f2f5;
+  --accent-text: #59000a;
+  --radius: 4px;
+  --font: Roboto, -apple-system, "Segoe UI", "Noto Sans", Arial, sans-serif;
+  --mono: ui-monospace, "Roboto Mono", Menlo, Consolas, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #272727; --surface: #414141; --text: #ffffff; --text-heading: #ffffff;
+    --text-muted: #aaaaaa; --divider: rgba(255, 255, 255, .1); --hover: #4a4a4a;
+    --error: #ff6b6b; --success: #73d13d; --warning: #ffa940; --code-bg: #1e1e1e;
+    --accent-text: #ffffff; --brand-ink: #ff6b78; --brand-soft: rgba(255, 107, 120, .16);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #272727; --surface: #414141; --text: #ffffff; --text-heading: #ffffff;
+  --text-muted: #aaaaaa; --divider: rgba(255, 255, 255, .1); --hover: #4a4a4a;
+  --error: #ff6b6b; --success: #73d13d; --warning: #ffa940; --code-bg: #1e1e1e;
+  --accent-text: #ffffff; --brand-ink: #ff6b78; --brand-soft: rgba(255, 107, 120, .16);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body { background: var(--bg); color: var(--text); font: 14px/1.45 var(--font); -webkit-tap-highlight-color: transparent; }
+a { color: var(--brand-ink); }
+h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--text-muted); font-weight: 500; margin: 18px 2px 8px; }
+h2:first-child { margin-top: 4px; }
+
+/* ---- App shell -------------------------------------------------------- */
+.app { max-width: 520px; min-height: 100%; margin: 0 auto; display: flex; flex-direction: column; background: var(--bg); }
+@media (min-width: 560px) { .app { box-shadow: 0 0 0 1px var(--divider); } }
+.appbar { position: sticky; top: 0; z-index: 10; height: 56px; display: flex; align-items: center; gap: 8px;
+          padding: 0 8px; background: var(--surface); border-bottom: 1px solid var(--divider); }
+.appbar .title { flex: 1; font-size: 19px; font-weight: 500; color: var(--brand-dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+:root[data-theme="dark"] .appbar .title { color: #fff; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .appbar .title { color: #fff; } }
+.iconbtn { width: 40px; height: 40px; display: grid; place-items: center; border: 0; background: none; color: var(--text);
+           border-radius: 50%; cursor: pointer; text-decoration: none; font-size: 22px; }
+.iconbtn:active { background: var(--hover); }
+.dbg-flag { font: 600 10px var(--font); letter-spacing: .05em; color: var(--warning); background: var(--warning-soft); padding: 2px 6px; border-radius: 8px; }
+/* Bottom padding = tab bar height, so short pages don't scroll. */
+main.content { flex: 1; padding: 12px 12px calc(68px + env(safe-area-inset-bottom)); }
+.tabbar { position: fixed; bottom: 0; left: 0; right: 0; z-index: 10; height: 60px; display: flex; justify-content: center;
+          background: var(--surface); border-top: 1px solid var(--divider); padding-bottom: env(safe-area-inset-bottom); }
+.tabbar .inner { display: flex; width: 100%; max-width: 520px; }
+.tabbar a { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+            font-size: 12px; color: var(--text-muted); text-decoration: none; }
+.tabbar a.on { color: var(--brand-ink); font-weight: 500; }
+
+/* Icons tinted via mask so they follow currentColor. */
+.ic { width: 24px; height: 24px; display: inline-block; flex: none; background: currentColor;
+      -webkit-mask: var(--src) center / contain no-repeat; mask: var(--src) center / contain no-repeat; }
+.ic.menu    { --src: url(icons/menu.svg); }
+.ic.ticket  { --src: url(icons/ticket.svg); }
+.ic.account { --src: url(icons/home_navigator_mobility_account_page.svg); }
+.ic.gear    { --src: url(icons/settings.svg); }
+.ic.qr      { --src: url(icons/qr_code.svg); }
+
+/* ---- Drawer (Home navigator) ----------------------------------------- */
+.scrim { position: fixed; inset: 0; z-index: 20; background: rgba(0, 0, 0, .4); opacity: 0; pointer-events: none; transition: opacity .2s; }
+.drawer { position: fixed; top: 0; bottom: 0; left: 0; z-index: 21; width: 300px; max-width: 85vw; background: var(--surface);
+          transform: translateX(-100%); transition: transform .2s; overflow-y: auto; }
+body.nav-open .scrim { opacity: 1; pointer-events: auto; }
+body.nav-open .drawer { transform: none; }
+.drawer .brand { padding: 22px 18px; background: linear-gradient(160deg, var(--brand), var(--brand-dark)); }
+.drawer .brand img { height: 36px; display: block; }
+.drawer .brand .appname { color: #fff; font-size: 17px; font-weight: 600; margin-top: 10px; }
+.drawer .brand small { display: block; color: rgba(255, 255, 255, .85); margin-top: 8px; font-size: 12px; }
+.navrow { display: flex; gap: 14px; align-items: center; padding: 11px 16px; border-bottom: 1px solid var(--divider);
+          color: inherit; text-decoration: none; }
+.navrow.on { background: var(--hover); }
+.navrow img { width: 36px; height: 36px; flex: none; }
+:root[data-theme="dark"] .navrow img { filter: invert(1) hue-rotate(180deg); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .navrow img { filter: invert(1) hue-rotate(180deg); } }
+.navrow .t { font-weight: 600; color: var(--text-heading); }
+.navrow .s { font-size: 12px; color: var(--text-muted); }
+
+/* ---- Controls --------------------------------------------------------- */
+.btn { display: block; width: 100%; padding: 11px 14px; border: 1px solid var(--brand); border-radius: var(--radius);
+       background: var(--brand); color: #fff; font: 500 15px var(--font); text-align: center; cursor: pointer; text-decoration: none; }
+.btn:active { filter: brightness(.92); }
+.btn.outline { background: transparent; color: var(--brand-ink); }
+.btn.small { display: inline-block; width: auto; padding: 6px 12px; font-size: 13px; }
+.btn.danger { background: transparent; color: var(--error); border-color: var(--error); }
+.btn + .btn { margin-top: 10px; }
+.row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.field { margin-bottom: 14px; }
+.field label, label.lbl { display: block; font-size: 13px; margin-bottom: 4px; color: var(--text-heading); }
+.field label small { color: var(--error); font-size: 11px; }
+input[type=text], input[type=email], input[type=password], input[type=url], select, textarea {
+  width: 100%; padding: 10px; border: 1px solid var(--text-muted); border-radius: var(--radius);
+  background: var(--surface); color: var(--text); font: 14px var(--font); }
+input:focus, select:focus, textarea:focus { outline: 2px solid var(--brand); outline-offset: -1px; border-color: var(--brand); }
+textarea { min-height: 80px; font-family: var(--mono); font-size: 12px; }
+.pw { position: relative; }
+.pw button { position: absolute; right: 4px; top: 50%; transform: translateY(-50%); border: 0; background: none; color: var(--text-muted);
+             font-size: 13px; padding: 6px 8px; cursor: pointer; }
+.hint { font-size: 12px; color: var(--text-muted); margin: 6px 2px; }
+.center { text-align: center; }
+
+.alert { border-radius: var(--radius); padding: 10px 12px; margin: 0 0 12px; font-size: 13px; }
+.alert.bad { background: var(--error-soft); color: var(--error); }
+.alert.ok { background: var(--success-soft); color: var(--success); }
+.alert.info { background: var(--surface); color: var(--text-heading); border: 1px solid var(--divider); border-left: 3px solid var(--brand); }
+
+.panel { background: var(--surface); border: 1px solid var(--divider); border-radius: var(--radius); padding: 14px; margin-bottom: 12px; }
+.panel h3 { margin: 0 0 10px; font-size: 15px; color: var(--text-heading); }
+.kv { width: 100%; border-collapse: collapse; font-size: 14px; }
+.kv td { padding: 8px 0; border-bottom: 1px solid var(--divider); vertical-align: top; }
+.kv tr:last-child td { border-bottom: 0; }
+.kv td:first-child { color: var(--text-muted); padding-right: 12px; }
+.kv td:last-child { text-align: right; font-weight: 500; color: var(--text-heading); word-break: break-word; }
+
+/* Segmented control (theme) and switch (debug) */
+.seg { display: flex; border: 1px solid var(--brand); border-radius: var(--radius); overflow: hidden; }
+.seg button { flex: 1; padding: 8px; border: 0; background: transparent; color: var(--brand-ink); font: 500 13px var(--font); cursor: pointer; }
+.seg button + button { border-left: 1px solid var(--brand); }
+.seg button.on { background: var(--brand); color: #fff; }
+.setting { display: flex; align-items: center; gap: 12px; padding: 4px 0; }
+.setting .grow { flex: 1; }
+.setting .t { font-weight: 500; color: var(--text-heading); }
+.setting .s { font-size: 12px; color: var(--text-muted); }
+.switch { position: relative; width: 44px; height: 26px; border-radius: 13px; border: 0; background: var(--text-muted); cursor: pointer; flex: none; }
+.switch::after { content: ""; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff; transition: left .15s; }
+.switch.on { background: var(--brand); }
+.switch.on::after { left: 21px; }
+
+/* ---- Ticket list ------------------------------------------------------ */
+.tcard { display: flex; gap: 12px; align-items: center; padding: 12px; margin-bottom: 8px; background: var(--surface);
+         border: 1px solid var(--divider); border-radius: var(--radius); color: inherit; text-decoration: none; }
+.tcard:active { background: var(--hover); }
+.tcard .logo { width: 42px; height: 42px; flex: none; display: grid; place-items: center; }
+.tcard .logo img { width: 32px; }
+.tcard .logo.round { border-radius: 50%; background: var(--brand); color: #fff; }
+.tcard .grow { flex: 1; min-width: 0; }
+.tcard .name { font-size: 15px; font-weight: 600; color: var(--text-heading); }
+.tcard .meta { font-size: 12px; color: var(--text-muted); }
+.tcard .chev { color: var(--text-muted); font-size: 20px; }
+.tcard.expired { opacity: .6; }
+.chip { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 10px; white-space: nowrap; }
+.chip.current { background: var(--success-soft); color: var(--success); }
+.chip.future, .chip.quota { background: var(--brand-soft); color: var(--brand-ink); }
+.chip.expired { background: var(--hover); color: var(--text-muted); }
+.empty { text-align: center; padding: 40px 20px; color: var(--text-muted); }
+.empty .ic { width: 48px; height: 48px; color: var(--brand-ink); opacity: .6; margin-bottom: 10px; }
+details.group > summary { list-style: none; cursor: pointer; }
+details.group > summary::-webkit-details-marker { display: none; }
+details.group > summary h2::after { content: " ▾"; }
+details.group:not([open]) > summary h2::after { content: " ▸"; }
+
+/* ---- Ticket detail (follows the theme; the code itself stays on white so it scans) ---- */
+.ticket-detail { margin: -12px -12px 0; background: var(--bg); color: var(--text); }
+.ticket-detail .head { background: var(--brand); color: #fff; padding: 16px; }
+.ticket-detail .head .name { font-size: 19px; font-weight: 600; }
+.ticket-detail .head .sub { font-size: 13px; opacity: .92; }
+/* The code fills the width but shrinks on short screens so header, code, timer and data
+   fit without scrolling (min 220px keeps it reliably scannable). ~415px = app bar, ticket
+   header, timer, data rows and tab bar. dvh follows the mobile browser's visible area. */
+.ticket-detail .codebox { margin: 12px auto 2px; padding: 12px; background: #fff; border-radius: var(--radius);
+                          text-align: center; border: 1px solid var(--divider);
+                          width: max(220px, min(84vw, 380px, calc(100vh - 415px))); }
+@supports (height: 100dvh) {
+  .ticket-detail .codebox { width: max(220px, min(84vw, 380px, calc(100dvh - 415px))); }
+}
+.ticket-detail .codebox canvas, .ticket-detail .codebox img { width: 100%; image-rendering: pixelated; background: #fff; display: block; }
+.ticket-detail .codelabel { font-size: 12px; color: #cf1322; margin-top: 6px; }
+.ticket-detail .codelabel:empty { display: none; }
+.ticket-detail .codebox { cursor: pointer; user-select: none; -webkit-user-select: none; }
+/* Tap spins the whole card a full turn; toggling 0deg <-> 360deg alternates the direction. */
+.ticket-detail .codebox { transition: transform .6s ease-in-out; }
+.ticket-detail .codebox.turned { transform: rotate(360deg); }
+.counter { text-align: center; margin: 8px 0 0; font: 600 24px/1 var(--mono); color: var(--accent-text); }
+.counter button { font: 12px var(--font); color: var(--text-muted); border: 0; background: none; cursor: pointer; display: block; margin: 4px auto 0; }
+.ticket-detail .kv { margin: 4px 16px 8px; width: calc(100% - 32px); }
+.ticket-detail .kv td { padding: 6px 0; }
+.ticket-detail .alert.bad { margin: 16px; }
+.ticket-detail .pad { padding: 0 16px 16px; }
+.sheet { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; max-width: 520px; margin: 0 auto; background: var(--surface); color: var(--text);
+         border-radius: 12px 12px 0 0; padding: 18px 18px 28px; box-shadow: 0 -8px 30px rgba(0, 0, 0, .2); }
+.sheet h3 { margin: 0 0 8px; }
+.sheet[hidden] { display: none; }
+
+/* ---- Debug ------------------------------------------------------------ */
+.debug { border: 1px dashed var(--warning); border-radius: var(--radius); background: var(--surface); margin: 12px 0; }
+.debug > summary { cursor: pointer; padding: 9px 12px; font: 600 12px var(--font); color: var(--warning); letter-spacing: .03em; }
+.debug > .body { padding: 0 12px 12px; }
+.debug .body > * + * { margin-top: 10px; }
+pre { margin: 0; padding: 10px; background: var(--code-bg); color: var(--text); border-radius: var(--radius); font: 11.5px/1.45 var(--mono);
+      white-space: pre-wrap; word-break: break-all; max-height: 360px; overflow: auto; }
+.ticket-detail .debug { margin: 12px 16px; }
+code { font-family: var(--mono); font-size: 12px; }
+iframe.vnc { width: 100%; height: 640px; border: 1px solid var(--divider); border-radius: var(--radius); background: #000; }
+
+/* VRN original palette (Settings > Farben): the official app's blue/navy. */
+:root[data-palette="vrn"] {
+  --brand: #0098d8; --brand-dark: #002d59; --brand-soft: rgba(0, 152, 216, .12);
+  --brand-ink: #0098d8; --accent-text: #002d59;
+}
+@media (prefers-color-scheme: dark) {
+  :root[data-palette="vrn"]:not([data-theme="light"]) {
+    --brand-ink: #4dbbe8; --brand-soft: rgba(77, 187, 232, .16); --accent-text: #ffffff;
+  }
+}
+:root[data-palette="vrn"][data-theme="dark"] {
+  --brand-ink: #4dbbe8; --brand-soft: rgba(77, 187, 232, .16); --accent-text: #ffffff;
+}
+
+/* Theme-dependent images */
+.only-dark { display: none; }
+:root[data-theme="dark"] .only-dark { display: inline; }
+:root[data-theme="dark"] .only-light { display: none; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .only-dark { display: inline; }
+  :root:not([data-theme="light"]) .only-light { display: none; }
+}
+
+/* ---- Account ---------------------------------------------------------- */
+.hello { font-size: 24px; font-weight: 500; color: var(--accent-text); margin: 10px 2px 14px; }
+.profile-card { display: flex; align-items: center; gap: 14px; }
+.profile-card .grow { min-width: 0; flex: 1; }
+.avatar { width: 52px; height: 52px; flex: none; border-radius: 50%; background: var(--brand-soft); color: var(--brand-ink);
+          display: grid; place-items: center; }
+.avatar svg { width: 30px; height: 30px; fill: currentColor; }
+.profile-card .pname { font-size: 16px; font-weight: 600; color: var(--text-heading); }
+.profile-card .pmail { font-size: 13px; color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

@@ -1,0 +1,3 @@
+{% macro debug_panel(label, open=false) -%}
+  {% if debug %}<details class="debug"{% if open %} open{% endif %}><summary>DEBUG · {{ label }}</summary><div class="body">{{ caller() }}</div></details>{% endif %}
+{%- endmacro %}

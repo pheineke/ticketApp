@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="center" style="padding:40px 0 26px">
+  <img class="only-light" src="{{ icon('vrn_logo.svg') }}" alt="" style="height:52px">
+  <img class="only-dark" src="{{ url_for('static', filename='icons/vrn_logo_dark.svg') }}" alt="" style="height:52px">
+</div>
+{% if error %}<div class="alert bad">{{ error }}</div>{% endif %}
+<div class="panel">
+  <h3>Zugang geschützt</h3>
+  <p class="hint">Diese private Instanz ist mit einem Zugangspasswort geschützt.</p>
+  <form method="post"><input type="hidden" name="_csrf" value="{{ csrf_token }}">
+    <div class="field"><input type="password" name="password" autocomplete="current-password" placeholder="Zugangspasswort" required autofocus></div>
+    <label class="row" style="gap:8px;margin:0 0 14px"><input type="checkbox" name="remember" value="1" checked style="width:auto"> Auf diesem Gerät merken</label>
+    <button class="btn" type="submit">Weiter</button>
+  </form>
+</div>
+{% endblock %}
