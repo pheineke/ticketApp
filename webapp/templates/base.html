@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   {# The browser bar in the page colour: white, or the palette's ink in dark mode. #}
-  {% set ink = '#002d59' if palette == 'vrn' else '#59000a' %}
+  {% set ink = {'vrn': '#002d59', 'modern': '#0b0d11'}.get(palette, '#59000a') %}
   {% if theme == 'dark' %}<meta name="theme-color" content="{{ ink }}">
   {% elif theme == 'light' %}<meta name="theme-color" content="#ffffff">
   {% else %}<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
@@ -24,7 +24,7 @@
   {% if not hide_nav %}
   <header class="appbar">
     {% if back %}
-      <a class="iconbtn" href="{{ back }}" aria-label="Zurück">←</a>
+      <a class="iconbtn backbtn" href="{{ back }}" aria-label="Zurück"><span class="arrow">←</span><span class="backlbl">Zurück</span></a>
     {% else %}
       <button class="iconbtn menubtn" type="button" aria-label="Menü" onclick="document.body.classList.add('nav-open')"><span class="ic menu"></span></button>
     {% endif %}
@@ -35,6 +35,8 @@
   {% endif %}
 
   <main class="content">
+    {# Modern: the page title large above the content instead of in the bar (pages with a back link start with their content). #}
+    {% if palette == 'modern' and title and not hide_nav and not back %}<header class="pagehead"><h1>{{ title }}</h1>{% block pagesub %}{% endblock %}</header>{% endif %}
     {% block content %}{% endblock %}
   </main>
 </div>
@@ -43,7 +45,8 @@
 <div class="scrim" onclick="document.body.classList.remove('nav-open')"></div>
 <nav class="drawer" aria-label="Navigation">
   <div class="brand">
-    <img src="{{ url_for('static', filename='icons/vrn_logo_dark.svg') }}" alt="VRN">
+    {% if palette == 'modern' %}<img class="mark" src="{{ url_for('static', filename='icons/modern/logo.svg') }}" alt="">
+    {% else %}<img src="{{ url_for('static', filename='icons/vrn_logo_dark.svg') }}" alt="VRN">{% endif %}
     <div class="appname">myVRN Lite</div>
     {% if meta.logged_in %}<small>angemeldet</small>{% else %}<small>nicht angemeldet</small>{% endif %}
   </div>

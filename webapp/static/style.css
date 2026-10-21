@@ -169,6 +169,103 @@
   color-scheme: dark;
 }
 
+/* Modern: its own design (Settings > Farben): warm paper, ink, one blue, lime for what is valid. */
+:root[data-palette="modern"] {
+  --brand: #1f4bdb;
+  --brand-dark: #111418;
+  --bg: #f5f4ef;
+  --surface: #ffffff;
+  --text: #111418;
+  --text-heading: #111418;
+  --text-muted: #575d65;
+  --divider: #dad8cf;
+  --hover: #e8e6de;
+  --code-bg: #e8e6de;
+  --success: #2f7d32;
+  --warning: #b45309;
+  --error: #b3261e;
+  --brand-soft: rgba(31, 75, 219, .1);
+  --brand-ink: #1f4bdb;
+  --accent-text: #111418;
+  --tcard-top: #ffffff;
+  --tcard-body: #ffffff;
+  --tcard-ink: #111418;
+  --ticket-bg: #f5f4ef;
+  --ticket-bg2: #f5f4ef;
+  --ticket-ink: #111418;
+  --ticket-line: #dad8cf;
+  --accent: #d7f25c;
+  --accent-ink: #111418;
+  --track: #e8e6de;
+  --inverse: #111418;
+  --inverse-ink: #ffffff;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root[data-palette="modern"]:not([data-theme="light"]) {
+    --brand: #3d63f0;
+    --brand-dark: #111418;
+    --bg: #111418;
+    --surface: #1a1e23;
+    --text: #e7e6e1;
+    --text-heading: #f5f4ef;
+    --text-muted: #9aa0a8;
+    --divider: #2c3137;
+    --hover: #23282e;
+    --code-bg: #0c0e11;
+    --success: #7bd88f;
+    --warning: #f2b35b;
+    --error: #f2827a;
+    --brand-soft: rgba(110, 140, 255, .16);
+    --brand-ink: #8ea6ff;
+    --accent-text: #f5f4ef;
+    --tcard-top: #1a1e23;
+    --tcard-body: #1a1e23;
+    --tcard-ink: #f5f4ef;
+    --ticket-bg: #111418;
+    --ticket-bg2: #111418;
+    --ticket-ink: #f5f4ef;
+    --ticket-line: #2c3137;
+    --accent: #d7f25c;
+    --accent-ink: #111418;
+    --track: #23282e;
+    --inverse: #f5f4ef;
+    --inverse-ink: #111418;
+    color-scheme: dark;
+  }
+}
+:root[data-palette="modern"][data-theme="dark"] {
+  --brand: #3d63f0;
+  --brand-dark: #111418;
+  --bg: #111418;
+  --surface: #1a1e23;
+  --text: #e7e6e1;
+  --text-heading: #f5f4ef;
+  --text-muted: #9aa0a8;
+  --divider: #2c3137;
+  --hover: #23282e;
+  --code-bg: #0c0e11;
+  --success: #7bd88f;
+  --warning: #f2b35b;
+  --error: #f2827a;
+  --brand-soft: rgba(110, 140, 255, .16);
+  --brand-ink: #8ea6ff;
+  --accent-text: #f5f4ef;
+  --tcard-top: #1a1e23;
+  --tcard-body: #1a1e23;
+  --tcard-ink: #f5f4ef;
+  --ticket-bg: #111418;
+  --ticket-bg2: #111418;
+  --ticket-ink: #f5f4ef;
+  --ticket-line: #2c3137;
+  --accent: #d7f25c;
+  --accent-ink: #111418;
+  --track: #23282e;
+  --inverse: #f5f4ef;
+  --inverse-ink: #111418;
+  color-scheme: dark;
+}
+
 * { box-sizing: border-box; }
 html, body { margin: 0; height: 100%; }
 body { background: var(--bg); color: var(--text); font: 14px/1.45 var(--font); -webkit-tap-highlight-color: transparent; }
@@ -255,6 +352,7 @@ input[type=text], input[type=email], input[type=password], input[type=url], inpu
 input:focus, select:focus, textarea:focus { outline: 2px solid var(--brand); outline-offset: -1px; border-color: var(--brand); }
 textarea { min-height: 80px; font-family: var(--mono); font-size: 12px; }
 .pw { position: relative; }
+.pw button { font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif; }
 .pw button { position: absolute; right: 4px; top: 50%; transform: translateY(-50%); border: 0; background: none; color: var(--text-muted);
              font-size: 13px; padding: 6px 8px; cursor: pointer; }
 .hint { font-size: 12px; color: var(--text-muted); margin: 6px 2px; }
@@ -649,3 +747,172 @@ body.mapmode main.content { padding: 0; }
 .shophead .s { font-size: 12px; color: var(--text-muted); }
 .shopcard .btn { margin-top: 4px; }
 .verify select { margin-bottom: 10px; }
+.verify .lbl { display: block; width: auto; margin: 0 0 6px; }  /* not the Fahrplan's narrow .lbl column */
+
+/* ---- Shared by the designs -------------------------------------------------------------- */
+.tcard .logo .dt-dark { display: none; }
+img.mark { border-radius: 22%; }
+.drawer .brand img.mark { height: 44px; }
+.backbtn .backlbl { display: none; }
+.ic.shop     { --src: url(icons/modern/i_shop.svg); }
+.ic.logout   { --src: url(icons/modern/i_logout.svg); }
+.ic.external { --src: url(icons/modern/i_external.svg); }
+.ic.info     { --src: url(icons/modern/i_info.svg); }
+
+/* ---- Modern design ---------------------------------------------------------------------
+   Large page titles instead of the bar title, white cards on warm paper, bordered tiles,
+   lime for what is valid, line icons. DM Sans / DM Mono (static/fonts, OFL). */
+@font-face { font-family: "DM Sans"; src: url(fonts/DMSans.woff2) format("woff2"); font-weight: 100 1000; font-display: swap; }
+@font-face { font-family: "DM Mono"; src: url(fonts/DMMono-400.woff2) format("woff2"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "DM Mono"; src: url(fonts/DMMono-500.woff2) format("woff2"); font-weight: 500; font-display: swap; }
+:root[data-palette="modern"] {
+  --font: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "DM Mono", ui-monospace, Menlo, Consolas, monospace;
+  --radius: 14px;
+}
+:root[data-palette="modern"] body { font-size: 15px; -webkit-font-smoothing: antialiased; }
+:root[data-palette="modern"] .app { box-shadow: none; }
+:root[data-palette="modern"] .ic.ticket   { --src: url(icons/modern/i_tickets.svg); }
+:root[data-palette="modern"] .ic.route    { --src: url(icons/modern/i_route.svg); }
+:root[data-palette="modern"] .ic.account  { --src: url(icons/modern/i_account.svg); }
+:root[data-palette="modern"] .ic.gear     { --src: url(icons/modern/i_settings.svg); }
+:root[data-palette="modern"] .ic.menu     { --src: url(icons/modern/i_menu.svg); }
+:root[data-palette="modern"] .ic.download { --src: url(icons/modern/i_download.svg); }
+:root[data-palette="modern"] .ic.chev-right { --src: url(icons/modern/i_chevron.svg); }
+
+/* Bars: the title moves into the page; back reads "‹ Zurück". */
+:root[data-palette="modern"] .appbar { background: var(--bg); border-bottom: 0; height: 52px; }
+:root[data-palette="modern"] .appbar .title { visibility: hidden; }
+:root[data-palette="modern"] .appbar .backbtn { width: auto; padding: 0 12px 0 4px; border-radius: 12px; gap: 2px;
+                                                display: flex; font-size: 15px; font-weight: 500; color: var(--text-heading); }
+:root[data-palette="modern"] .backbtn .arrow { display: none; }
+:root[data-palette="modern"] .backbtn .backlbl { display: inline; }
+:root[data-palette="modern"] .backbtn::before { content: ""; width: 22px; height: 22px; background: currentColor;
+  -webkit-mask: url(icons/modern/i_back.svg) center / contain no-repeat; mask: url(icons/modern/i_back.svg) center / contain no-repeat; }
+:root[data-palette="modern"] .pagehead { padding: 4px 2px 18px; }
+:root[data-palette="modern"] .pagehead h1 { margin: 0; font-size: 32px; line-height: 1.1; font-weight: 700; letter-spacing: -.02em; color: var(--text-heading); }
+:root[data-palette="modern"] .pagehead p { margin: 4px 0 0; font-size: 15px; color: var(--text-muted); }
+:root[data-palette="modern"] body.mapmode .pagehead { display: none; }
+:root[data-palette="modern"] .tabbar { background: var(--surface); border-top: 1px solid var(--divider); height: 72px; }
+:root[data-palette="modern"] .tabbar a { gap: 4px; font-size: 12px; font-weight: 500; color: var(--text-muted); }
+:root[data-palette="modern"] .tabbar a.on { color: var(--brand-ink); font-weight: 700; }
+:root[data-palette="modern"] .tabbar .ic { width: 22px; height: 22px; }
+:root[data-palette="modern"] main.content { padding-bottom: calc(84px + env(safe-area-inset-bottom)); }
+:root[data-palette="modern"] body.mapmode main.content { padding: 0; }
+
+/* Type, surfaces, controls. */
+:root[data-palette="modern"] h2, :root[data-palette="modern"] .tickets-page h2 {
+  margin: 24px 2px 10px; font-size: 13px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--text-muted); }
+:root[data-palette="modern"] h2:first-child { margin-top: 4px; }
+:root[data-palette="modern"] .panel { background: var(--surface); border: 1px solid var(--divider); border-radius: 18px; padding: 16px; }
+:root[data-palette="modern"] .btn { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 52px; padding: 14px 18px;
+                                    border: 0; border-radius: 14px; font: 700 16px var(--font); }
+:root[data-palette="modern"] .btn.outline { background: var(--surface); border: 1px solid var(--divider); color: var(--text-heading); }
+:root[data-palette="modern"] .btn.danger { background: transparent; border: 0; color: var(--error); }
+:root[data-palette="modern"] .btn.small { display: inline-flex; min-height: 0; padding: 8px 14px; font-size: 14px; border-radius: 12px; }
+:root[data-palette="modern"] .btn .ic { margin: 0; width: 20px; height: 20px; vertical-align: 0; }
+:root[data-palette="modern"] .alert { border-radius: 14px; padding: 12px 14px; font-size: 14px; }
+:root[data-palette="modern"] .alert.ok { background: var(--accent); color: var(--accent-ink); }
+:root[data-palette="modern"] .alert.info { background: var(--surface); border: 1px solid var(--divider); }
+:root[data-palette="modern"] input[type=text], :root[data-palette="modern"] input[type=email],
+:root[data-palette="modern"] input[type=password], :root[data-palette="modern"] input[type=url],
+:root[data-palette="modern"] input[type=date], :root[data-palette="modern"] input[type=time],
+:root[data-palette="modern"] select, :root[data-palette="modern"] textarea {
+  padding: 14px; border: 1px solid var(--divider); border-radius: 14px; background: var(--surface); font-size: 16px; }
+:root[data-palette="modern"] .seg { border: 0; border-radius: 14px; background: var(--track); padding: 4px; gap: 4px; }
+:root[data-palette="modern"] .seg button, :root[data-palette="modern"] .seg label span {
+  padding: 10px 0; border-radius: 11px; color: var(--text-muted); font: 500 15px var(--font); }
+:root[data-palette="modern"] .seg button + button, :root[data-palette="modern"] .seg label + label { border-left: 0; }
+:root[data-palette="modern"] .seg button.on, :root[data-palette="modern"] .seg label input:checked + span {
+  background: var(--surface); color: var(--text-heading); font-weight: 700; box-shadow: 0 1px 2px rgba(0, 0, 0, .08); }
+:root[data-palette="modern"] .chip { border-radius: 99px; padding: 4px 10px; font-size: 12px; }
+:root[data-palette="modern"] .hint { font-size: 13px; }
+:root[data-palette="modern"] .setting .t { font-size: 16px; }
+:root[data-palette="modern"] .setting .s { font-size: 14px; }
+:root[data-palette="modern"] .jrow { border-radius: 18px; padding: 14px 8px 14px 16px; }
+:root[data-palette="modern"] .sheet .sheet-close { border-radius: 14px; background: var(--brand); color: #fff; }
+
+/* Drawer: the logo on paper, rows as soft pills. */
+:root[data-palette="modern"] .drawer { background: var(--bg); }
+:root[data-palette="modern"] .drawer .brand { background: var(--bg); padding: 24px 18px 14px; }
+:root[data-palette="modern"] .drawer .brand .appname { color: var(--text-heading); font-size: 20px; letter-spacing: -.01em; }
+:root[data-palette="modern"] .drawer .brand small { color: var(--text-muted); }
+:root[data-palette="modern"] .navrow { border-bottom: 0; border-radius: 14px; margin: 2px 10px; padding: 9px 10px; }
+:root[data-palette="modern"] .navrow.on { background: var(--surface); box-shadow: inset 0 0 0 1px var(--divider); }
+:root[data-palette="modern"] .navrow img, :root[data-palette="modern"] .navrow .navic {
+  border: 0; border-radius: 12px; background: var(--brand-soft); color: var(--brand-ink); padding: 6px; filter: none !important; }
+
+/* Ticket list: one card per ticket, valid ones in lime. */
+.mcard { display: flex; flex-direction: column; gap: 14px; margin-bottom: 12px; padding: 18px; border-radius: 20px;
+         background: var(--surface); border: 1px solid var(--divider); color: var(--text-heading); text-decoration: none; }
+.mcard.current { background: var(--accent); color: var(--accent-ink); border-color: transparent; }
+.mcard.expired { opacity: .6; }
+.mcard .mrow { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: 14px; }
+.mlabel { font-size: 13px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.mcard .mstate { font-size: 13px; font-weight: 700; white-space: nowrap; }
+.mcard .mtitle { font-size: 24px; line-height: 1.15; font-weight: 700; letter-spacing: -.01em; }
+.mcard .mshow { display: flex; align-items: center; gap: 2px; font-weight: 700; white-space: nowrap; }
+.mcard .mshow .ic { width: 18px; height: 18px; }
+.tgrid > .mcard { grid-column: auto; }
+
+/* Ticket detail: the ticket as one card, the data as tiles. */
+:root[data-palette="modern"] .ticket-detail { padding: 0; color: var(--text-heading); }
+.mt-card { display: flex; flex-direction: column; align-items: center; gap: 18px; padding: 22px 20px; border-radius: 24px;
+           background: var(--surface); border: 1px solid var(--divider); }
+.mt-card > * { width: 100%; }
+.mt-card > .codebox { width: min(100%, 320px); }
+.mt-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.mt-right { display: flex; align-items: center; gap: 8px; }
+.pill { display: inline-block; padding: 4px 10px; border-radius: 99px; background: var(--track); color: var(--text-heading);
+        font-size: 13px; font-weight: 700; white-space: nowrap; }
+.pill.current { background: var(--accent); color: var(--accent-ink); }
+:root[data-palette="modern"] .ticket-detail .timer { width: auto; height: auto; padding: 4px 10px; border: 1px solid var(--divider);
+  border-radius: 99px; color: var(--text-heading); font: 500 13px var(--mono); }
+:root[data-palette="modern"] .ticket-detail .codebox { margin: 0; padding: 12px; border: 1px solid var(--divider); border-radius: 16px; }
+:root[data-palette="modern"] .ticket-detail .alert { margin: 0; }
+.mt-num { text-align: center; }
+.mono { font-family: var(--mono); font-size: 15px; }
+.mt-hint { margin-top: 4px; font-size: 13px; color: var(--text-muted); }
+.mt-perf { border-top: 2px dashed var(--divider); }
+.mt-title { font-size: 22px; font-weight: 700; letter-spacing: -.01em; }
+.mt-sub { font-size: 15px; color: var(--text-muted); }
+.mt-tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 16px 0 0; }
+.mt-tiles > div { padding: 14px; border: 1px solid var(--divider); border-radius: 14px; }
+.mt-tiles dt { font-size: 13px; color: var(--text-muted); }
+.mt-tiles dd { margin: 4px 0 0; font-size: 16px; font-weight: 700; overflow-wrap: anywhere; }
+.mt-terms { margin: 16px 2px 0; font-size: 13px; line-height: 1.5; color: var(--text-muted); }
+:root[data-palette="modern"] #rechnung { margin-top: 16px; }
+:root[data-palette="modern"] #rechnung .alert { margin-bottom: 10px; }
+
+/* Account: profile card, the student status as a dark card, grouped rows. */
+.m-profile { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; padding: 16px; border-radius: 18px;
+             background: var(--surface); border: 1px solid var(--divider); }
+.m-avatar { width: 56px; height: 56px; flex: none; display: flex; align-items: center; justify-content: center; border-radius: 50%;
+            background: var(--accent); color: var(--accent-ink); font-size: 20px; font-weight: 700; }
+.m-profile .grow { flex: 1; min-width: 0; }
+.m-profile .pname { font-size: 18px; font-weight: 700; color: var(--text-heading); }
+.m-profile .pmail { font-size: 14px; color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; }
+.m-dark { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; padding: 16px;
+          border-radius: 18px; background: var(--inverse); color: var(--inverse-ink); text-decoration: none; }
+.m-dark .k { font-size: 13px; opacity: .75; }
+.m-dark .v { font-size: 17px; font-weight: 700; }
+.m-dark .mono { font-size: 13px; white-space: nowrap; }
+.m-list { margin-bottom: 16px; border-radius: 18px; background: var(--surface); border: 1px solid var(--divider); overflow: hidden; }
+.m-item { display: flex; align-items: center; gap: 14px; min-height: 64px; padding: 8px 16px; color: var(--text-heading); text-decoration: none; }
+.m-item + .m-item { border-top: 1px solid var(--divider); }
+.m-item > .ic { width: 22px; height: 22px; color: var(--text-muted); }
+.m-item > .ic.chev-right { width: 18px; height: 18px; }
+.m-item .grow { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.m-item .t { font-size: 16px; font-weight: 500; }
+.m-item .s { font-size: 14px; color: var(--text-muted); }
+.m-logout { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; min-height: 52px; border: 0;
+            background: none; color: var(--error); font: 700 16px var(--font); cursor: pointer; }
+.m-logout .ic { width: 22px; height: 22px; }
+
+@media (min-width: 1000px) {
+  :root[data-palette="modern"] .ticket-detail { grid-template-columns: minmax(320px, 420px) 1fr; }
+  :root[data-palette="modern"] .ticket-detail .mt-card { grid-column: 1; grid-row: 1 / span 4; }
+  :root[data-palette="modern"] .ticket-detail .mt-tiles, :root[data-palette="modern"] .ticket-detail .mt-terms,
+  :root[data-palette="modern"] .ticket-detail #rechnung { grid-column: 2; margin-top: 0; }
+  :root[data-palette="modern"] .ticket-detail .mt-terms, :root[data-palette="modern"] .ticket-detail #rechnung { margin-top: 16px; }
+}

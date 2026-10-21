@@ -4,6 +4,8 @@
   {% if meta.logged_in %}<a class="iconbtn" href="{{ url_for('tickets', reload=1) }}" aria-label="Aktualisieren" title="Aktualisieren">↻</a>{% endif %}
 {% endblock %}
 {% block bodyclass %}ticketpage{% endblock %}
+{% block pagesub %}{% if meta.logged_in and groups is defined %}{% set valid = (groups|selectattr('key', 'equalto', 'current')|first or {'tickets': []}).tickets|length %}
+  <p>{{ valid }} gültige{{ 's' if valid == 1 }} Ticket{{ 's' if valid != 1 }}</p>{% endif %}{% endblock %}
 {% block content %}
 <div class="tickets-page">
 {% if not meta.logged_in %}
@@ -22,9 +24,19 @@
     {% if collapsed %}<details class="group"><summary><h2>{{ g.label }} ({{ g.tickets|length }}) · Debug</h2></summary>{% else %}<h2>{{ g.label }}</h2>{% endif %}
     {% for t in g.tickets %}
       {% set n.i = n.i + 1 %}
+      {% if palette == 'modern' %}
+      {# Modern: the ticket as a card; valid ones in the accent colour. #}
+      <a class="mcard {{ g.key }}" href="{{ url_for('ticket_detail', tid=t.id) }}">
+        <span class="mrow"><span class="mlabel">{{ 'Deutschlandticket' if t.dticket else t.name }}</span>
+          <span class="mstate">{{ {'current': '● Gültig', 'future': '○ Zukünftig', 'quota': 'Guthaben', 'expired': 'Abgelaufen', 'unknown': '?'}[g.key] }}</span></span>
+        <span class="mtitle">{{ t.headline or t.name }}</span>
+        <span class="mrow"><span>{% if g.key == 'quota' %}{{ t.quota[0] or 0 }} von {{ t.quota[1] }} genutzt{% else %}{{ t.period or (t.valid_to|dt) }}{% if t.dticket %} · deutschlandweit{% elif t.area %} · {{ t.area }}{% endif %}{% endif %}</span>
+          <span class="mshow">Anzeigen<span class="ic chev-right"></span></span></span>
+      </a>
+      {% else %}
       <a class="tcard {{ g.key }}" href="{{ url_for('ticket_detail', tid=t.id) }}">
         <span class="ttop">
-          {% if t.dticket %}<span class="logo"><img src="{{ url_for('static', filename='icons/deutschlandticket.svg') }}" alt=""></span>
+          {% if t.dticket %}<span class="logo"><img class="dt-light" src="{{ url_for('static', filename='icons/deutschlandticket.svg') }}" alt=""><img class="dt-dark" src="{{ url_for('static', filename='icons/deutschlandticket_darkmode.svg') }}" alt=""></span>
           {% else %}<span class="logo"><span class="ic ticket"></span></span>{% endif %}
           <span class="no">#{{ n.i }} {{ t.name }}</span>
         </span>
@@ -39,6 +51,7 @@
           </span>
         </span>
       </a>
+      {% endif %}
     {% endfor %}
     {% if collapsed %}</details>{% endif %}
   {% else %}

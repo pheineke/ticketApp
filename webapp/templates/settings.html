@@ -15,11 +15,12 @@
 <h2>Farben</h2>
 <div class="panel">
   <form method="post" action="{{ url_for('settings') }}" class="seg" role="group" aria-label="Farbschema"><input type="hidden" name="_csrf" value="{{ csrf_token }}">
-    {% for key, label in [('lite', 'myVRN Lite'), ('vrn', 'VRN Original')] %}
+    {% for key, label in [('lite', 'myVRN Lite'), ('vrn', 'VRN Original'), ('modern', 'Modern')] %}
       <button type="submit" name="palette" value="{{ key }}" class="{{ 'on' if palette == key }}">{{ label }}</button>
     {% endfor %}
   </form>
-  <div class="hint">myVRN Lite: VRN-Rot · VRN Original: Navy wie in der offiziellen App. Im dunklen Design wird die Farbe zum Hintergrund.</div>
+  <div class="hint">myVRN Lite: VRN-Rot · VRN Original: Navy wie in der offiziellen App. Im dunklen Design wird die Farbe zum Hintergrund.
+    Modern: eigenes, schlichtes Design mit großen Titeln und eigenem Logo.</div>
 </div>
 
 <h2>Offline</h2>

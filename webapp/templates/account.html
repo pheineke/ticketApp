@@ -10,6 +10,33 @@
   {% set p = profile or {} %}
   {% set full_name = [p.title or '', p.first or '', p.last or '']|join(' ')|trim %}
   {% set email = p.email or meta.claims.get('email') %}
+  {% if palette == 'modern' %}
+  {# Modern: profile card, the student status as the highlight, then grouped rows. #}
+  {% set initials = ((p.first or '')[:1] ~ (p.last or '')[:1])|upper or (email or '?')[:1]|upper %}
+  <div class="m-profile">
+    <span class="m-avatar">{{ initials }}</span>
+    <div class="grow"><div class="pname">{{ full_name or email or 'Mein Konto' }}</div>{% if email and full_name %}<div class="pmail">{{ email }}</div>{% endif %}</div>
+  </div>
+  <a class="m-dark" href="{{ url_for('ticketshop') }}#verify">
+    <div><div class="k">Studierendenstatus</div><div class="v">Deutschland-Semesterticket</div></div>
+    <span class="mono">Verifizieren ›</span>
+  </a>
+  {% if p.dob or p.street or p.city or p.phone %}
+  <div class="m-list">
+    {% if p.dob %}<div class="m-item"><span class="ic account"></span><span class="grow"><span class="t">Geburtsdatum</span><span class="s">{{ p.dob|dt(false) }}</span></span></div>{% endif %}
+    {% if p.street or p.city %}<div class="m-item"><span class="ic route"></span><span class="grow"><span class="t">Adresse</span><span class="s">{{ p.street or '' }}, {{ p.zip or '' }} {{ p.city or '' }}</span></span></div>{% endif %}
+    {% if p.phone %}<div class="m-item"><span class="ic info"></span><span class="grow"><span class="t">Telefon</span><span class="s">{{ p.phone }}</span></span></div>{% endif %}
+  </div>
+  {% endif %}
+  {% if not profile %}<div class="alert info">Profildaten konnten nicht geladen werden{% if profile_rec.calls %} ({{ profile_rec.calls[-1].status }}){% endif %}.</div>{% endif %}
+  <div class="m-list">
+    <a class="m-item" href="{{ url_for('ticketshop') }}"><span class="ic shop"></span><span class="grow"><span class="t">Ticketshop</span><span class="s">Tickets kaufen, Berechtigungen</span></span><span class="ic chev-right"></span></a>
+    <a class="m-item" href="{{ url_for('settings') }}"><span class="ic gear"></span><span class="grow"><span class="t">Einstellungen</span><span class="s">Darstellung, Offline, Entwickler</span></span><span class="ic chev-right"></span></a>
+    <a class="m-item" href="https://shop.myvrn.de/authentication/private?organization=vrn&client=vrn" target="_blank" rel="noopener"><span class="ic external"></span><span class="grow"><span class="t">Login-Daten ändern</span><span class="s">Im VRN-Shop</span></span><span class="ic chev-right"></span></a>
+  </div>
+  <p class="hint center">{% if remembered %}Angemeldet bleiben ist auf diesem Gerät aktiv.{% else %}Du wirst nach einiger Zeit automatisch abgemeldet.{% endif %}</p>
+  <form method="post" action="{{ url_for('logout') }}"><input type="hidden" name="_csrf" value="{{ csrf_token }}"><button class="m-logout" type="submit"><span class="ic logout"></span>Abmelden</button></form>
+  {% else %}
   <h1 class="hello">Hallo{% if p.first %} {{ p.first }}{% endif %}!</h1>
   <div class="panel profile-card">
     <span class="avatar" aria-hidden="true">
@@ -41,6 +68,8 @@
   <p class="hint center">{% if remembered %}Angemeldet bleiben ist auf diesem Gerät aktiv.{% else %}Du wirst nach einiger Zeit automatisch abgemeldet.{% endif %}</p>
   <form method="post" action="{{ url_for('logout') }}"><input type="hidden" name="_csrf" value="{{ csrf_token }}"><button class="btn outline" type="submit">Abmelden</button></form>
   <p class="center hint"><a href="https://shop.myvrn.de/authentication/private?organization=vrn&client=vrn" target="_blank" rel="noopener">Login Daten ändern ↗</a></p>
+
+  {% endif %}
 
   {% call m.debug_panel('Token', open=true) %}
     <table class="kv">
@@ -76,8 +105,9 @@
 
 {% else %}
   <div class="center" style="padding:18px 0 22px">
-    <img class="only-light" src="{{ icon('vrn_logo.svg') }}" alt="VRN" style="height:52px">
-    <img class="only-dark" src="{{ url_for('static', filename='icons/vrn_logo_dark.svg') }}" alt="VRN" style="height:52px">
+    {% if palette == 'modern' %}<img class="mark" src="{{ url_for('static', filename='icons/modern/logo.svg') }}" alt="" style="height:64px">
+    {% else %}<img class="only-light" src="{{ icon('vrn_logo.svg') }}" alt="VRN" style="height:52px">
+    <img class="only-dark" src="{{ url_for('static', filename='icons/vrn_logo_dark.svg') }}" alt="VRN" style="height:52px">{% endif %}
   </div>
   <form class="narrow" method="post" action="{{ url_for('login_direct') }}"><input type="hidden" name="_csrf" value="{{ csrf_token }}">
     <div class="field"><label for="email">E-Mail <small>(erforderlich)</small></label>

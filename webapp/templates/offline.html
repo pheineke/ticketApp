@@ -33,17 +33,25 @@
   (function () {
     var c = {};
     document.cookie.split(";").forEach(function (kv) { var i = kv.indexOf("="); if (i > 0) c[kv.slice(0, i).trim()] = kv.slice(i + 1); });
-    var root = document.documentElement, pal = c.palette === "vrn" ? "vrn" : "lite";
+    var root = document.documentElement, pal = c.palette === "vrn" || c.palette === "modern" ? c.palette : "lite";
     root.setAttribute("data-palette", pal);
     if (c.theme === "light" || c.theme === "dark") root.setAttribute("data-theme", c.theme); else root.removeAttribute("data-theme");
     Array.prototype.forEach.call(document.querySelectorAll("img[src*='/static/icons/']"), function (img) {
-      var src = img.getAttribute("src").replace("/static/icons/vrn/", "/static/icons/");
+      var src = img.getAttribute("src").replace(/\/static\/icons\/(vrn|modern)\//, "/static/icons/");
       var name = src.split("/static/icons/")[1];
-      var recoloured = /^(vrn_logo\.svg|icon-192\.png|home_navigator_[a-z_]+\.svg)$/.test(name);
-      img.setAttribute("src", pal === "vrn" && recoloured ? "/static/icons/vrn/" + name : src);
+      if (pal === "vrn" && /^(vrn_logo\.svg|icon-192\.png|home_navigator_[a-z_]+\.svg)$/.test(name) && name !== "home_navigator_ticket_shop_page.svg") {
+        src = "/static/icons/vrn/" + name;
+      } else if (pal === "modern" && /^(icon-192\.png|home_navigator_[a-z_]+\.svg)$/.test(name)) {
+        src = "/static/icons/modern/" + name;
+      }
+      img.setAttribute("src", src);
     });
-    var meta = document.querySelector("meta[name=theme-color]");
-    if (meta) meta.setAttribute("content", pal === "vrn" ? "#0098d8" : "#d80019");
+    // The browser bar in the page colour: white, or the palette's ink in dark mode.
+    var dark = c.theme === "dark" || (c.theme !== "light" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+    var ink = { vrn: "#002d59", modern: "#111418" }[pal] || "#59000a";
+    Array.prototype.forEach.call(document.querySelectorAll("meta[name=theme-color]"), function (m) {
+      m.removeAttribute("media"); m.setAttribute("content", dark ? ink : "#ffffff");
+    });
   })();
 </script>
 <script>
@@ -78,8 +86,9 @@
   function logo(t) {
     var span = el("span", "logo");
     if (t.dticket) {
-      var a = el("img"); a.src = DTICKET.light; a.alt = "";  // the card is always light
-      span.appendChild(a);
+      var a = el("img", "dt-light"); a.src = DTICKET.light; a.alt = "";
+      var b = el("img", "dt-dark"); b.src = DTICKET.dark; b.alt = "";  // dark cards (Modern, dark mode)
+      span.appendChild(a); span.appendChild(b);
     } else {
       span.appendChild(el("span", "ic ticket"));
     }

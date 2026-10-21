@@ -3,17 +3,7 @@
 {% block actions %}<a class="iconbtn" href="{{ url_for('ticket_detail', tid=t.id, reload=1) }}" aria-label="Neu laden" title="Neu laden">↻</a>{% endblock %}
 {% block bodyclass %}ticketpage{% endblock %}
 {% block content %}
-{# Laid out as in the official app: name and timer, the code on white, conditions, ticket data,
-   invoice. White with VRN navy ink, navy with white in dark mode. #}
-<div class="ticket-detail">
-  <div class="tk-head">
-    <div class="name">{{ t.name }}</div>
-    {% if qr.code_data %}<button type="button" class="timer" id="counter" title="Was bedeutet der Zähler?"
-      onclick="document.getElementById('sheet').hidden=false">00:00</button>{% endif %}
-  </div>
-  {% if t.group == 'expired' %}<div class="alert bad">Abgelaufen am {{ t.valid_to|dt }}</div>
-  {% elif t.group == 'future' %}<div class="alert info">Gültig ab {{ t.valid_from|dt }}</div>{% endif %}
-
+{% macro code() %}
   {% if qr.code_data %}
     <div class="codebox" id="codebox" role="button" tabindex="0" aria-label="Code drehen" title="Antippen zum Drehen">
       {% if qr.kind in ('png', 'jpeg') %}
@@ -28,6 +18,58 @@
   {% else %}
     <div class="alert bad">Kein QR Code verfügbar.{% if qr.error %} {{ qr.error }}{% endif %}</div>
   {% endif %}
+
+{% endmacro %}
+{# Laid out as in the official app: name and timer, the code on white, conditions, ticket data,
+   invoice. White with VRN navy ink, navy with white in dark mode. #}
+<div class="ticket-detail">
+{% if palette == 'modern' %}
+  {# Modern: the ticket as one card (state, code, number, perforation, name), the data as tiles. #}
+  <div class="mt-card">
+    <div class="mt-row">
+      <span class="mlabel">{{ 'Deutschlandticket' if t.dticket else t.name }}</span>
+      <span class="mt-right">
+        {% if qr.code_data %}<button type="button" class="timer" id="counter" title="Was bedeutet der Zähler?"
+          onclick="document.getElementById('sheet').hidden=false">00:00</button>{% endif %}
+        <span class="pill {{ t.group }}">{{ {'current': '● Gültig', 'future': '○ Zukünftig', 'quota': 'Guthaben', 'expired': 'Abgelaufen', 'unknown': '?'}[t.group] }}</span>
+      </span>
+    </div>
+    {% if t.group == 'expired' %}<div class="alert bad">Abgelaufen am {{ t.valid_to|dt }}</div>
+    {% elif t.group == 'future' %}<div class="alert info">Gültig ab {{ t.valid_from|dt }}</div>{% endif %}
+    {{ code() }}
+    {% if t.number %}<div class="mt-num"><span class="mono">{{ t.number }}</span>
+      {% if t.dticket %}<div class="mt-hint">Nur mit amtlichem Lichtbildausweis gültig</div>{% endif %}</div>{% endif %}
+    <div class="mt-perf"></div>
+    <div><div class="mt-title">{{ t.headline or t.name }}</div>
+      <div class="mt-sub">{% if t.headline %}{{ t.name }} · {% endif %}{{ t.period or (t.valid_to|dt) }}</div></div>
+  </div>
+  <dl class="mt-tiles">
+    {% if t.holder %}<div><dt>Ticketinhaber</dt><dd>{{ t.holder }}</dd></div>{% endif %}
+    {% if t.dob %}<div><dt>Geburtsdatum</dt><dd>{{ t.dob|dt(false) }}</dd></div>{% endif %}
+    <div><dt>Gültig ab</dt><dd>{{ t.valid_from|dt }}</dd></div>
+    <div><dt>Gültig bis</dt><dd>{{ t.valid_to|dt }}</dd></div>
+    {% if t.dticket %}<div><dt>Gültig in</dt><dd>Deutschland · Nahverkehr</dd></div>{% elif t.area %}<div><dt>Geltungsbereich</dt><dd>{{ t.area }}</dd></div>{% endif %}
+    {% if t.booked %}<div><dt>Kaufdatum</dt><dd>{{ t.booked|dt }}</dd></div>{% endif %}
+    {% if t.price_level %}<div><dt>Preisstufe</dt><dd>{{ t.price_level }}</dd></div>{% endif %}
+  </dl>
+  {% if t.dticket %}<div class="mt-terms">Keine Mitnahme weiterer Personen. Nicht übertragbar. Es gelten die Tarif- und
+    Beförderungsbestimmungen des jeweiligen Tarifanbieters.</div>{% endif %}
+  {% if t.order_id %}
+    <div id="rechnung">
+      {% if invoice and invoice.error %}<div class="alert bad">Rechnung nicht verfügbar: {{ invoice.error }}</div>{% endif %}
+      <a class="btn outline" href="{{ url_for('ticket_invoice', tid=t.id) }}" target="_blank" rel="noopener"><span class="ic download"></span>Rechnung herunterladen</a>
+    </div>
+  {% endif %}
+{% else %}
+  <div class="tk-head">
+    <div class="name">{{ t.name }}</div>
+    {% if qr.code_data %}<button type="button" class="timer" id="counter" title="Was bedeutet der Zähler?"
+      onclick="document.getElementById('sheet').hidden=false">00:00</button>{% endif %}
+  </div>
+  {% if t.group == 'expired' %}<div class="alert bad">Abgelaufen am {{ t.valid_to|dt }}</div>
+  {% elif t.group == 'future' %}<div class="alert info">Gültig ab {{ t.valid_from|dt }}</div>{% endif %}
+
+  {{ code() }}
 
   <div class="tk-info">
     {% if t.dticket %}
@@ -52,6 +94,7 @@
       </div>
     {% endif %}
   </div>
+{% endif %}
 
   {% call m.debug_panel('Barcode') %}
     {% if qr.code_data and qr.kind == 'data' %}

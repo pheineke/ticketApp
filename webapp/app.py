@@ -276,13 +276,19 @@ def go(sid: str, endpoint: str, **kw):
 # Settings (per browser, in cookies so they survive container restarts)
 # --------------------------------------------------------------------------
 THEMES = ("system", "light", "dark")
-# Colour scheme: "lite" = the red myVRN Lite palette (default), "vrn" = original VRN blue/navy.
-PALETTES = ("lite", "vrn")
+# Colour scheme: "lite" = the red myVRN Lite palette (default), "vrn" = original VRN blue/navy,
+# "modern" = its own design (large titles, cards, DM Sans) with its own logo (static/icons/modern/).
+PALETTES = ("lite", "vrn", "modern")
 # Icons recoloured for the red palette; the original blue versions live in static/icons/vrn/.
 RECOLOURED_ICONS = {"vrn_logo.svg", "icon-192.png", "home_navigator_bulletin_board_page.svg",
                     "home_navigator_help_and_contact_page.svg", "home_navigator_imprint_page.svg",
                     "home_navigator_mobility_account_page.svg", "home_navigator_privacy_page.svg",
                     "home_navigator_settings_page.svg"}
+# The Modern design's icons (static/icons/modern/): its logo and the drawer icons without circles.
+MODERN_ICONS = {"icon-192.png", "home_navigator_bulletin_board_page.svg", "home_navigator_help_and_contact_page.svg",
+                 "home_navigator_imprint_page.svg", "home_navigator_mobility_account_page.svg",
+                 "home_navigator_privacy_page.svg", "home_navigator_settings_page.svg",
+                 "home_navigator_ticket_shop_page.svg"}
 
 
 @app.context_processor
@@ -296,6 +302,8 @@ def inject_settings():
         """URL of an icon in the active colour scheme."""
         if palette == "vrn" and name in RECOLOURED_ICONS:
             return url_for("static", filename="icons/vrn/" + name)
+        if palette == "modern" and name in MODERN_ICONS:
+            return url_for("static", filename="icons/modern/" + name)
         return url_for("static", filename="icons/" + name)
 
     return {
@@ -568,6 +576,21 @@ def _first_date(t: dict, *keys) -> tuple[str | None, datetime | None]:
     return None, None
 
 
+MONTHS = ("Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober",
+          "November", "Dezember")
+
+
+def ticket_period(start: datetime | None, end: datetime | None) -> tuple[str | None, str | None]:
+    """(headline, period) for a ticket card: "Oktober 2026", "01.10. – 31.10.2026" for a calendar
+    month (ends early on the 1st of the next), else no headline and the plain dates."""
+    if not start or not end:
+        return None, None
+    last = (end - timedelta(hours=6)).date()  # validity ends a few hours into the next day
+    period = f"{start:%d.%m.} – {last:%d.%m.%Y}" if start.year == last.year else f"{start:%d.%m.%Y} – {last:%d.%m.%Y}"
+    monthly = start.day == 1 and start.hour == 0 and last.month == start.month and (last + timedelta(days=1)).day == 1
+    return (f"{MONTHS[start.month - 1]} {start.year}" if monthly else None), period
+
+
 def ticket_view(order: dict, t: dict) -> dict:
     """One ticket card/detail model from OrderResult + OrderResultTicket."""
     now = datetime.now(TZ)
@@ -595,6 +618,7 @@ def ticket_view(order: dict, t: dict) -> dict:
         "holder": _detail(t, "Holder"), "dob": _detail(t, "Dob"),
         "number": _detail(t, "AuthorizationNumber") or order.get("OrderNumber"),
         "order_id": order.get("Id"), "order_number": order.get("OrderNumber"), "booked": order.get("BookingDate"),
+        **dict(zip(("headline", "period"), ticket_period(start, end))),
         "quota": (t.get("UsedQuota"), t.get("AllowedQuota")),
         "hidden": bool(t.get("Canceled") or t.get("Refunded")),
         "order": order, "raw": t,

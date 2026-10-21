@@ -1,8 +1,9 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="center" style="padding:40px 0 26px">
-  <img class="only-light" src="{{ icon('vrn_logo.svg') }}" alt="" style="height:52px">
-  <img class="only-dark" src="{{ url_for('static', filename='icons/vrn_logo_dark.svg') }}" alt="" style="height:52px">
+  {% if palette == 'modern' %}<img class="mark" src="{{ url_for('static', filename='icons/modern/logo.svg') }}" alt="" style="height:64px">
+  {% else %}<img class="only-light" src="{{ icon('vrn_logo.svg') }}" alt="" style="height:52px">
+  <img class="only-dark" src="{{ url_for('static', filename='icons/vrn_logo_dark.svg') }}" alt="" style="height:52px">{% endif %}
 </div>
 {% if error %}<div class="alert bad">{{ error }}</div>{% endif %}
 <div class="panel narrow">
