@@ -493,3 +493,11 @@ body.mapmode main.content { padding: 0; }
 @media (min-width: 1000px) {
   body:not(.has-nav) .app { max-width: none; box-shadow: none; }  /* gate page: no phone column */
 }
+
+/* ---- Ticketshop ------------------------------------------------------- */
+.shophead { display: flex; gap: 12px; align-items: center; margin-bottom: 12px; }
+.shophead img { width: 42px; flex: none; }
+.shophead .t { font-size: 15px; font-weight: 600; color: var(--text-heading); }
+.shophead .s { font-size: 12px; color: var(--text-muted); }
+.shopcard .btn { margin-top: 4px; }
+.verify select { margin-bottom: 10px; }

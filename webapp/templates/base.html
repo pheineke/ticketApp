@@ -45,6 +45,9 @@
   <a class="navrow{{ ' on' if active == 'tickets' }}" href="{{ url_for('tickets') }}">
     <img src="{{ icon('home_navigator_bulletin_board_page.svg') }}" alt="">
     <div><div class="t">Meine Tickets</div><div class="s">Meine aktuell gültigen Tickets.</div></div></a>
+  <a class="navrow{{ ' on' if active == 'shop' }}" href="{{ url_for('ticketshop') }}">
+    <img src="{{ icon('home_navigator_ticket_shop_page.svg') }}" alt="">
+    <div><div class="t">Ticketshop</div><div class="s">Tickets kaufen, Berechtigungen.</div></div></a>
   <a class="navrow{{ ' on' if active == 'fahrplan' }}" href="{{ url_for('connections') }}">
     <span class="navic" aria-hidden="true"><span class="ic route"></span></span>
     <div><div class="t">Fahrplan</div><div class="s">Verbindungen suchen, Route auf der Karte.</div></div></a>

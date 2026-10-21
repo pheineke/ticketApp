@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% import "_macros.html" as m with context %}
+{% block content %}
+{% if error %}<div class="alert bad">{{ error }}</div>{% endif %}
+{% set o = payload.Purchase[0] %}
+<div class="panel">
+  <h3>Deutschland-Semesterticket</h3>
+  <table class="kv">
+    <tr><td>Gültig ab</td><td>{{ st.month.strftime('%d.%m.%Y') }}</td></tr>
+    <tr><td>Verlängerung</td><td>monatlich bis Semesterende ({{ st.current.EligibleUntil|dt(false) }})</td></tr>
+    {% if o.PurchaseUser %}<tr><td>Ticketinhaber</td><td>{{ o.PurchaseUser.FirstName }} {{ o.PurchaseUser.LastName }}</td></tr>{% endif %}
+    <tr><td>Preis</td><td>0,00 €</td></tr>
+  </table>
+</div>
+<form method="post" action="{{ url_for('ticketshop_buy') }}"><input type="hidden" name="_csrf" value="{{ csrf_token }}">
+  <label class="row" style="gap:8px;margin:4px 2px 14px">
+    <input type="checkbox" name="agb" value="1" style="width:auto">
+    <span>Mit dem Kauf akzeptiere ich die <a href="https://www.vrn.de/_inc/app/agb/" target="_blank" rel="noopener">AGB</a>.
+      Der Digitalkauf wird über die Rhein-Neckar-Verkehr GmbH abgewickelt.</span>
+  </label>
+  <button class="btn" type="submit">Jetzt kostenlos buchen</button>
+</form>
+<p class="hint center">Die Bestellung wird genau so an den VRN-Shop gesendet:</p>
+<pre>{{ payload|pretty }}</pre>
+{% endblock %}

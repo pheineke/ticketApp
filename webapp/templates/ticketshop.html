@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% import "_macros.html" as m with context %}
+{% block content %}
+{% if saved %}<div class="alert ok">Daten gespeichert. Danke!</div>{% endif %}
+{% if not meta.logged_in %}
+  <div class="empty">
+    <span class="ic ticket"></span>
+    <p>Für den Ticketkauf bitte zuerst im <a href="{{ url_for('account') }}">Konto</a> anmelden.</p>
+    <a class="btn" href="{{ url_for('account') }}">Einloggen</a>
+  </div>
+{% else %}
+  {% if result %}
+    <div id="result" class="alert {{ 'ok' if result.ok else 'bad' }}">{{ result.text }}
+      {% if result.ok %}<a href="{{ url_for('tickets', reload=1) }}">Zu meinen Tickets</a>{% endif %}</div>
+    {% call m.debug_panel('CreateOrder') %}
+      <pre>{{ result.request }}</pre><pre>{{ result.response|pretty }}</pre>
+    {% endcall %}
+  {% endif %}
+
+  {# ---- Deutschland-Semesterticket ---- #}
+  <h2>Deutschland-Semesterticket</h2>
+  <div class="panel shopcard">
+    <div class="shophead">
+      <img src="{{ url_for('static', filename='icons/deutschlandticket.svg') }}" alt="" class="only-light">
+      <img src="{{ url_for('static', filename='icons/deutschlandticket_darkmode.svg') }}" alt="" class="only-dark">
+      <div class="grow">
+        <div class="t">Deutschland-Semesterticket</div>
+        <div class="s">Deutschlandweit im Nahverkehr, 2. Klasse · monatlich, bis Semesterende · 0,00 €</div>
+      </div>
+    </div>
+    {% if st.items is none %}
+      <div class="alert bad">Berechtigungen konnten nicht geladen werden ({{ st.status }}).</div>
+    {% elif st.running %}
+      <div class="alert ok">Dein Semesterticket-Abo läuft{% if st.this_month %} (aktuell gültig bis {{ st.this_month.to.strftime('%d.%m.%Y') }}){% endif %}.
+        Es verlängert sich monatlich bis Semesterende ({{ st.current.EligibleUntil|dt(false) if st.current else '' }}).</div>
+    {% elif st.current %}
+      <p class="hint">Berechtigt bis {{ st.current.EligibleUntil|dt(false) }}. Das Ticket gilt ab {{ st.month.strftime('%d.%m.%Y') }}
+        und verlängert sich monatlich bis Semesterende.</p>
+      <a class="btn" href="{{ url_for('ticketshop_buy') }}">Semesterticket buchen (0,00 €)</a>
+    {% else %}
+      <div class="alert info">Für dieses Semester ist noch kein Studierendenstatus nachgewiesen.
+        {% if st.latest %}Letzte Berechtigung: bis {{ st.latest.EligibleUntil|dt(false) }}.{% endif %}
+        Bitte zuerst unten per Hochschul-Login verifizieren.</div>
+    {% endif %}
+  </div>
+
+  {# ---- Verification ---- #}
+  <h2 id="verify">Studierendenstatus</h2>
+  <div class="panel">
+    {% if st.student %}
+      <table class="kv">
+        {% for e in st.student[:4] %}
+          <tr><td>{{ e.EligibleFrom|dt(false) }} – {{ e.EligibleUntil|dt(false) }}</td>
+            <td>{{ st.status_name(e) }}{% if e is sameas st.current %} · aktuell{% endif %}
+              <div class="hint" style="margin:0">angelegt {{ e.Created|dt }}{% if (e.EditedBy or '').startswith('dfn:') %} · Hochschul-Login{% endif %}</div></td></tr>
+        {% endfor %}
+      </table>
+      {% if not st.current %}
+        <p class="hint">Keiner dieser Nachweise gilt heute ({{ st.now.strftime('%d.%m.%Y') }}){% if st.student[0].Approved is false or st.student[0].Status in (0, 1) %}: der neueste ist noch nicht genehmigt{% endif %}.</p>
+      {% endif %}
+    {% else %}
+      <p class="hint">Für dieses Konto ist kein Studierenden-Nachweis gespeichert{% if st.other_count %} ({{ st.other_count }} andere Berechtigung{{ 'en' if st.other_count != 1 }}){% endif %}.</p>
+    {% endif %}
+    {% if not st.current %}
+      <p class="hint">Mit dem Hochschul-Login bestätigt deine Hochschule, dass du in diesem Semester eingeschrieben bist.
+        Du meldest dich dazu zuerst im VRN-Shop und dann bei deiner Hochschule an; danach ist die Berechtigung sofort aktiv.
+        Wichtig: im VRN-Shop mit <b>demselben VRN-Konto</b> anmelden wie hier ({{ meta.claims.get('email') or 'siehe Konto' }}).</p>
+    {% endif %}
+    {% if unis %}
+      <form method="get" action="{{ url_for('ticketshop_verify') }}" target="_blank" class="verify">
+        <label class="lbl" for="uni">{{ 'Erneut verifizieren' if st.current else 'Hochschule' }}</label>
+        <select id="uni" name="uni">
+          {% for u in unis %}<option value="{{ u.id }}"{{ ' selected' if 'uni-kl.de' in u.id }}>{{ u.name }}</option>{% endfor %}
+        </select>
+        <button class="btn{{ ' outline' if st.current }}" type="submit">Hochschul-Login starten</button>
+      </form>
+      <p class="hint">Öffnet den VRN-Shop in einem neuen Tab. Danach hier die Seite neu laden.</p>
+    {% else %}
+      <div class="alert bad">Die Liste der Hochschulen konnte nicht geladen werden.</div>
+    {% endif %}
+  </div>
+
+  {% if st.tickets %}
+    <h2>Bisherige Semestertickets</h2>
+    <div class="panel">
+      <table class="kv">
+        {% for t in st.tickets[:6] %}
+          <tr><td>{{ t.from.strftime('%m/%Y') if t.from }}</td><td>Bestellung {{ t.order.OrderNumber }}</td></tr>
+        {% endfor %}
+      </table>
+    </div>
+  {% endif %}
+
+  {% call m.debug_panel('Berechtigungen') %}
+    <div class="hint">{{ st.status }}</div>
+    <pre>{{ st['items']|pretty }}</pre>
+  {% endcall %}
+  {% call m.debug_panel('Analyse') %}
+    <form method="post" action="{{ url_for('ticketshop_snapshot') }}"><input type="hidden" name="_csrf" value="{{ csrf_token }}">
+      <button class="btn small outline" type="submit">Daten für Analyse speichern</button>
+    </form>
+  {% endcall %}
+{% endif %}
+{% endblock %}

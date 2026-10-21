@@ -18,7 +18,7 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY app.py efa.py remote_browser.py vrn_client.py security.py remember.py start.sh ./
+COPY app.py efa.py shop.py remote_browser.py vrn_client.py security.py remember.py start.sh ./
 COPY templates ./templates
 COPY static ./static
 RUN chmod +x start.sh

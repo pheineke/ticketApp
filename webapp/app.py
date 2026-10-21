@@ -38,6 +38,7 @@ from flask import (
 
 import efa
 import remember
+import shop
 import security as sec
 import vrn_client
 from remote_browser import remote
@@ -118,6 +119,8 @@ class Session:
     discovery: dict | None = None
     probe: dict | None = None                        # last free-form probe
     trips: dict | None = None                        # last connection search (Fahrplan)
+    shop_unis: list | None = None                    # Dfn/GetAuthorities (Hochschul-Login)
+    shop_result: dict | None = None                  # result of the last ticket order
     csrf: str = field(default_factory=sec.new_csrf)  # per-session CSRF token
     gate_ok: bool = False                            # passed the ACCESS_PASSWORD gate
     device: str | None = None                        # persistent-login cookie value (remember.py)
@@ -1045,6 +1048,125 @@ def probe():
         payload = None
     sess.probe = api_call(sess, method, (request.form.get("url") or "").strip(), payload)
     return go(sid, "settings", _anchor="probe")
+
+
+# --------------------------------------------------------------------------
+# Ticketshop: entitlements (Berechtigungsnachweise) and buying (see shop.py)
+# --------------------------------------------------------------------------
+SNAPSHOT_PATH = os.environ.get("SHOP_SNAPSHOT", "/data/shop-snapshot.json")
+
+
+def shop_state(sess: Session) -> dict:
+    """Everything the Ticketshop page needs: entitlements, Semesterticket history, what to offer."""
+    now = datetime.now(TZ)
+    items, status = shop.entitlements(lambda m, u, p=None: api_call(sess, m, u, p))
+    current, latest = shop.student_entitlement(items or [], now)
+    if sess.orders is None:
+        load_orders(sess)
+    tickets = shop.semester_tickets((sess.orders or {}).get("orders") or [])
+    this_month = next((t for t in tickets if t["from"] and t["to"] and t["from"] <= now < t["to"]), None)
+    # The subscription renews itself monthly (orders around the 29th): a Semesterticket that starts
+    # within the current entitlement's period means it's running, so never offer a second one.
+    # (Last semester's final ticket ends a few hours into the new period: it doesn't count.)
+    since = shop._ts(current.get("EligibleFrom")) if current else None
+    running = next((t for t in tickets if since and t["from"] and t["from"] >= since - timedelta(hours=1)), None)
+    return {
+        "now": now, "items": items, "status": status, "current": current, "latest": latest,
+        "tickets": tickets, "this_month": this_month, "running": running,
+        "student": shop.student_entitlements(items or []),
+        "other_count": len([e for e in items or [] if shop.ticket_type(e) != shop.STUDENT_ANNOTATION]),
+        "can_buy": bool(current) and running is None,
+        "month": shop.month_start(now),
+        "status_name": lambda e: shop.STATUS_LABELS.get(shop.STATUS_NAMES.get(e.get("Status"), "unknown"), "?"),
+    }
+
+
+def shop_authorities(sess: Session) -> list[dict]:
+    """Universities for the Hochschul-Login (Dfn/GetAuthorities, cached per session)."""
+    if sess.shop_unis is None:
+        rec = api_call(sess, "GET", shop.AUTHORITIES_URL)
+        sess.shop_unis = shop.authorities(rec.get("json")) if rec.get("code") == 200 else []
+    return sess.shop_unis
+
+
+@app.route("/ticketshop")
+def ticketshop():
+    sess, sid = get_session()
+    st = shop_state(sess) if sess.tokens else None
+    unis = shop_authorities(sess) if sess.tokens else []
+    return page(sess, sid, "ticketshop.html", active="shop", title="Ticketshop", st=st, unis=unis,
+                result=sess.shop_result, saved=request.args.get("saved"))
+
+
+@app.route("/ticketshop/verifizieren")
+def ticketshop_verify():
+    """Hochschul-Login: to the shop's login, which continues to the chosen university."""
+    sess, sid = get_session()
+    entity = request.args.get("uni", "")
+    if not sess.tokens or entity not in {u["id"] for u in shop_authorities(sess)}:
+        return go(sid, "ticketshop")
+    return attach_cookie(make_response(redirect(shop.verify_url(entity))), sid)
+
+
+def _semester_order(sess: Session, st: dict) -> dict:
+    prof = (load_profile(sess) if sess.profile is None else sess.profile).get("profile") or {}
+    template = st["tickets"][0] if st["tickets"] else None
+    detail = ((template or {}).get("ticket") or {}).get("Details") or [{}]
+    person = {"first": prof.get("first"), "last": prof.get("last"), "gender": (detail[0] or {}).get("Gender"),
+              "dob": (detail[0] or {}).get("Dob") or prof.get("dob")}
+    return shop.build_semester_order(template, person, st["now"])
+
+
+@app.route("/ticketshop/semesterticket", methods=["GET", "POST"])
+def ticketshop_buy():
+    """Deutschland-Semesterticket for this month: confirm (GET), then order (POST)."""
+    sess, sid = get_session()
+    if not sess.tokens:
+        return go(sid, "account")
+    st = shop_state(sess)
+    if not st["can_buy"]:
+        return go(sid, "ticketshop")
+    payload = _semester_order(sess, st)
+    if request.method == "GET":
+        sess.shop_result = None
+        return page(sess, sid, "ticketshop_confirm.html", active="shop", title="Ticketkauf überprüfen",
+                    back=url_for("ticketshop"), st=st, payload=payload)
+    if request.form.get("agb") != "1":
+        return page(sess, sid, "ticketshop_confirm.html", active="shop", title="Ticketkauf überprüfen",
+                    back=url_for("ticketshop"), st=st, payload=payload, error="Bitte die AGB bestätigen.")
+    rec = api_call(sess, "POST", shop.CREATE_ORDER_URL, payload)
+    data = rec.get("json") if isinstance(rec.get("json"), dict) else {}
+    err = data.get("Error") or {}
+    if data.get("Orders"):
+        result = {"ok": True, "text": "Dein Deutschland-Semesterticket wurde gebucht."}
+    elif data.get("RedirectUrl"):
+        # A payment step: never followed here (the Semesterticket is free; something is off).
+        result = {"ok": False, "text": "Der Shop verlangt eine Zahlung. Abgebrochen: das Semesterticket sollte 0 € kosten."}
+    else:
+        result = {"ok": False, "text": "Kauf fehlgeschlagen: " + (err.get("Message") or rec.get("status") or "unbekannter Fehler")
+                  + (f" (Code {err.get('MessageID')})" if err.get("MessageID") else "")}
+    result["request"] = rec.get("request")
+    result["response"] = rec.get("json") if rec.get("json") is not None else rec.get("text")
+    sess.shop_result = result
+    load_orders(sess)  # the new ticket shows up in "Meine Tickets"
+    return go(sid, "ticketshop", _anchor="result")
+
+
+@app.route("/ticketshop/snapshot", methods=["POST"])
+def ticketshop_snapshot():
+    """Debug: save the read-only shop answers (entitlements, universities, products, orders)
+    on the server for analysis. Only on the user's own tap; contains personal data."""
+    sess, sid = get_session()
+    if not sess.tokens:
+        return go(sid, "account")
+    data = shop.snapshot(lambda m, u, p=None: api_call(sess, m, u, p))
+    orders = load_orders(sess)
+    data["orders"] = {"status": orders.get("status"), "json": orders.get("json")}
+    os.makedirs(os.path.dirname(SNAPSHOT_PATH), exist_ok=True)
+    fd = os.open(SNAPSHOT_PATH, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+    with os.fdopen(fd, "w") as f:
+        json.dump(data, f, ensure_ascii=False, indent=1)
+    return go(sid, "ticketshop", saved=1)
 
 
 # --------------------------------------------------------------------------

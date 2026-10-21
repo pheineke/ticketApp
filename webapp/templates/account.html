@@ -31,6 +31,13 @@
   </div>
   {% endif %}
   {% if not profile %}<div class="alert info">Profildaten konnten nicht geladen werden{% if profile_rec.calls %} ({{ profile_rec.calls[-1].status }}){% endif %}.</div>{% endif %}
+  <div class="panel setting">
+    <div class="grow">
+      <div class="t">Studierendenstatus</div>
+      <div class="s">Für das Deutschland-Semesterticket: per Hochschul-Login verifizieren.</div>
+    </div>
+    <a class="btn small outline" href="{{ url_for('ticketshop') }}#verify">Verifizieren</a>
+  </div>
   <p class="hint center">{% if remembered %}Angemeldet bleiben ist auf diesem Gerät aktiv.{% else %}Du wirst nach einiger Zeit automatisch abgemeldet.{% endif %}</p>
   <form method="post" action="{{ url_for('logout') }}"><input type="hidden" name="_csrf" value="{{ csrf_token }}"><button class="btn outline" type="submit">Abmelden</button></form>
   <p class="center hint"><a href="https://shop.myvrn.de/authentication/private?organization=vrn&client=vrn" target="_blank" rel="noopener">Login Daten ändern ↗</a></p>

@@ -4,7 +4,7 @@
  * - Navigations go to the network; if that fails (no signal), /offline is shown, which
  *   renders the tickets from the browser's own offline copy (localStorage).
  */
-const VERSION = "v19";
+const VERSION = "v21";
 // Show the offline page if a page hasn't loaded within this time (slow/absent mobile data).
 const NAV_TIMEOUT_MS = 2500;
 const SHELL = `shell-${VERSION}`;
