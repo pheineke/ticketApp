@@ -1,3 +1,13 @@
 {% macro debug_panel(label, open=false) -%}
   {% if debug %}<details class="debug"{% if open %} open{% endif %}><summary>DEBUG · {{ label }}</summary><div class="body">{{ caller() }}</div></details>{% endif %}
 {%- endmacro %}
+
+{# Planned time with the realtime delay: +3 in red, on time in green (only with realtime data). #}
+{% macro clock(planned, rt, delay) -%}
+  <span class="clock">{{ planned|hm }}{% if delay is not none %}{% if delay > 0 %}<small class="late">+{{ delay }}</small>{% elif delay < 0 %}<small class="ontime">{{ delay }}</small>{% else %}<small class="ontime" title="pünktlich">●</small>{% endif %}{% endif %}</span>
+{%- endmacro %}
+
+{# Line badge in the mode's colour, e.g. "Bus 116", "S2", "RE1". #}
+{% macro line(leg) -%}
+  <span class="line m-{{ leg.mode }}" title="{{ leg.name }}">{% if leg.mode == 'bus' %}Bus {% elif leg.mode == 'tram' %}Tram {% endif %}{{ leg.line or leg.mode_label }}</span>
+{%- endmacro %}

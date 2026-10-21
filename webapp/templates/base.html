@@ -12,6 +12,7 @@
   <link rel="apple-touch-icon" href="{{ icon('icon-192.png') }}">
   <link rel="manifest" href="/manifest.webmanifest">
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  {% block head %}{% endblock %}
 </head>
 <body>
 <div class="app">
@@ -44,6 +45,9 @@
   <a class="navrow{{ ' on' if active == 'tickets' }}" href="{{ url_for('tickets') }}">
     <img src="{{ icon('home_navigator_bulletin_board_page.svg') }}" alt="">
     <div><div class="t">Meine Tickets</div><div class="s">Meine aktuell gültigen Tickets.</div></div></a>
+  <a class="navrow{{ ' on' if active == 'fahrplan' }}" href="{{ url_for('connections') }}">
+    <span class="navic" aria-hidden="true"><span class="ic route"></span></span>
+    <div><div class="t">Fahrplan</div><div class="s">Verbindungen suchen, Route auf der Karte.</div></div></a>
   <a class="navrow{{ ' on' if active == 'account' }}" href="{{ url_for('account') }}">
     <img src="{{ icon('home_navigator_mobility_account_page.svg') }}" alt="">
     <div><div class="t">VRN Konto</div><div class="s">Meine Benutzerdaten und Login.</div></div></a>
@@ -67,6 +71,7 @@
 <nav class="tabbar" aria-label="Hauptnavigation">
   <div class="inner">
     <a class="{{ 'on' if active == 'tickets' }}" href="{{ url_for('tickets') }}"><span class="ic ticket"></span>Tickets</a>
+    <a class="{{ 'on' if active == 'fahrplan' }}" href="{{ url_for('connections') }}"><span class="ic route"></span>Fahrplan</a>
     <a class="{{ 'on' if active == 'account' }}" href="{{ url_for('account') }}"><span class="ic account"></span>Konto</a>
     <a class="{{ 'on' if active == 'settings' }}" href="{{ url_for('settings') }}"><span class="ic gear"></span>Einstellen</a>
     <a class="{{ 'on' if active == 'app' }}" href="{{ url_for('android_app') }}"><span class="ic download"></span>App</a>

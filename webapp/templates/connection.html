@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% import "_macros.html" as m with context %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='vendor/leaflet/leaflet.css') }}">
+{% endblock %}
+{% block content %}
+<div class="jsummary">
+  <div class="jtimes">{{ m.clock(j.dep, j.dep_rt, j.dep_delay) }} – {{ m.clock(j.arr, j.arr_rt, j.arr_delay) }}</div>
+  <div class="hint">{{ j.dep.strftime('%d.%m.%Y') if j.dep }} · {{ j.minutes|duration }} · {{ j.changes }} Umstieg{{ 'e' if j.changes != 1 }}{% if j.ticket %} · {{ j.ticket }}{% endif %}</div>
+</div>
+
+<div id="map" class="routemap" role="img" aria-label="Karte der Route"></div>
+<script type="application/json" id="map-data">{{ map_legs|tojson }}</script>
+
+{% if j.cancelled %}<div class="alert bad">Diese Verbindung fällt laut Echtzeitdaten (teilweise) aus.</div>{% endif %}
+
+<div class="legs">
+{% for leg in j.legs %}
+  {% if leg.mode == 'walk' %}
+    <div class="walkleg">
+      <span class="walkicon" aria-hidden="true">🚶</span>
+      Fußweg {{ leg.minutes }} min{% if leg.distance %} · {{ leg.distance }} m{% endif %}
+      {% if loop.first %}<div class="hint">von {{ leg.origin.name }}</div>{% endif %}
+      {% if loop.last %}<div class="hint">nach {{ leg.destination.name }}</div>{% endif %}
+    </div>
+  {% else %}
+    <div class="leg m-{{ leg.mode }}{{ ' cancelled' if leg.cancelled }}">
+      <div class="lstop">
+        <span class="ltime">{{ m.clock(leg.origin.time, leg.origin.rt, leg.origin.delay) }}</span>
+        <span class="lname">{{ leg.origin.name }}</span>
+        {% if leg.origin.platform %}<span class="plat">Steig {{ leg.origin.platform }}</span>{% endif %}
+      </div>
+      <div class="lride">
+        <div>{{ m.line(leg) }} <span class="dir">Richtung {{ leg.direction or '—' }}</span></div>
+        <div class="hint">{{ leg.minutes }} min{% if leg.operator %} · {{ leg.operator }}{% endif %}{% if not leg.realtime %} · ohne Echtzeit{% endif %}</div>
+        {% if leg.stops %}
+          <details class="between">
+            <summary>{{ leg.stops|length }} Zwischenhalt{{ 'e' if leg.stops|length != 1 }}</summary>
+            <ul>
+              {% for s in leg.stops %}<li><span class="ltime">{{ m.clock(s.time, s.rt, s.delay) }}</span> {{ s.name }}</li>{% endfor %}
+            </ul>
+          </details>
+        {% endif %}
+        {% for info in leg.infos %}
+          <details class="linfo">
+            <summary>⚠ {{ info.title or 'Hinweis' }}</summary>
+            {% if info.text %}<p>{{ info.text }}</p>{% endif %}
+          </details>
+        {% endfor %}
+      </div>
+      <div class="lstop">
+        <span class="ltime">{{ m.clock(leg.destination.time, leg.destination.rt, leg.destination.delay) }}</span>
+        <span class="lname">{{ leg.destination.name }}</span>
+        {% if leg.destination.platform %}<span class="plat">Steig {{ leg.destination.platform }}</span>{% endif %}
+      </div>
+    </div>
+  {% endif %}
+{% endfor %}
+</div>
+<p class="hint center">Echtzeitdaten der VRN-Fahrplanauskunft · Angaben ohne Gewähr</p>
+
+{% call m.debug_panel('Verbindung (geparst)') %}
+  <pre>{{ j.legs|map(attribute='name')|list|pretty }}</pre>
+  <pre>{{ rec.url }}</pre>
+{% endcall %}
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='vendor/leaflet/leaflet.js') }}"></script>
+<script src="{{ url_for('static', filename='routemap.js') }}"></script>
+{% endblock %}

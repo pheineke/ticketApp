@@ -78,6 +78,8 @@ main.content { flex: 1; padding: 12px 12px calc(68px + env(safe-area-inset-botto
 .ic.gear    { --src: url(icons/settings.svg); }
 .ic.qr      { --src: url(icons/qr_code.svg); }
 .ic.download { --src: url(icons/app_download.svg); }
+.ic.route    { --src: url(icons/route.svg); }
+.ic.locate   { --src: url(icons/locate.svg); }
 
 /* ---- Drawer (Home navigator) ----------------------------------------- */
 .scrim { position: fixed; inset: 0; z-index: 20; background: rgba(0, 0, 0, .4); opacity: 0; pointer-events: none; transition: opacity .2s; }
@@ -113,7 +115,7 @@ body.nav-open .drawer { transform: none; }
 .field { margin-bottom: 14px; }
 .field label, label.lbl { display: block; font-size: 13px; margin-bottom: 4px; color: var(--text-heading); }
 .field label small { color: var(--error); font-size: 11px; }
-input[type=text], input[type=email], input[type=password], input[type=url], select, textarea {
+input[type=text], input[type=email], input[type=password], input[type=url], input[type=date], input[type=time], select, textarea {
   width: 100%; padding: 10px; border: 1px solid var(--text-muted); border-radius: var(--radius);
   background: var(--surface); color: var(--text); font: 14px var(--font); }
 input:focus, select:focus, textarea:focus { outline: 2px solid var(--brand); outline-offset: -1px; border-color: var(--brand); }
@@ -259,3 +261,90 @@ iframe.vnc { width: 100%; height: 640px; border: 1px solid var(--divider); borde
 .hint.sha { font-family: var(--mono); font-size: 11px; word-break: break-all; }
 .steps { margin: 0; padding-left: 20px; }
 .steps li + li { margin-top: 6px; }
+
+/* ---- Fahrplan ---------------------------------------------------------- */
+/* Mode colours, also used by routemap.js. */
+.m-train { --mode: #3d3d3d; } .m-sbahn { --mode: #00965e; } .m-ubahn { --mode: #0065ae; }
+.m-tram { --mode: #b5007a; } .m-bus { --mode: #0072bc; } .m-ship { --mode: #0094c6; }
+.m-taxi { --mode: #e0a800; } .m-bike { --mode: #5d9b2c; } .m-walk { --mode: #8c8c8c; } .m-other { --mode: #6b6b6b; }
+
+.search .places { position: relative; padding-right: 40px; }
+.search .place { position: relative; display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.search .place input[type=text] { flex: 1; min-width: 0; }
+.search .pin { width: 12px; height: 12px; flex: none; border-radius: 50%; border: 3px solid var(--brand-ink); }
+.search .pin.to { border-radius: 2px; background: var(--brand-ink); }
+.search .locate { position: absolute; right: 2px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+.search .locate .ic { width: 20px; height: 20px; }
+.search .locate.busy { animation: spin 1s linear infinite; }
+.search .place:has(.locate) input[type=text] { padding-right: 40px; }
+.search .swap { position: absolute; right: 0; top: 50%; transform: translateY(-60%); font-size: 20px; color: var(--brand-ink); }
+.search .when { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin: 4px 0 12px; }
+.search .when input[type=date] { flex: 1 1 130px; width: auto; }
+.search .when input[type=time] { flex: 0 1 100px; width: auto; }
+.seg.small { flex: 1 1 100%; }
+.seg label { flex: 1; display: block; margin: 0; cursor: pointer; }
+.seg label input { position: absolute; opacity: 0; pointer-events: none; }
+.seg label span { display: block; padding: 7px; text-align: center; color: var(--brand-ink); font: 500 13px var(--font); }
+.seg label + label { border-left: 1px solid var(--brand); }
+.seg label input:checked + span { background: var(--brand); color: #fff; }
+.seg label input:focus-visible + span { outline: 2px solid var(--brand-dark); outline-offset: -3px; }
+@keyframes spin { to { transform: translateY(-50%) rotate(360deg); } }
+
+.suggest { position: absolute; left: 20px; right: 0; top: 100%; z-index: 15; margin: 2px 0 0; padding: 0; list-style: none;
+           background: var(--surface); border: 1px solid var(--divider); border-radius: var(--radius);
+           box-shadow: 0 4px 14px rgba(0, 0, 0, .18); max-height: 300px; overflow-y: auto; }
+.suggest li { display: flex; gap: 8px; align-items: baseline; padding: 9px 10px; cursor: pointer; border-bottom: 1px solid var(--divider); }
+.suggest li:last-child { border-bottom: 0; }
+.suggest li.on { background: var(--hover); }
+.suggest .n { flex: 1; color: var(--text-heading); }
+.suggest .k { font-size: 11px; color: var(--text-muted); white-space: nowrap; }
+
+.recent { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.rchip { padding: 7px 12px; border-radius: 16px; background: var(--surface); border: 1px solid var(--divider);
+         color: var(--text-heading); text-decoration: none; font-size: 13px; }
+.rchip:active { background: var(--hover); }
+
+.btn.shift { display: block; width: 100%; margin: 0 0 8px; text-align: center; }
+.jcard { display: block; padding: 12px; margin-bottom: 8px; background: var(--surface); border: 1px solid var(--divider);
+         border-radius: var(--radius); color: inherit; text-decoration: none; }
+.jcard:active { background: var(--hover); }
+.jcard.cancelled .jtimes { text-decoration: line-through; opacity: .7; }
+.jtop { display: flex; align-items: baseline; gap: 8px; }
+.jtimes { flex: 1; font-size: 18px; font-weight: 600; color: var(--text-heading); }
+.jdur { font-size: 13px; color: var(--text-muted); white-space: nowrap; }
+.clock small { font-size: 11px; font-weight: 600; margin-left: 2px; vertical-align: 3px; }
+.clock .late { color: var(--error); }
+.clock .ontime { color: var(--success); }
+.jlines { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; margin: 8px 0 6px; }
+.jlines .sep { color: var(--text-muted); }
+.jlines .walk { font-size: 12px; color: var(--text-muted); }
+.line { display: inline-block; padding: 1px 7px; border-radius: 3px; background: var(--mode, #6b6b6b); color: #fff;
+        font-size: 12px; font-weight: 600; white-space: nowrap; }
+.jmeta { font-size: 12px; color: var(--text-muted); }
+.jwarn { font-size: 12px; color: var(--warning); margin-top: 4px; }
+.jwarn.bad { color: var(--error); }
+
+.jsummary { padding: 4px 2px 10px; }
+.routemap { height: 260px; margin: 0 -12px 12px; background: var(--hover); z-index: 0; }
+.mpin { border-radius: 50%; border: 3px solid #fff; box-shadow: 0 1px 4px rgba(0, 0, 0, .4); background: var(--brand); }
+.mpin.to { border-radius: 3px; background: var(--brand-dark); }
+.leaflet-container { font: 12px var(--font); }
+.legs { margin-bottom: 12px; }
+.leg { position: relative; background: var(--surface); border: 1px solid var(--divider); border-radius: var(--radius);
+       padding: 10px 12px 10px 22px; margin-bottom: 8px; }
+.leg::before { content: ""; position: absolute; left: 9px; top: 16px; bottom: 16px; width: 4px; border-radius: 2px; background: var(--mode); }
+.leg.cancelled { opacity: .65; }
+.lstop { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+.ltime { min-width: 52px; font-weight: 600; color: var(--text-heading); }
+.lname { flex: 1; font-weight: 600; color: var(--text-heading); }
+.plat { font-size: 12px; color: var(--text-muted); white-space: nowrap; }
+.lride { margin: 8px 0 8px 60px; }
+.lride .dir { color: var(--text); }
+.between summary, .linfo summary { cursor: pointer; font-size: 12px; color: var(--brand-ink); margin-top: 4px; }
+.linfo summary { color: var(--warning); }
+.linfo p { font-size: 12px; margin: 4px 0; }
+.between ul { list-style: none; margin: 4px 0 0; padding: 0; font-size: 13px; }
+.between li { padding: 2px 0; }
+.between .ltime { display: inline-block; font-weight: 400; color: var(--text-muted); }
+.walkleg { padding: 4px 12px 10px 22px; color: var(--text-muted); font-size: 13px; }
+.walkicon { margin-right: 4px; }

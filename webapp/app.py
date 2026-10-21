@@ -4,6 +4,7 @@ myVRN Lite — web client in the original myVRN design.
 Three areas, like the app's bottom tab bar:
   Tickets   /tickets, /tickets/<id>   my tickets + QR code (Mentz TicketShop API)
   Konto     /account                  login (browserless, see vrn_client.py) and profile
+  Fahrplan   /fahrplan                connection search + route map (VRN EFA API, efa.py)
   Einstellen /settings                theme + debug mode
   App        /app                     download of the native Android app (APK from downloads/)
 
@@ -26,7 +27,7 @@ import stat
 import time
 import urllib.parse
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
 
 from curl_cffi import requests
@@ -35,6 +36,7 @@ from flask import (
     url_for,
 )
 
+import efa
 import remember
 import security as sec
 import vrn_client
@@ -115,6 +117,7 @@ class Session:
     profile: dict | None = None                      # last UserProfile call record
     discovery: dict | None = None
     probe: dict | None = None                        # last free-form probe
+    trips: dict | None = None                        # last connection search (Fahrplan)
     csrf: str = field(default_factory=sec.new_csrf)  # per-session CSRF token
     gate_ok: bool = False                            # passed the ACCESS_PASSWORD gate
     device: str | None = None                        # persistent-login cookie value (remember.py)
@@ -1042,6 +1045,144 @@ def probe():
         payload = None
     sess.probe = api_call(sess, method, (request.form.get("url") or "").strip(), payload)
     return go(sid, "settings", _anchor="probe")
+
+
+# --------------------------------------------------------------------------
+# Fahrplan: connection search via VRN's EFA journey planner (see efa.py)
+# --------------------------------------------------------------------------
+def _search_params() -> dict:
+    """The search as given in the query string, with defaults (now, departure)."""
+    a = request.args
+    now = efa.now_local()
+    return {
+        "from": a.get("from", "").strip(), "from_name": a.get("from_name", "").strip(),
+        "to": a.get("to", "").strip(), "to_name": a.get("to_name", "").strip(),
+        "date": a.get("date") or now.strftime("%Y-%m-%d"),
+        "time": a.get("time") or now.strftime("%H:%M"),
+        "arr": a.get("arr") == "1",
+    }
+
+
+def _search_when(p: dict) -> datetime:
+    try:
+        return datetime.strptime(f"{p['date']} {p['time']}", "%Y-%m-%d %H:%M").replace(tzinfo=TZ)
+    except ValueError:
+        return efa.now_local().replace(second=0, microsecond=0)
+
+
+def _resolve(place_id: str, name: str) -> tuple[str, str]:
+    """An id for the trip request: the chosen suggestion, else the best stop-finder match."""
+    if place_id:
+        return place_id, name
+    hits = efa.stops(http.get, name, timeout=HTTP_TIMEOUT, limit=3)
+    if not hits:
+        raise efa.EfaError(f"„{name}“ wurde nicht gefunden.")
+    best = next((h for h in hits if h["best"]), hits[0])
+    return best["id"], best["name"]
+
+
+def run_search(sess: Session, p: dict) -> dict:
+    """Trip request for the search parameters, cached per session for the detail view."""
+    key = (p["from"], p["to"], p["date"], p["time"], p["arr"])
+    cached = sess.trips
+    if cached and cached["key"] == key and time.time() - cached["at"] < 120:
+        return cached
+    rec = {"key": key, "at": time.time(), "journeys": [], "error": None, "url": None, "raw": None}
+    try:
+        res = efa.trips(http.get, p["from"], p["to"], _search_when(p), arrive=p["arr"], timeout=HTTP_TIMEOUT)
+        rec.update(journeys=res["journeys"], url=res["url"], raw=res["raw"])
+    except efa.EfaError as e:
+        rec["error"] = str(e)
+    except Exception as e:  # network
+        rec["error"] = f"VRN-Fahrplanauskunft nicht erreichbar ({type(e).__name__})."
+    if not rec["error"]:
+        sess.trips = rec
+    return rec
+
+
+def _query(p: dict) -> dict:
+    """Search parameters as URL arguments."""
+    q = {k: p[k] for k in ("from", "from_name", "to", "to_name", "date", "time")}
+    return q | {"arr": "1"} if p["arr"] else q
+
+
+def _shifted(p: dict, when: datetime) -> dict:
+    """The same search as a departure search at another time (Früher/Später)."""
+    return _query(p | {"date": when.strftime("%Y-%m-%d"), "time": when.strftime("%H:%M"), "arr": False})
+
+
+@app.route("/fahrplan")
+def connections():
+    sess, sid = get_session()
+    p = _search_params()
+    rec, error = None, None
+    if (p["from"] or p["from_name"]) and (p["to"] or p["to_name"]):
+        try:
+            p["from"], p["from_name"] = _resolve(p["from"], p["from_name"])
+            p["to"], p["to_name"] = _resolve(p["to"], p["to_name"])
+        except efa.EfaError as e:
+            error = str(e)
+        except Exception as e:
+            error = f"VRN-Fahrplanauskunft nicht erreichbar ({type(e).__name__})."
+        if not error:
+            rec = run_search(sess, p)
+            error = rec["error"]
+    elif request.args.get("from_name") is not None:
+        error = "Bitte Start und Ziel angeben."
+    journeys = (rec or {}).get("journeys") or []
+    earlier = later = None
+    if journeys:
+        earlier = _shifted(p, (journeys[0]["dep"] or _search_when(p)) - timedelta(minutes=45))
+        later = _shifted(p, (journeys[-1]["dep"] or _search_when(p)) + timedelta(minutes=1))
+    return page(sess, sid, "connections.html", active="fahrplan", title="Fahrplan", p=p, error=error,
+                journeys=journeys, rec=rec, earlier=earlier, later=later, query=_query(p))
+
+
+@app.route("/fahrplan/verbindung/<int:idx>")
+def connection_detail(idx: int):
+    sess, sid = get_session()
+    p = _search_params()
+    if not (p["from"] and p["to"]):
+        return go(sid, "connections")
+    rec = run_search(sess, p)
+    journeys = rec.get("journeys") or []
+    if idx >= len(journeys):
+        return go(sid, "connections", **_query(p))
+    j = journeys[idx]
+    # Map data: one polyline per leg (falls back to the stop coordinates), plus the stops.
+    map_legs = []
+    for leg in j["legs"]:
+        pts = leg["coords"] or [s["coord"] for s in [leg["origin"], *leg["stops"], leg["destination"]] if s["coord"]]
+        map_legs.append({"mode": leg["mode"], "line": leg["line"], "coords": pts,
+                         "from": leg["origin"]["name"], "to": leg["destination"]["name"],
+                         "stops": [{"name": s["name"], "coord": s["coord"]} for s in leg["stops"] if s["coord"]],
+                         "start": leg["origin"]["coord"], "end": leg["destination"]["coord"]})
+    return page(sess, sid, "connection.html", active="fahrplan", title="Verbindung",
+                back=url_for("connections", **_query(p)), j=j, p=p, map_legs=map_legs, rec=rec)
+
+
+@app.route("/fahrplan/orte")
+def connection_places():
+    q = (request.args.get("q") or "").strip()
+    if len(q) < 2:
+        return jsonify([])
+    try:
+        return jsonify(efa.stops(http.get, q[:80], timeout=HTTP_TIMEOUT))
+    except Exception:
+        return jsonify([]), 502
+
+
+@app.template_filter("hm")
+def fmt_hm(value) -> str:
+    return value.strftime("%H:%M") if value else "—"
+
+
+@app.template_filter("duration")
+def fmt_duration(minutes) -> str:
+    if minutes is None:
+        return "—"
+    h, m = divmod(int(minutes), 60)
+    return f"{h}:{m:02d} h" if h else f"{m} min"
 
 
 # --------------------------------------------------------------------------

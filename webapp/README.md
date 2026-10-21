@@ -41,6 +41,11 @@ The UI follows the original app (colours from `/Layout/ClientTheme`, icons from 
 
 - **Tickets** — grouped list (Aktuell gültig / Zukünftig gültig / Guthaben / Abgelaufen); tap a ticket for
   the QR code, count-up timer and ticket data.
+- **Fahrplan** — connection search against VRN's journey planner (`efa.py`, the Mentz EFA API behind
+  vrn.de/mng): stop/address suggestions, "Mein Standort", departure/arrival time, realtime delays,
+  earlier/later, recent searches (stored in the browser), and per connection the legs with platforms,
+  intermediate stops, disruption notes and the route on an OpenStreetMap map (Leaflet, vendored in
+  `static/vendor/leaflet`). Works without a VRN login.
 - **Konto** — browserless login (email + password, email 2FA code) and the profile.
 - **Einstellen** — theme (System/Hell/Dunkel) and **Debug-Modus**. Debug mode adds raw API responses,
   token details + refresh, the alternative logins (remote WebView, manual callback paste), the OIDC

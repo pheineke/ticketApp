@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% import "_macros.html" as m with context %}
+{% block content %}
+<form class="panel search" method="get" action="{{ url_for('connections') }}" id="search" autocomplete="off">
+  <div class="places">
+    <div class="place">
+      <span class="pin from" aria-hidden="true"></span>
+      <input type="text" name="from_name" value="{{ p.from_name }}" placeholder="Start: Haltestelle, Adresse, Ort"
+             aria-label="Start" enterkeyhint="next" spellcheck="false">
+      <input type="hidden" name="from" value="{{ p['from'] }}">
+      <button type="button" class="iconbtn locate" title="Mein Standort" aria-label="Mein Standort als Start"><span class="ic locate"></span></button>
+      <ul class="suggest" role="listbox" hidden></ul>
+    </div>
+    <div class="place">
+      <span class="pin to" aria-hidden="true"></span>
+      <input type="text" name="to_name" value="{{ p.to_name }}" placeholder="Ziel: Haltestelle, Adresse, Ort"
+             aria-label="Ziel" enterkeyhint="search" spellcheck="false">
+      <input type="hidden" name="to" value="{{ p.to }}">
+      <ul class="suggest" role="listbox" hidden></ul>
+    </div>
+    <button type="button" class="iconbtn swap" title="Start und Ziel tauschen" aria-label="Start und Ziel tauschen">⇅</button>
+  </div>
+  <div class="when">
+    <div class="seg small" role="radiogroup" aria-label="Abfahrt oder Ankunft">
+      <label><input type="radio" name="arr" value="0"{{ ' checked' if not p.arr }}><span>Abfahrt</span></label>
+      <label><input type="radio" name="arr" value="1"{{ ' checked' if p.arr }}><span>Ankunft</span></label>
+    </div>
+    <input type="date" name="date" value="{{ p.date }}" aria-label="Datum" required>
+    <input type="time" name="time" value="{{ p.time }}" aria-label="Uhrzeit" required>
+    <button type="button" class="btn small outline now">Jetzt</button>
+  </div>
+  <button class="btn" type="submit">Verbindungen suchen</button>
+</form>
+
+{% if error %}<div class="alert bad">{{ error }}</div>{% endif %}
+
+{% if journeys %}
+  <h2>{{ 'Ankunft bis' if p.arr else 'Ab' }} {{ p.time }} · {{ journeys[0].dep.strftime('%d.%m.%Y') if journeys[0].dep else p.date }}</h2>
+  <a class="btn small outline shift" href="{{ url_for('connections', **earlier) }}">↑ Früher</a>
+  {% for j in journeys %}
+    <a class="jcard{{ ' cancelled' if j.cancelled }}" href="{{ url_for('connection_detail', idx=loop.index0, **query) }}">
+      <div class="jtop">
+        <span class="jtimes">{{ m.clock(j.dep, j.dep_rt, j.dep_delay) }} – {{ m.clock(j.arr, j.arr_rt, j.arr_delay) }}</span>
+        <span class="jdur">{{ j.minutes|duration }}</span>
+      </div>
+      <div class="jlines">
+        {% for leg in j.legs %}
+          {% if not loop.first %}<span class="sep">›</span>{% endif %}
+          {% if leg.mode == 'walk' %}<span class="walk" title="Fußweg">🚶{{ leg.minutes }}′</span>
+          {% else %}{{ m.line(leg) }}{% endif %}
+        {% endfor %}
+      </div>
+      <div class="jmeta">
+        {% set r = j.rides[0] if j.rides else j.legs[0] %}
+        ab {{ r.origin.name }}{% if r.origin.platform %} · Steig {{ r.origin.platform }}{% endif %}
+        · {{ j.changes }} Umstieg{{ 'e' if j.changes != 1 }}
+      </div>
+      {% if j.cancelled %}<div class="jwarn bad">Fällt (teilweise) aus</div>
+      {% elif j.infos %}<div class="jwarn">⚠ {{ j.infos }} Hinweis{{ 'e' if j.infos != 1 }}</div>{% endif %}
+    </a>
+  {% endfor %}
+  <a class="btn small outline shift" href="{{ url_for('connections', **later) }}">↓ Später</a>
+  <p class="hint center">Echtzeitdaten der VRN-Fahrplanauskunft · Angaben ohne Gewähr</p>
+{% else %}
+  <div id="recent" hidden>
+    <h2>Zuletzt gesucht</h2>
+    <div class="recent"></div>
+  </div>
+{% endif %}
+
+{% if rec %}
+  {% call m.debug_panel('XML_TRIP_REQUEST2') %}
+    <pre>{{ rec.url }}</pre>
+    <pre>{{ rec.raw|pretty }}</pre>
+  {% endcall %}
+{% endif %}
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='fahrplan.js') }}"></script>
+{% endblock %}

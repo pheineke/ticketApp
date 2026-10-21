@@ -102,7 +102,8 @@ CSP = "; ".join([
     "default-src 'self'",
     "script-src 'self' 'unsafe-inline'",
     "style-src 'self' 'unsafe-inline'",
-    "img-src 'self' data:",
+    # OpenStreetMap tiles for the route map (Fahrplan).
+    "img-src 'self' data: https://tile.openstreetmap.org",
     "connect-src 'self'",
     "frame-src " + ("'none'" if PUBLIC_MODE else "*"),
     "frame-ancestors 'none'",
@@ -117,7 +118,7 @@ def add_headers(resp):
     resp.headers.setdefault("X-Content-Type-Options", "nosniff")
     resp.headers.setdefault("X-Frame-Options", "DENY")
     resp.headers.setdefault("Referrer-Policy", "no-referrer")
-    resp.headers.setdefault("Permissions-Policy", "camera=(), microphone=(), geolocation=()")
+    resp.headers.setdefault("Permissions-Policy", "camera=(), microphone=(), geolocation=(self)")
     if COOKIE_SECURE:
         resp.headers.setdefault("Strict-Transport-Security", "max-age=31536000")
     if resp.mimetype == "text/html":
