@@ -2,12 +2,22 @@
   {% if debug %}<details class="debug"{% if open %} open{% endif %}><summary>DEBUG · {{ label }}</summary><div class="body">{{ caller() }}</div></details>{% endif %}
 {%- endmacro %}
 
-{# Planned time with the realtime delay: +3 in red, on time in green (only with realtime data). #}
-{% macro clock(planned, rt, delay) -%}
-  <span class="clock">{{ planned|hm }}{% if delay is not none %}{% if delay > 0 %}<small class="late">+{{ delay }}</small>{% elif delay < 0 %}<small class="ontime">{{ delay }}</small>{% else %}<small class="ontime" title="pünktlich">●</small>{% endif %}{% endif %}</span>
+{# Planned time; the corrected (realtime) time next to it only when it differs: red when late. #}
+{% macro clock(planned, rt, delay, cancelled=false) -%}
+  <span class="clock{{ ' gone' if cancelled }}"><b>{{ planned|hm }}</b>{% if delay %}<span class="rt {{ 'late' if delay > 0 else 'early' }}" title="{{ '%+d'|format(delay) }} Min.">{{ rt|hm }}</span>{% endif %}</span>
 {%- endmacro %}
 
-{# Line badge in the mode's colour, e.g. "Bus 116", "S2", "RE1". #}
+{# Vehicle icon + line as vrn.de shows it: "SWK 105", "RE1", "S2". #}
 {% macro line(leg) -%}
-  <span class="line m-{{ leg.mode }}" title="{{ leg.name }}">{% if leg.mode == 'bus' %}Bus {% elif leg.mode == 'tram' %}Tram {% endif %}{{ leg.line or leg.mode_label }}</span>
+  <span class="line" title="{{ leg.name }}{% if leg.direction %} → {{ leg.direction }}{% endif %}"><span class="ic mode-{{ leg.icon }}" aria-label="{{ leg.mode_label }}"></span>{{ leg.label }}</span>
+{%- endmacro %}
+
+{# "1 Std 25 Min." with the numbers emphasised. #}
+{% macro duration(minutes) -%}
+  {%- if minutes is none %}—{% else %}{% set h, mm = (minutes // 60), (minutes % 60) -%}
+  <span class="dur">{% if h %}<b>{{ h }}</b> Std {% endif %}<b>{{ mm }}</b> Min.</span>{% endif -%}
+{%- endmacro %}
+
+{% macro price(value) -%}
+  {%- if value %}<span class="price">ab {{ ('%.2f'|format(value)).replace('.', ',') }} €</span>{% endif -%}
 {%- endmacro %}

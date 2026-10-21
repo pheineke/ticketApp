@@ -46,6 +46,9 @@ MODES = {
     99: "walk", 100: "walk",
     105: "taxi", 107: "bike",
 }
+LONG_DISTANCE = {"ICE", "IC", "EC", "ECE", "TGV", "RJ", "RJX", "NJ", "EN", "FLX", "ICD"}
+# Vehicle icon per mode (static/icons/mode_<icon>.svg).
+ICONS = {"bus": "bus", "taxi": "bus", "tram": "tram", "walk": "walk"}
 MODE_LABELS = {"train": "Zug", "sbahn": "S-Bahn", "ubahn": "U-Bahn", "tram": "Straßenbahn", "bus": "Bus",
                "ship": "Schiff", "walk": "Fußweg", "taxi": "Taxi", "bike": "Fahrrad", "other": "Sonstiges"}
 LOCATION_TYPES = {"stop": "Haltestelle", "poi": "Ort", "street": "Straße", "address": "Adresse",
@@ -154,11 +157,20 @@ def _leg(leg: dict) -> dict:
         text = _plain(info.get("content"))
         if title or text:
             infos.append({"title": title, "text": text if text != title else ""})
+    train_type = (tr.get("properties") or {}).get("trainType") or ""
     line = tr.get("disassembledName") or tr.get("number") or ""
+    label = tr.get("number") or line or product.get("name") or ""
+    if train_type and label.isdigit():  # long-distance trains: number "9553", trainType "ICE"
+        label = f"{train_type} {label}"
     return {
         "mode": mode,
+        "icon": ICONS.get(mode, "train"),
         "mode_label": MODE_LABELS[mode] if mode != "other" else (product.get("name") or MODE_LABELS["other"]),
         "line": line if mode != "walk" else "",
+        # As vrn.de labels lines: "SWK 105" (operator + line), "RE1", "S2".
+        "label": label if mode != "walk" else "",
+        # Deutschlandticket / Semesterticket aren't valid on these.
+        "long_distance": train_type.upper() in LONG_DISTANCE or product.get("class") in (14, 15, 16),
         "name": tr.get("name") or product.get("name") or "",
         "direction": (tr.get("destination") or {}).get("name") or "",
         "operator": (tr.get("operator") or {}).get("name") or "",
@@ -177,10 +189,21 @@ def _journey(j: dict) -> dict | None:
     legs = [_leg(l) for l in j.get("legs") or []]
     if not legs:
         return None
+    # Minutes to change between two rides (walks between them carry their own time).
+    for prev, leg in zip(legs, legs[1:]):
+        if prev["mode"] != "walk" and leg["mode"] != "walk":
+            arr = prev["destination"]["rt"] or prev["destination"]["time"]
+            dep = leg["origin"]["rt"] or leg["origin"]["time"]
+            leg["transfer"] = round((dep - arr).total_seconds() / 60) if arr and dep else None
     first, last = legs[0]["origin"], legs[-1]["destination"]
     dep = first["rt"] or first["time"]
     arr = last["rt"] or last["time"]
     tickets = (j.get("fare") or {}).get("tickets") or []
+    # "ab 2,62 €" as on vrn.de: the cheapest adult single ticket (2nd class) for the whole trip.
+    singles = [t.get("priceBrutto") for t in tickets
+               if t.get("person") == "ADULT" and t.get("travellerClass") == "SECOND"
+               and t.get("timeValidity") == "SINGLE" and t.get("isSupplement") != "YES"
+               and (t.get("priceBrutto") or 0) > 0]
     return {
         "dep": first["time"], "dep_rt": first["rt"], "dep_delay": first["delay"],
         "arr": last["time"], "arr_rt": last["rt"], "arr_delay": last["delay"],
@@ -191,7 +214,8 @@ def _journey(j: dict) -> dict | None:
         "cancelled": any(l["cancelled"] for l in legs),
         "realtime": any(l["realtime"] for l in legs),
         "infos": sum(len(l["infos"]) for l in legs),
-        "ticket": tickets[0].get("name") if tickets else None,
+        "price": min(singles) if singles else None,
+        "long_distance": [l["label"] for l in legs if l.get("long_distance")],
     }
 
 

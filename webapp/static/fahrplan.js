@@ -130,7 +130,7 @@
   }
 
   // A result page: remember this search (not "Mein Standort", that changes).
-  if (document.querySelector(".jcard") && from.id.value && to.id.value && from.id.value.indexOf("coord:") !== 0) {
+  if (document.querySelector(".jrow") && from.id.value && to.id.value && from.id.value.indexOf("coord:") !== 0) {
     var cur = { from: from.id.value, fromName: from.text.value, to: to.id.value, toName: to.text.value };
     saveRecent([cur].concat(loadRecent().filter(function (r) {
       return !(r.from === cur.from && r.to === cur.to);

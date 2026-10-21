@@ -35,31 +35,35 @@
 {% if error %}<div class="alert bad">{{ error }}</div>{% endif %}
 
 {% if journeys %}
-  <h2>{{ 'Ankunft bis' if p.arr else 'Ab' }} {{ p.time }} · {{ journeys[0].dep.strftime('%d.%m.%Y') if journeys[0].dep else p.date }}</h2>
-  <a class="btn small outline shift" href="{{ url_for('connections', **earlier) }}">↑ Früher</a>
+  <div class="jhead">
+    <h2>{{ 'Ankunft bis' if p.arr else 'Ab' }} {{ p.time }} · {{ journeys[0].dep.strftime('%d.%m.%Y') if journeys[0].dep else p.date }}</h2>
+  </div>
+  <a class="shift" href="{{ url_for('connections', **earlier) }}"><span class="ic chev-up"></span>früher</a>
+  <div class="jlist">
   {% for j in journeys %}
-    <a class="jcard{{ ' cancelled' if j.cancelled }}" href="{{ url_for('connection_detail', idx=loop.index0, **query) }}">
-      <div class="jtop">
-        <span class="jtimes">{{ m.clock(j.dep, j.dep_rt, j.dep_delay) }} – {{ m.clock(j.arr, j.arr_rt, j.arr_delay) }}</span>
-        <span class="jdur">{{ j.minutes|duration }}</span>
+    <a class="jrow{{ ' cancelled' if j.cancelled }}" href="{{ url_for('connection_detail', idx=loop.index0, **query) }}">
+      <div class="jtimes">
+        <div><span class="lbl">ab</span>{{ m.clock(j.dep, j.dep_rt, j.dep_delay, j.cancelled) }}</div>
+        <div><span class="lbl">an</span>{{ m.clock(j.arr, j.arr_rt, j.arr_delay, j.cancelled) }}</div>
       </div>
-      <div class="jlines">
-        {% for leg in j.legs %}
-          {% if not loop.first %}<span class="sep">›</span>{% endif %}
-          {% if leg.mode == 'walk' %}<span class="walk" title="Fußweg">🚶{{ leg.minutes }}′</span>
-          {% else %}{{ m.line(leg) }}{% endif %}
-        {% endfor %}
+      <div class="jmain">
+        <div class="jtop">{{ m.duration(j.minutes) }}<span class="chg">{{ j.changes }} Umstieg{{ 'e' if j.changes != 1 }}</span>{{ m.price(j.price) }}</div>
+        <div class="jseq">
+          {%- for leg in j.legs -%}
+            {% if not loop.first %}<span class="ic chev-right sep"></span>{% endif %}
+            {%- if leg.mode == 'walk' %}<span class="ic mode-walk walk" title="Fußweg {{ leg.minutes }} Min."></span>
+            {%- else %}{{ m.line(leg) }}{% endif -%}
+          {%- endfor -%}
+        </div>
+        {% if j.cancelled %}<div class="jnote bad"><span class="ic warn"></span>Fällt laut Echtzeit (teilweise) aus</div>
+        {% elif j.long_distance %}<div class="jnote"><span class="ic warn"></span>Fernverkehr ({{ j.long_distance|join(', ') }}): Deutschlandticket nicht gültig</div>
+        {% elif j.infos %}<div class="jnote"><span class="ic warn"></span>{{ j.infos }} Hinweis{{ 'e' if j.infos != 1 }} zur Fahrt</div>{% endif %}
       </div>
-      <div class="jmeta">
-        {% set r = j.rides[0] if j.rides else j.legs[0] %}
-        ab {{ r.origin.name }}{% if r.origin.platform %} · Steig {{ r.origin.platform }}{% endif %}
-        · {{ j.changes }} Umstieg{{ 'e' if j.changes != 1 }}
-      </div>
-      {% if j.cancelled %}<div class="jwarn bad">Fällt (teilweise) aus</div>
-      {% elif j.infos %}<div class="jwarn">⚠ {{ j.infos }} Hinweis{{ 'e' if j.infos != 1 }}</div>{% endif %}
+      <span class="ic chev-right go"></span>
     </a>
   {% endfor %}
-  <a class="btn small outline shift" href="{{ url_for('connections', **later) }}">↓ Später</a>
+  </div>
+  <a class="shift" href="{{ url_for('connections', **later) }}"><span class="ic chev-down"></span>später</a>
   <p class="hint center">Echtzeitdaten der VRN-Fahrplanauskunft · Angaben ohne Gewähr</p>
 {% else %}
   <div id="recent" hidden>

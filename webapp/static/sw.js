@@ -4,7 +4,7 @@
  * - Navigations go to the network; if that fails (no signal), /offline is shown, which
  *   renders the tickets from the browser's own offline copy (localStorage).
  */
-const VERSION = "v14";
+const VERSION = "v15";
 // Show the offline page if a page hasn't loaded within this time (slow/absent mobile data).
 const NAV_TIMEOUT_MS = 2500;
 const SHELL = `shell-${VERSION}`;
@@ -31,6 +31,15 @@ const ASSETS = [
   "/static/icons/qr_code.svg",
   "/static/icons/app_download.svg",
   "/static/icons/route.svg",
+  "/static/icons/mode_bus.svg",
+  "/static/icons/mode_tram.svg",
+  "/static/icons/mode_train.svg",
+  "/static/icons/mode_walk.svg",
+  "/static/icons/warning.svg",
+  "/static/icons/chevron_up.svg",
+  "/static/icons/chevron_down.svg",
+  "/static/icons/chevron_right.svg",
+  "/static/icons/locate.svg",
   "/static/icons/vrn/vrn_logo.svg",
   "/static/icons/vrn/icon-192.png",
   "/static/icons/vrn/home_navigator_bulletin_board_page.svg",
