@@ -2,7 +2,8 @@
 
 A native Android client for myVRN tickets that runs on **Android 5.0 (API 21) and newer**.
 Same scope and design as the web client (`../webapp`, design plan in `../pwa/DESIGN.md`):
-login, my tickets, the ticket barcode, account and settings. No server or proxy is needed.
+login, my tickets, the ticket barcode, the journey planner (Fahrplan), account and settings.
+No server or proxy is needed.
 The app talks to `shop.myvrn.de` directly, using the protocol documented in
 `../webapp/vrn_client.py`.
 
@@ -40,6 +41,15 @@ the old version.
   kept on, count-up timer, tap the code to spin it.
 - **Offline**: the tickets and the barcodes of up to 6 valid tickets are kept on the device, so
   a ticket check works without signal. The copy is cleared on logout or in the settings.
+- **Fahrplan**: connection search against VRN's journey planner (`net/Efa.kt`, the Mentz EFA API
+  behind vrn.de/mng, documented in `../webapp/efa.py`). Full-screen OpenStreetMap (osmdroid) with
+  a draggable bottom sheet: search with stop suggestions, "Mein Standort", date/time, Ab/An,
+  results in the vrn.de layout (ab/an, duration, vehicles, price), früher/später, recent searches.
+  Long-press the map for a place card (address + nearby stops, "Von hier"/"Nach hier"). A
+  connection opens with its route on the map and the timeline (platforms, stops, changes, notes).
+- **Wide screens** (≥ 900 dp, tablet landscape): the drawer is a permanent sidebar instead of the
+  tab bar, pages are centred, tickets show in a grid (from 600 dp), the ticket detail in two
+  columns, and the Fahrplan sheet becomes a side panel next to the map.
 - **Einstellen**: System/Hell/Dunkel, "myVRN Lite" red or "VRN Original" blue, offline copy,
   debug mode (raw API responses, token details, barcode symbology).
 
@@ -53,7 +63,12 @@ the old version.
   trusts the system CAs plus the ISRG roots bundled in `res/raw/` (SHA-256 fingerprints
   `96:BC:EC:06…08:C6` for X1 and `69:72:9B:8E…14:70` for X2). The server accepts TLS 1.2 with
   ECDHE-RSA-AES-GCM, which Android 5 supports.
-- **HTTP**: OkHttp 4.12, the last line that supports API 21 without AndroidX. Barcodes use
+- **HTTP**: OkHttp 4.12, the last line that supports API 21 without AndroidX. `www.vrn.de` (the
+  journey planner) uses the same Let's Encrypt chain, so it shares the client and its trust setup.
+- **Map**: osmdroid 6.1.20 (no dependencies, no AndroidX). Tiles from tile.openstreetmap.org
+  (GlobalSign root, trusted by Android 5), cached in the app's cache dir, with the app's user agent
+  as OSM's tile policy asks. Location ("Mein Standort") uses the framework `LocationManager`; the
+  permission is only requested when that button is used. Barcodes use
   ZXing core, which needs nothing newer than API 19.
 - **Storage**: tokens and the offline copy are AES-GCM encrypted with an Android Keystore key
   on Android 6+. Android 5's Keystore has no AES keys, so there they're stored unencrypted, but
@@ -66,12 +81,15 @@ the old version.
 ```
 app/src/main/kotlin/de/heineke/myvrnlite/
   net/VrnClient.kt   login flow (PKCE, e-mail code), token refresh, ListOrdersV2, QRCode, profile
+  net/Efa.kt         journey planner: stop finder, nearby stops, trips (port of webapp/efa.py)
   net/Tls.kt         system + bundled ISRG roots
   net/Tokens.kt      token response, JWT claims, profile model
   data/Tickets.kt    date parsing and ticket grouping (port of app.py's ticket_view/grouped_tickets)
   data/Repo.kt       app state, background calls, token refresh, offline copy
   data/Store.kt      settings, Keystore encryption, sealed files
-  ui/                MainActivity (tabs + drawer), TicketsPage, AccountPage, SettingsPage,
-                     TicketActivity, Barcode
+  data/Fahrplan.kt   search state, results, früher/später, recent searches
+  ui/                MainActivity (tabs + drawer / sidebar), TicketsPage, FahrplanPage, AccountPage,
+                     SettingsPage, TicketActivity, ConnectionActivity, Barcode,
+                     BottomSheet (draggable sheet, FlowLayout), RouteMap (osmdroid), Journeys (rows, timeline)
 app/src/test/        date/grouping tests and an Aztec/QR round trip through ZXing's reader
 ```

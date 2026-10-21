@@ -5,6 +5,7 @@
     android:layout_height="match_parent">
 
     <LinearLayout
+        android:id="@+id/main_column"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
@@ -26,6 +27,7 @@
             android:orientation="horizontal">
 
             <include android:id="@+id/tab_tickets" layout="@layout/tab" />
+            <include android:id="@+id/tab_fahrplan" layout="@layout/tab" />
             <include android:id="@+id/tab_account" layout="@layout/tab" />
             <include android:id="@+id/tab_settings" layout="@layout/tab" />
         </LinearLayout>
@@ -89,6 +91,7 @@
             </LinearLayout>
 
             <include android:id="@+id/nav_tickets" layout="@layout/nav_row" />
+            <include android:id="@+id/nav_fahrplan" layout="@layout/nav_row" />
             <include android:id="@+id/nav_account" layout="@layout/nav_row" />
             <include android:id="@+id/nav_settings" layout="@layout/nav_row" />
             <include android:id="@+id/nav_help" layout="@layout/nav_row" />

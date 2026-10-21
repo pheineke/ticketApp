@@ -1,6 +1,7 @@
 package de.heineke.myvrnlite.ui
 
 import android.annotation.SuppressLint
+import android.content.pm.PackageManager
 import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
 import android.os.Build
@@ -20,15 +21,25 @@ abstract class Page(protected val activity: MainActivity, layout: Int) {
     protected val repo get() = activity.repo
 
     abstract fun render()
+
+    /** Activity lifecycle, for pages with a map or listeners of their own. */
+    open fun onResume() = Unit
+
+    open fun onPause() = Unit
+
+    /** Answer to a runtime permission request the page made (location). */
+    open fun onPermissionResult(granted: Boolean) = Unit
 }
 
 /**
- * The app shell (Gullivr layout): app bar, bottom tabs Tickets · Konto · Einstellen, and the
- * "Home navigator" drawer for everything else.
+ * The app shell (Gullivr layout): app bar, bottom tabs Tickets · Fahrplan · Konto · Einstellen,
+ * and the "Home navigator" drawer for everything else. On wide screens (tablet landscape)
+ * the drawer is a permanent sidebar and the tab bar goes, as in the web client.
  */
 class MainActivity : BaseActivity() {
     enum class Tab(val title: Int) {
-        TICKETS(R.string.title_tickets), ACCOUNT(R.string.title_account), SETTINGS(R.string.title_settings)
+        TICKETS(R.string.title_tickets), FAHRPLAN(R.string.title_fahrplan), ACCOUNT(R.string.title_account),
+        SETTINGS(R.string.title_settings)
     }
 
     private var tab = Tab.TICKETS
@@ -39,10 +50,14 @@ class MainActivity : BaseActivity() {
     private var backCallback: Any? = null  // OnBackInvokedCallback, Android 13+
     private val onChange: () -> Unit = { render() }
 
+    /** Tablet landscape and up: sidebar instead of drawer + tab bar, Fahrplan as a side panel. */
+    val wide: Boolean get() = resources.configuration.screenWidthDp >= WIDE_DP
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent(R.layout.activity_main)
-        pages = mapOf(Tab.TICKETS to TicketsPage(this), Tab.ACCOUNT to AccountPage(this), Tab.SETTINGS to SettingsPage(this))
+        pages = mapOf(Tab.TICKETS to TicketsPage(this), Tab.FAHRPLAN to FahrplanPage(this),
+            Tab.ACCOUNT to AccountPage(this), Tab.SETTINGS to SettingsPage(this))
         val container = findViewById<FrameLayout>(R.id.pages)
         for (page in pages.values) container.addView(page.view, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
         navButton.setOnClickListener { openDrawer(true) }
@@ -50,11 +65,12 @@ class MainActivity : BaseActivity() {
             when (tab) {
                 Tab.TICKETS -> repo.refreshTickets()
                 Tab.ACCOUNT -> repo.refreshProfile()
-                Tab.SETTINGS -> Unit
+                Tab.FAHRPLAN, Tab.SETTINGS -> Unit
             }
         }
         setupTabs()
         setupDrawer()
+        applyWide()
         select(savedInstanceState?.getString(STATE_TAB)?.let(Tab::valueOf) ?: Tab.TICKETS)
     }
 
@@ -68,6 +84,23 @@ class MainActivity : BaseActivity() {
     override fun onStop() {
         repo.removeListener(onChange)
         super.onStop()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        pages.values.forEach { it.onResume() }
+    }
+
+    override fun onPause() {
+        pages.values.forEach { it.onPause() }
+        super.onPause()
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == REQ_LOCATION) {
+            pages.getValue(Tab.FAHRPLAN).onPermissionResult(grantResults.any { it == PackageManager.PERMISSION_GRANTED })
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -86,7 +119,7 @@ class MainActivity : BaseActivity() {
     fun render() {
         titleView.setText(tab.title)
         findViewById<View>(R.id.debug_flag).visibility = if (repo.prefs.debug) View.VISIBLE else View.GONE
-        action.visibility = if (tab != Tab.SETTINGS && repo.loggedIn) View.VISIBLE else View.GONE
+        action.visibility = if ((tab == Tab.TICKETS || tab == Tab.ACCOUNT) && repo.loggedIn) View.VISIBLE else View.GONE
         spin(action, if (tab == Tab.TICKETS) repo.loadingTickets else repo.loadingProfile)
         styleTabs()
         findViewById<TextView>(R.id.drawer_state).setText(if (repo.loggedIn) R.string.drawer_logged_in else R.string.drawer_logged_out)
@@ -99,6 +132,7 @@ class MainActivity : BaseActivity() {
 
     private val tabViews = listOf(
         Triple(R.id.tab_tickets, Tab.TICKETS, R.drawable.ic_ticket to R.string.tab_tickets),
+        Triple(R.id.tab_fahrplan, Tab.FAHRPLAN, R.drawable.ic_route to R.string.tab_fahrplan),
         Triple(R.id.tab_account, Tab.ACCOUNT, R.drawable.nav_account to R.string.tab_account),
         Triple(R.id.tab_settings, Tab.SETTINGS, R.drawable.ic_settings to R.string.tab_settings),
     )
@@ -135,6 +169,7 @@ class MainActivity : BaseActivity() {
         findViewById<View>(R.id.drawer_brand).background =
             GradientDrawable(GradientDrawable.Orientation.TL_BR, intArrayOf(attrColor(R.attr.brand), attrColor(R.attr.brandDark)))
         navRow(R.id.nav_tickets, R.drawable.nav_tickets, R.string.nav_tickets, R.string.nav_tickets_sub) { select(Tab.TICKETS) }
+        navRow(R.id.nav_fahrplan, R.drawable.nav_fahrplan, R.string.nav_fahrplan, R.string.nav_fahrplan_sub) { select(Tab.FAHRPLAN) }
         navRow(R.id.nav_account, R.drawable.nav_account, R.string.nav_account, R.string.nav_account_sub) { select(Tab.ACCOUNT) }
         navRow(R.id.nav_settings, R.drawable.nav_settings, R.string.nav_settings, R.string.nav_settings_sub) { select(Tab.SETTINGS) }
         navRow(R.id.nav_help, R.drawable.nav_help, R.string.nav_help, external = true) { openUrl(URL_HELP) }
@@ -155,7 +190,28 @@ class MainActivity : BaseActivity() {
         }
     }
 
+    /** Wide screens: the drawer stays open as a sidebar next to the content; no tab bar. */
+    private fun applyWide() {
+        if (!wide) return
+        val side = dp(272)
+        findViewById<View>(R.id.tab_bar).visibility = View.GONE
+        navButton.visibility = View.GONE
+        scrim.visibility = View.GONE
+        drawer.layoutParams.width = side
+        drawer.elevation = 0f
+        drawer.translationX = 0f
+        drawer.visibility = View.VISIBLE
+        drawer.setBackgroundResource(R.drawable.bg_sidebar)
+        (findViewById<View>(R.id.main_column).layoutParams as ViewGroup.MarginLayoutParams).marginStart = side
+        findViewById<View>(R.id.app_bar).setPadding(dp(20), 0, dp(8), 0)
+        // Pages other than the map: centred at a readable width (max. 880dp, as in the web client).
+        val free = resources.configuration.screenWidthDp - 272
+        val pad = dp(maxOf(0, (free - 880) / 2))
+        for ((t, page) in pages) if (t != Tab.FAHRPLAN) page.view.setPadding(pad, 0, pad, 0)
+    }
+
     private fun openDrawer(open: Boolean) {
+        if (wide) return
         drawerOpen = open
         val hidden = -drawer.layoutParams.width.toFloat()
         scrim.animate().cancel()
@@ -204,12 +260,15 @@ class MainActivity : BaseActivity() {
         }
     }
 
-    private companion object {
-        const val STATE_TAB = "tab"
-        const val ANIM_MS = 200L
-        const val URL_HELP = "https://www.vrn.de/service/kontakt/feedback/index.html"
-        const val URL_PRIVACY = "https://www.vrn.de/_inc/app/agb/"
-        const val URL_IMPRINT = "https://www.vrn.de/_inc/app/impressum/index.html"
-        val NAV_TABS = listOf(R.id.nav_tickets to Tab.TICKETS, R.id.nav_account to Tab.ACCOUNT, R.id.nav_settings to Tab.SETTINGS)
+    companion object {
+        const val REQ_LOCATION = 1
+        private const val WIDE_DP = 900
+        private const val STATE_TAB = "tab"
+        private const val ANIM_MS = 200L
+        private const val URL_HELP = "https://www.vrn.de/service/kontakt/feedback/index.html"
+        private const val URL_PRIVACY = "https://www.vrn.de/_inc/app/agb/"
+        private const val URL_IMPRINT = "https://www.vrn.de/_inc/app/impressum/index.html"
+        private val NAV_TABS = listOf(R.id.nav_tickets to Tab.TICKETS, R.id.nav_fahrplan to Tab.FAHRPLAN,
+            R.id.nav_account to Tab.ACCOUNT, R.id.nav_settings to Tab.SETTINGS)
     }
 }

@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import de.heineke.myvrnlite.net.ApiCall
+import de.heineke.myvrnlite.net.Efa
 import de.heineke.myvrnlite.net.LoginFlow
 import de.heineke.myvrnlite.net.Profile
 import de.heineke.myvrnlite.net.ProfileResult
@@ -35,7 +36,10 @@ class QrCode(val code: String, val savedAt: Long, val call: ApiCall? = null)
 class Repo(context: Context) {
     private val app = context.applicationContext
     val prefs = Prefs(app)
-    private val client by lazy { VrnClient.create(app) }
+    private val http by lazy { VrnClient.httpClient(app) }
+    private val client by lazy { VrnClient(http) }
+    /** Journey planner (Fahrplan); shares the HTTP client and its TLS setup. */
+    val efa by lazy { Efa(http) }
     private val io = Executors.newSingleThreadExecutor()
     private val disk = Executors.newSingleThreadExecutor()
     private val main = Handler(Looper.getMainLooper())

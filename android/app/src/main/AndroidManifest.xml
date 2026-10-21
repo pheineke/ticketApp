@@ -3,6 +3,10 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Fahrplan: "Mein Standort" as the origin. Asked for only when that button is used. -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-feature android:name="android.hardware.location" android:required="false" />
 
     <!-- Tokens and the offline copy stay on this device: no cloud backup, no device transfer. -->
     <application
@@ -27,6 +31,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".ui.ConnectionActivity"
+            android:exported="false"
+            android:parentActivityName=".ui.MainActivity" />
 
         <activity
             android:name=".ui.TicketActivity"

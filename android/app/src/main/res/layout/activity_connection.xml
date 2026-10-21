@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Connection detail: the route on the map, summary + timeline in a bottom sheet
+     (side panel on wide screens). -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <include layout="@layout/app_bar" />
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@color/bg">
+
+            <FrameLayout
+                android:id="@+id/map_container"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+            <de.heineke.myvrnlite.ui.BottomSheet
+                android:id="@+id/sheet"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/bg_sheet"
+                android:elevation="12dp"
+                android:orientation="vertical">
+
+                <FrameLayout
+                    android:id="@+id/sheet_grab"
+                    android:layout_width="match_parent"
+                    android:layout_height="24dp">
+
+                    <View
+                        android:layout_width="40dp"
+                        android:layout_height="5dp"
+                        android:layout_gravity="center"
+                        android:background="@drawable/bg_grab" />
+                </FrameLayout>
+
+                <ScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:scrollbars="none">
+
+                    <!-- Filled by ConnectionActivity. -->
+                    <LinearLayout
+                        android:id="@+id/sheet_body"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:paddingStart="@dimen/page_pad"
+                        android:paddingEnd="@dimen/page_pad"
+                        android:paddingBottom="20dp" />
+                </ScrollView>
+            </de.heineke.myvrnlite.ui.BottomSheet>
+        </FrameLayout>
+    </LinearLayout>
+</FrameLayout>

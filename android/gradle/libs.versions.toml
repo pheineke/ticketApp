@@ -3,11 +3,14 @@ agp = "9.4.0"
 # OkHttp 4.12 is the last line that officially supports Android 5 (API 21) without AndroidX.
 okhttp = "4.12.0"
 zxing = "3.5.4"
+# OpenStreetMap map view (Fahrplan); no dependencies, works down to API 21 without AndroidX.
+osmdroid = "6.1.20"
 junit = "4.13.2"
 
 [libraries]
 okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
 zxing-core = { group = "com.google.zxing", name = "core", version.ref = "zxing" }
+osmdroid = { group = "org.osmdroid", name = "osmdroid-android", version.ref = "osmdroid" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 json = { group = "org.json", name = "json", version = "20260814" }
 

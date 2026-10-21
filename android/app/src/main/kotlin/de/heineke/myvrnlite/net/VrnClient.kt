@@ -140,16 +140,17 @@ class VrnClient(private val http: OkHttpClient) {
         private const val TICKETS_ALL = 1 or 2 or 4 or 8
         private const val DAY = 86_400_000L
 
-        fun create(context: Context): VrnClient {
+        /** The app's HTTP client (ticket API and journey planner): system + bundled ISRG roots. */
+        fun httpClient(context: Context): OkHttpClient {
             val trust = Tls.trustManager(context)
             val userAgent = "myVRNLite/${BuildConfig.VERSION_NAME} (Android ${Build.VERSION.RELEASE})"
-            return VrnClient(OkHttpClient.Builder()
+            return OkHttpClient.Builder()
                 .sslSocketFactory(Tls.socketFactory(trust), trust)
                 .connectTimeout(15, TimeUnit.SECONDS)
                 .readTimeout(25, TimeUnit.SECONDS)
                 .writeTimeout(25, TimeUnit.SECONDS)
                 .addInterceptor { it.proceed(it.request().newBuilder().header("User-Agent", userAgent).build()) }
-                .build())
+                .build()
         }
 
         private fun iso(ms: Long): String =

@@ -57,6 +57,7 @@ android {
 dependencies {
     implementation(libs.okhttp)
     implementation(libs.zxing.core)
+    implementation(libs.osmdroid)
 
     testImplementation(libs.junit)
     testImplementation(libs.json)

@@ -54,7 +54,7 @@ class TicketsPage(activity: MainActivity) : Page(activity, R.layout.page_tickets
                     render()
                 }
             }
-            if (open) for (t in g.tickets) list.add(card(t))
+            if (open) addCards(g.tickets.map(::card))
         }
 
         if (hasCopy && tickets.groups.isEmpty() && repo.ordersError == null) {
@@ -75,6 +75,25 @@ class TicketsPage(activity: MainActivity) : Page(activity, R.layout.page_tickets
                     add(a.pre(pretty(call.json, call.body)), top = 10)
                 }
             }, top = 12)
+        }
+    }
+
+    /** Ticket cards, two per row from tablet width on (as the web client's grid). */
+    private fun addCards(cards: List<View>) {
+        val a = activity
+        val columns = if (a.resources.configuration.screenWidthDp >= 600) 2 else 1
+        // list.add() sets its own layout params, so the card's 8dp gap is given here.
+        if (columns == 1) return cards.forEachIndexed { i, c -> list.add(c, top = if (i == 0) 0 else 8) }
+        cards.chunked(columns).forEachIndexed { r, row ->
+            list.add(LinearLayout(a).apply {
+                row.forEachIndexed { i, c ->
+                    addView(c, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1f).apply {
+                        if (i > 0) marginStart = a.dp(10)
+                    })
+                }
+                // Keep a lone last card at its column's width.
+                repeat(columns - row.size) { addView(View(a), LinearLayout.LayoutParams(0, 0, 1f).apply { marginStart = a.dp(10) }) }
+            }, top = if (r == 0) 0 else 8)
         }
     }
 

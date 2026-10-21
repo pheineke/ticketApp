@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Permanent sidebar (wide screens): surface with a divider on its right edge. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape>
+            <solid android:color="@color/divider" />
+        </shape>
+    </item>
+    <item android:right="1dp">
+        <shape>
+            <solid android:color="@color/surface" />
+        </shape>
+    </item>
+</layer-list>

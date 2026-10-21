@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Long-press place card: surface, rounded top. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="@color/surface" />
+    <corners android:topLeftRadius="14dp" android:topRightRadius="14dp" />
+</shape>

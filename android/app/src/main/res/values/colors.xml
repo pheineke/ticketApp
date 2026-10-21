@@ -19,6 +19,20 @@
     <!-- The barcode always sits on white so it scans in dark mode too. -->
     <color name="code_paper">#ffffff</color>
 
+    <!-- Vehicle types (Fahrplan), as the .m-<mode> colours in the web client. -->
+    <color name="mode_train">#3d3d3d</color>
+    <color name="mode_sbahn">#00965e</color>
+    <color name="mode_ubahn">#0065ae</color>
+    <color name="mode_tram">#b5007a</color>
+    <color name="mode_bus">#0072bc</color>
+    <color name="mode_ship">#0094c6</color>
+    <color name="mode_taxi">#e0a800</color>
+    <color name="mode_bike">#5d9b2c</color>
+    <color name="mode_walk">#8c8c8c</color>
+    <color name="mode_other">#6b6b6b</color>
+    <!-- On the (always light) map the train line stays dark. -->
+    <color name="mode_train_map">#3d3d3d</color>
+
     <!-- Palettes (Settings > Farben): "myVRN Lite" red and "VRN Original" blue/navy. -->
     <color name="lite_brand">#d80019</color>
     <color name="lite_brand_dark">#59000a</color>

@@ -4,9 +4,12 @@
 
     <!-- Shell -->
     <string name="tab_tickets">Tickets</string>
+    <string name="tab_fahrplan">Fahrplan</string>
     <string name="tab_account">Konto</string>
     <string name="tab_settings">Einstellen</string>
     <string name="title_tickets">Tickets</string>
+    <string name="title_fahrplan">Fahrplan</string>
+    <string name="title_connection">Verbindung</string>
     <string name="title_account">Konto</string>
     <string name="title_settings">Einstellungen</string>
     <string name="title_ticket">Ticketdetails</string>
@@ -18,6 +21,8 @@
     <string name="drawer_logged_out">nicht angemeldet</string>
     <string name="nav_tickets">Meine Tickets</string>
     <string name="nav_tickets_sub">Meine aktuell gültigen Tickets.</string>
+    <string name="nav_fahrplan">Fahrplan</string>
+    <string name="nav_fahrplan_sub">Verbindungen suchen, Route auf der Karte.</string>
     <string name="nav_account">VRN Konto</string>
     <string name="nav_account_sub">Meine Benutzerdaten und Login.</string>
     <string name="nav_settings">Einstellungen</string>
@@ -26,6 +31,68 @@
     <string name="nav_privacy">Datenschutz &amp; AGB</string>
     <string name="nav_imprint">Impressum</string>
     <string name="no_browser">Kein Browser installiert.</string>
+
+    <!-- Fahrplan -->
+    <string name="fp_from_hint">Start: Haltestelle, Adresse, Ort</string>
+    <string name="fp_to_hint">Ziel: Haltestelle, Adresse, Ort</string>
+    <string name="fp_locate">Mein Standort als Start</string>
+    <string name="fp_my_location">Mein Standort</string>
+    <string name="fp_swap">Start und Ziel tauschen</string>
+    <string name="fp_dep">Ab</string>
+    <string name="fp_arr">An</string>
+    <string name="fp_now">Jetzt</string>
+    <string name="fp_search">Verbindungen suchen</string>
+    <string name="fp_searching">Suche …</string>
+    <string name="fp_head_dep">Ab %1$s · %2$s</string>
+    <string name="fp_head_arr">Ankunft bis %1$s · %2$s</string>
+    <string name="fp_earlier">früher</string>
+    <string name="fp_later">später</string>
+    <string name="fp_recent">Zuletzt gesucht</string>
+    <string name="fp_recent_clear">Verlauf löschen</string>
+    <string name="fp_tip">Tipp: Lange auf die Karte drücken, um einen Ort als Start oder Ziel zu wählen.</string>
+    <string name="fp_footer">Echtzeitdaten der VRN-Fahrplanauskunft · Angaben ohne Gewähr</string>
+    <string name="fp_ab">ab</string>
+    <string name="fp_an">an</string>
+    <string name="fp_std">Std</string>
+    <string name="fp_min">Min.</string>
+    <string name="fp_price">ab %1$s €</string>
+    <plurals name="fp_changes">
+        <item quantity="one">%d Umstieg</item>
+        <item quantity="other">%d Umstiege</item>
+    </plurals>
+    <plurals name="fp_infos">
+        <item quantity="one">%d Hinweis zur Fahrt</item>
+        <item quantity="other">%d Hinweise zur Fahrt</item>
+    </plurals>
+    <plurals name="fp_stops">
+        <item quantity="one">%d Zwischenhalt</item>
+        <item quantity="other">%d Zwischenhalte</item>
+    </plurals>
+    <string name="fp_cancelled">Fällt laut Echtzeit (teilweise) aus</string>
+    <string name="fp_long_distance">Fernverkehr (%1$s): Deutschlandticket nicht gültig</string>
+    <string name="fp_long_distance_detail">Enthält Fernverkehr (%1$s). Deutschlandticket und Semesterticket gelten dort nicht.</string>
+    <string name="fp_cancelled_detail">Diese Verbindung fällt laut Echtzeitdaten (teilweise) aus.</string>
+    <string name="fp_platform">Steig %1$s</string>
+    <string name="fp_walk">Fußweg %1$d Min.</string>
+    <string name="fp_walk_dist">Fußweg %1$d Min. · %2$d m</string>
+    <string name="fp_walk_from">ab %1$s</string>
+    <string name="fp_walk_to">bis %1$s</string>
+    <string name="fp_transfer">Umstieg · %1$d Min.</string>
+    <string name="fp_ride_sub">%1$d Min.</string>
+    <string name="fp_no_realtime">ohne Echtzeit</string>
+    <string name="fp_falls_out">fällt aus</string>
+    <string name="fp_info">Hinweis</string>
+    <string name="fp_place_kind">Ort auf der Karte</string>
+    <string name="fp_place_loading">…</string>
+    <string name="fp_from_here">Von hier</string>
+    <string name="fp_to_here">Nach hier</string>
+    <string name="fp_nearby">Haltestellen in der Nähe</string>
+    <string name="fp_distance">%1$d m</string>
+    <string name="fp_close">Schließen</string>
+    <string name="fp_location_denied">Standort nicht verfügbar. Bitte die Standortfreigabe erlauben.</string>
+    <string name="fp_location_off">Standort nicht verfügbar. Ist die Standortermittlung eingeschaltet?</string>
+    <string name="fp_locating">Standort wird ermittelt …</string>
+    <string name="fp_trip_gone">Diese Verbindung ist nicht mehr verfügbar. Bitte erneut suchen.</string>
 
     <!-- Tickets -->
     <string name="tickets_logged_out">Dir werden Tickets nicht angezeigt? Überprüfe in deinem Konto, ob du eingeloggt bist.</string>
