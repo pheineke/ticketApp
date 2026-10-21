@@ -40,7 +40,7 @@ class AccountPage(activity: MainActivity) : Page(activity, R.layout.page_account
         val a = activity
         remember.isChecked = repo.prefs.remember
         view.findViewById<ImageButton>(R.id.password_toggle).apply {
-            tint(a.color(R.color.text_muted))
+            tint(a.attrColor(R.attr.cTextMuted))
             setOnClickListener {
                 // Compare the whole variation: VISIBLE_PASSWORD (0x90) contains the PASSWORD bit (0x80).
                 val hidden = password.inputType and InputType.TYPE_MASK_VARIATION == InputType.TYPE_TEXT_VARIATION_PASSWORD

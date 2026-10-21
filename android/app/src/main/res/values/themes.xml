@@ -6,11 +6,11 @@
 
     <style name="Base.MyVrn" parent="Platform.MyVrn">
         <!-- Surface: what shows behind the bars when drawn edge to edge (Android 15+). -->
-        <item name="android:windowBackground">@color/surface</item>
-        <item name="android:colorBackground">@color/bg</item>
-        <item name="android:textColorPrimary">@color/text_heading</item>
-        <item name="android:textColorSecondary">@color/text_muted</item>
-        <item name="android:textColorHint">@color/text_muted</item>
+        <item name="android:windowBackground">?attr/cBg</item>
+        <item name="android:colorBackground">?attr/cBg</item>
+        <item name="android:textColorPrimary">?attr/cTextHeading</item>
+        <item name="android:textColorSecondary">?attr/cTextMuted</item>
+        <item name="android:textColorHint">?attr/cTextMuted</item>
         <item name="android:colorPrimary">?attr/brand</item>
         <item name="android:colorPrimaryDark">?attr/brandDark</item>
         <item name="android:colorAccent">?attr/brand</item>
@@ -21,6 +21,18 @@
     </style>
 
     <style name="Theme.MyVrn.Lite" parent="Base.MyVrn">
+        <item name="cBg">@color/lite_bg</item>
+        <item name="cSurface">@color/lite_surface</item>
+        <item name="cText">@color/lite_text</item>
+        <item name="cTextHeading">@color/lite_text_heading</item>
+        <item name="cTextMuted">@color/lite_text_muted</item>
+        <item name="cDivider">@color/lite_divider</item>
+        <item name="cHover">@color/lite_hover</item>
+        <item name="cCodeBg">@color/lite_code_bg</item>
+        <item name="cTcardTop">@color/lite_tcard_top</item>
+        <item name="cTcardBody">@color/lite_tcard_body</item>
+        <item name="cTcardInk">@color/lite_tcard_ink</item>
+        <item name="cTicketLine">@color/lite_ticket_line</item>
         <item name="brand">@color/lite_brand</item>
         <item name="brandDark">@color/lite_brand_dark</item>
         <item name="brandSoft">@color/lite_brand_soft</item>
@@ -29,6 +41,18 @@
     </style>
 
     <style name="Theme.MyVrn.Vrn" parent="Base.MyVrn">
+        <item name="cBg">@color/vrn_bg</item>
+        <item name="cSurface">@color/vrn_surface</item>
+        <item name="cText">@color/vrn_text</item>
+        <item name="cTextHeading">@color/vrn_text_heading</item>
+        <item name="cTextMuted">@color/vrn_text_muted</item>
+        <item name="cDivider">@color/vrn_divider</item>
+        <item name="cHover">@color/vrn_hover</item>
+        <item name="cCodeBg">@color/vrn_code_bg</item>
+        <item name="cTcardTop">@color/vrn_tcard_top</item>
+        <item name="cTcardBody">@color/vrn_tcard_body</item>
+        <item name="cTcardInk">@color/vrn_tcard_ink</item>
+        <item name="cTicketLine">@color/vrn_ticket_line</item>
         <item name="brand">@color/vrn_brand</item>
         <item name="brandDark">@color/vrn_brand_dark</item>
         <item name="brandSoft">@color/vrn_brand_soft</item>

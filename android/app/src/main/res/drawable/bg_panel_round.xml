@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Side panel / floating card on wide screens. -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="@color/bg" />
+    <solid android:color="?attr/cBg" />
     <corners android:radius="12dp" />
 </shape>

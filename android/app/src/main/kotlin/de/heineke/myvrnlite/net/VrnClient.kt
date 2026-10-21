@@ -13,6 +13,7 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
+import org.json.JSONArray
 import org.json.JSONObject
 import java.io.IOException
 import java.net.URLDecoder
@@ -121,6 +122,14 @@ class VrnClient(private val http: OkHttpClient) {
 
     /** Universities for the Hochschul-Login: {value: [{EntityId, DisplayNames}]}. */
     fun authorities(accessToken: String): ApiCall = get(accessToken, "$BASE/Dfn/GetAuthorities")
+
+    /**
+     * POST Pdfconverter/Invoice {TicketOrderId: [Orders[].Id], IsGuestUser} → {Success, Invoice, Error}:
+     * the order's invoice as a PDF (base64), as the app's "Rechnung herunterladen". On the shop's
+     * root, not under TicketShop/ (the web shop's CommonOrderInvoicePdf).
+     */
+    fun invoice(accessToken: String, orderId: Long): ApiCall = post(accessToken, "$BASE/Pdfconverter/Invoice",
+        JSONObject().put("TicketOrderId", JSONArray().put(orderId)).put("IsGuestUser", false))
 
     /** POST TicketShop/Shop/CreateOrder → {Orders} | {RedirectUrl} | {Error}. Buys: only on the user's tap. */
     fun createOrder(accessToken: String, payload: JSONObject): ApiCall = shop(accessToken, "Shop/CreateOrder", payload)

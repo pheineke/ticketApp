@@ -79,7 +79,7 @@ class FahrplanPage(activity: MainActivity) : Page(activity, R.layout.page_fahrpl
         setupField(to, isFrom = false)
         to.setOnEditorActionListener { _, id, _ -> (id == EditorInfo.IME_ACTION_SEARCH).also { if (it) search() } }
 
-        view.findViewById<ImageButton>(R.id.locate).apply { tint(a.color(R.color.text_muted)); setOnClickListener { locate() } }
+        view.findViewById<ImageButton>(R.id.locate).apply { tint(a.attrColor(R.attr.cTextMuted)); setOnClickListener { locate() } }
         view.findViewById<ImageButton>(R.id.swap).apply {
             tint(a.attrColor(R.attr.brandInk))
             setOnClickListener { swap() }
@@ -93,7 +93,7 @@ class FahrplanPage(activity: MainActivity) : Page(activity, R.layout.page_fahrpl
         }
         view.findViewById<View>(R.id.search).setOnClickListener { search() }
 
-        view.findViewById<ImageButton>(R.id.pc_close).apply { tint(a.color(R.color.text_muted)); setOnClickListener { closeCard() } }
+        view.findViewById<ImageButton>(R.id.pc_close).apply { tint(a.attrColor(R.attr.cTextMuted)); setOnClickListener { closeCard() } }
         view.findViewById<View>(R.id.pc_from).setOnClickListener { useCard(isFrom = true) }
         view.findViewById<View>(R.id.pc_to).setOnClickListener { useCard(isFrom = false) }
 
@@ -503,7 +503,7 @@ class FahrplanPage(activity: MainActivity) : Page(activity, R.layout.page_fahrpl
             val p = items[position]
             return LinearLayout(ctx).apply {
                 gravity = Gravity.CENTER_VERTICAL
-                setBackgroundColor(ctx.color(R.color.surface))
+                setBackgroundColor(ctx.attrColor(R.attr.cSurface))
                 setPadding(ctx.dp(12), ctx.dp(11), ctx.dp(12), ctx.dp(11))
                 addView(ctx.styled(R.style.Text_Heading, p.name), LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
                 addView(ctx.styled(R.style.Text_Hint, p.kind).apply { setPadding(ctx.dp(8), 0, 0, 0) })

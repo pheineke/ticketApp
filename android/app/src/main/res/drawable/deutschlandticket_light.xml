@@ -1,0 +1,34 @@
+<!-- The light Deutschland-Ticket logo in both modes (on the always light ticket cards). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="67.3dp"
+    android:height="86dp"
+    android:viewportWidth="67.3"
+    android:viewportHeight="86">
+  <path
+      android:fillColor="#FF000000"
+      android:pathData="m57,26h-45.4c-1.7,0 -3,-1.3 -3,-3s1.3,-3 3,-3h45.4c1.7,0 3,1.3 3,3s-1.3,3 -3,3z"/>
+  <path
+      android:fillColor="#FF000000"
+      android:pathData="m54.7,16h-41.8c-1.7,0 -3,-1.3 -3,-3s1.3,-3 3,-3h41.8c1.7,0 3,1.3 3,3s-1.4,3 -3,3z"/>
+  <path
+      android:fillColor="#FF000000"
+      android:pathData="m31.3,6h-8.4c-1.7,0 -3,-1.3 -3,-3s1.3,-3 3,-3h8.4c1.7,0 3,1.3 3,3s-1.3,3 -3,3z"/>
+  <path
+      android:pathData="m47,86h-33.1c-1.7,0 -3,-1.3 -3,-3s1.3,-3 3,-3h33.1c1.7,0 3,1.3 3,3s-1.3,3 -3,3z"
+      android:fillColor="#fcbe00"/>
+  <path
+      android:pathData="m58.5,76h-40.7c-1.7,0 -3,-1.3 -3,-3s1.3,-3 3,-3h40.6c1.7,0 3,1.3 3,3s-1.3,3 -2.9,3z"
+      android:fillColor="#fcbe00"/>
+  <path
+      android:pathData="m48.2,66h-41.2c-1.7,0 -3,-1.3 -3,-3s1.3,-3 3,-3h41.2c1.7,0 3,1.3 3,3s-1.3,3 -3,3z"
+      android:fillColor="#fcbe00"/>
+  <path
+      android:pathData="m41.8,56h-37c-1.7,0 -3,-1.3 -3,-3s1.3,-3 3,-3h37c1.7,0 3,1.3 3,3s-1.3,3 -3,3z"
+      android:fillColor="#e42313"/>
+  <path
+      android:pathData="m64.3,46h-61.3c-1.7,0 -3,-1.3 -3,-3s1.3,-3 3,-3h61.3c1.7,0 3,1.3 3,3s-1.3,3 -3,3z"
+      android:fillColor="#e42313"/>
+  <path
+      android:pathData="m61.7,36h-53.3c-1.7,0 -3,-1.3 -3,-3s1.3,-3 3,-3h53.3c1.7,0 3,1.3 3,3s-1.4,3 -3,3z"
+      android:fillColor="#e42313"/>
+</vector>

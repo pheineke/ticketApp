@@ -1,20 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Design tokens from the VRN ClientTheme (Mode 0), as in webapp/static/style.css. -->
+<!-- Design tokens, as in webapp/static/style.css. The page colours depend on the palette:
+     see lite_* / vrn_* below and the c* theme attributes (attrs.xml). -->
 <resources>
-    <color name="bg">#f4f4f4</color>
-    <color name="surface">#ffffff</color>
-    <color name="text">#414141</color>
-    <color name="text_heading">#d9000000</color>
-    <color name="text_muted">#767676</color>
-    <color name="divider">#14050505</color>
-    <color name="hover">#eeeeee</color>
     <color name="success">#389e0d</color>
     <color name="success_soft">#2452c41a</color>
     <color name="warning">#d46b08</color>
     <color name="warning_soft">#24fa8c16</color>
     <color name="error">#f5222d</color>
     <color name="error_soft">#1af5222d</color>
-    <color name="code_bg">#f0f2f5</color>
     <color name="scrim">#66000000</color>
     <!-- The barcode always sits on white so it scans in dark mode too. -->
     <color name="code_paper">#ffffff</color>
@@ -33,7 +26,34 @@
     <!-- On the (always light) map the train line stays dark. -->
     <color name="mode_train_map">#3d3d3d</color>
 
-    <!-- Palettes (Settings > Farben): "myVRN Lite" red and "VRN Original" blue/navy. -->
+    <!-- Palettes (Settings > Farben): one ink per palette, used everywhere (as the official app's
+         ticket screens): white with the ink in light mode, the ink as the background in dark mode.
+         "myVRN Lite" = VRN red (#59000a), "VRN Original" = VRN navy (#002d59). -->
+    <color name="lite_bg">#ffffff</color>
+    <color name="lite_surface">#faf0f1</color>
+    <color name="lite_text">#59000a</color>
+    <color name="lite_text_heading">#59000a</color>
+    <color name="lite_text_muted">#ad59000a</color>
+    <color name="lite_divider">#2159000a</color>
+    <color name="lite_hover">#f3e2e4</color>
+    <color name="lite_code_bg">#faf0f1</color>
+    <color name="lite_tcard_top">#faf0f1</color>
+    <color name="lite_tcard_body">#f1d9dc</color>
+    <color name="lite_tcard_ink">#59000a</color>
+    <color name="lite_ticket_line">#4059000a</color>
+    <color name="vrn_bg">#ffffff</color>
+    <color name="vrn_surface">#eef2f9</color>
+    <color name="vrn_text">#002d59</color>
+    <color name="vrn_text_heading">#002d59</color>
+    <color name="vrn_text_muted">#ad002d59</color>
+    <color name="vrn_divider">#21002d59</color>
+    <color name="vrn_hover">#e1e8f3</color>
+    <color name="vrn_code_bg">#eef2f9</color>
+    <color name="vrn_tcard_top">#eef2f9</color>
+    <color name="vrn_tcard_body">#d9e2f1</color>
+    <color name="vrn_tcard_ink">#002d59</color>
+    <color name="vrn_ticket_line">#40002d59</color>
+
     <color name="lite_brand">#d80019</color>
     <color name="lite_brand_dark">#59000a</color>
     <color name="lite_brand_soft">#1fd80019</color>

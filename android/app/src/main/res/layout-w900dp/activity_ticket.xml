@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Ticket detail on wide screens (tablet landscape): header across, code and timer left,
-     ticket data right — as the web client's desktop layout. Same ids as layout/activity_ticket.xml. -->
+<!-- Ticket detail on wide screens (tablet landscape): name and timer across, code left, conditions
+     and ticket data right. Same ids as layout/activity_ticket.xml. -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/bg_ticket"
     android:orientation="vertical">
 
     <include layout="@layout/app_bar" />
@@ -14,36 +15,46 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:background="@color/bg"
         android:fillViewport="true">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="24dp">
+            android:paddingStart="40dp"
+            android:paddingEnd="40dp"
+            android:paddingBottom="24dp">
 
+            <!-- Name and the count-up timer (TicketDetailCountUpView): tells a live ticket from a screenshot. -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="?attr/brand"
-                android:orientation="vertical"
-                android:padding="16dp">
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingTop="8dp">
 
                 <TextView
                     android:id="@+id/ticket_name"
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:fontFamily="sans-serif-medium"
-                    android:textColor="@android:color/white"
-                    android:textSize="19sp" />
+                    android:textColor="?attr/cTextHeading"
+                    android:textSize="21sp"
+                    android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/ticket_sub"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textColor="#ebffffff"
-                    android:textSize="13sp" />
+                    android:id="@+id/counter"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:layout_marginStart="12dp"
+                    android:background="@drawable/bg_ticket_timer"
+                    android:contentDescription="@string/counter_info"
+                    android:fontFamily="sans-serif-medium"
+                    android:gravity="center"
+                    android:textColor="?attr/cTextHeading"
+                    android:textSize="15sp"
+                    tools:text="05:00" />
             </LinearLayout>
 
             <LinearLayout
@@ -56,21 +67,20 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
-                    <LinearLayout
+                <LinearLayout
                         android:id="@+id/codebox"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal"
-                        android:layout_marginTop="12dp"
-                        android:layout_marginBottom="2dp"
-                        android:background="@drawable/bg_codebox"
+                        android:layout_marginTop="20dp"
+                        android:background="@drawable/bg_ticket_code"
                         android:clickable="true"
                         android:contentDescription="@string/ticket_code_spin"
                         android:focusable="true"
                         android:gravity="center"
                         android:orientation="vertical"
                         android:padding="12dp">
-
+    
                         <ImageView
                             android:id="@+id/code_image"
                             android:layout_width="match_parent"
@@ -78,7 +88,7 @@
                             android:adjustViewBounds="true"
                             android:contentDescription="@string/ticket_code"
                             android:scaleType="fitCenter" />
-
+    
                         <TextView
                             android:id="@+id/code_label"
                             android:layout_width="wrap_content"
@@ -89,60 +99,59 @@
                             android:textSize="12sp"
                             android:visibility="gone" />
                     </LinearLayout>
-
-                    <TextView
-                        android:id="@+id/counter"
-                        android:layout_width="wrap_content"
+    
+                    <LinearLayout
+                        android:id="@+id/ticket_alerts"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal"
                         android:layout_marginTop="8dp"
-                        android:fontFamily="monospace"
-                        tools:text="00:00"
-                        android:textColor="?attr/accentText"
-                        android:textSize="24sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/counter_info"
-                        style="@style/Text.Hint"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal"
-                        android:background="?android:attr/selectableItemBackground"
-                        android:drawableEnd="@drawable/ic_info"
-                        android:drawablePadding="4dp"
-                        android:gravity="center_vertical"
-                        android:padding="6dp"
-                        android:text="@string/counter_info" />
+                        android:orientation="vertical" />
                 </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="28dp"
+                    android:layout_marginStart="40dp"
                     android:layout_weight="1"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:paddingTop="8dp">
 
+                <!-- Conditions (Deutschland-Ticket), ticket data, both after a rule; filled by TicketActivity. -->
                     <LinearLayout
-                        android:id="@+id/ticket_alerts"
+                        android:id="@+id/ticket_terms"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
                         android:orientation="vertical" />
-
-                    <FrameLayout
+    
+                    <LinearLayout
                         android:id="@+id/ticket_kv"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp" />
+                        android:orientation="vertical" />
+
+                    <!-- "Rechnung herunterladen →": the order's invoice, kept on the device once fetched. -->
+                    <TextView
+                        android:id="@+id/ticket_invoice"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="end"
+                        android:layout_marginTop="20dp"
+                        android:background="?android:attr/selectableItemBackground"
+                        android:fontFamily="sans-serif-medium"
+                        android:paddingTop="8dp"
+                        android:paddingBottom="8dp"
+                        android:text="@string/invoice_download"
+                        android:textColor="?attr/cTextHeading"
+                        android:textSize="16sp"
+                        android:visibility="gone" />
+
+                    <LinearLayout
+                        android:id="@+id/ticket_debug"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical" />
                 </LinearLayout>
             </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/ticket_debug"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical" />
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

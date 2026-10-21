@@ -166,7 +166,7 @@ class MainActivity : BaseActivity() {
         for ((id, t, _) in tabViews) {
             val v = findViewById<View>(id)
             val on = t == tab
-            val c = if (on) attrColor(R.attr.brandInk) else color(R.color.text_muted)
+            val c = if (on) attrColor(R.attr.brandInk) else attrColor(R.attr.cTextMuted)
             v.findViewById<ImageView>(R.id.tab_icon).tint(c)
             v.findViewById<TextView>(R.id.tab_label).apply {
                 setTextColor(c)
@@ -200,7 +200,7 @@ class MainActivity : BaseActivity() {
         row.findViewById<ImageView>(R.id.nav_icon).apply { setImageResource(icon); tint(attrColor(R.attr.accentText)) }
         row.findViewById<TextView>(R.id.nav_title).setText(title)
         if (sub != 0) row.findViewById<TextView>(R.id.nav_sub).apply { setText(sub); visibility = View.VISIBLE }
-        if (external) row.findViewById<ImageView>(R.id.nav_external).apply { visibility = View.VISIBLE; tint(color(R.color.text_muted)) }
+        if (external) row.findViewById<ImageView>(R.id.nav_external).apply { visibility = View.VISIBLE; tint(attrColor(R.attr.cTextMuted)) }
         row.setOnClickListener {
             if (external) openDrawer(false)
             onClick()

@@ -79,7 +79,7 @@ fun Context.alert(kind: AlertKind, text: CharSequence) = styled(R.style.Text, te
     when (kind) {
         AlertKind.BAD -> { setBackgroundResource(R.drawable.bg_alert_bad); setTextColor(color(R.color.error)) }
         AlertKind.OK -> { setBackgroundResource(R.drawable.bg_alert_ok); setTextColor(color(R.color.success)) }
-        AlertKind.INFO -> { setBackgroundResource(R.drawable.bg_alert_info); setTextColor(color(R.color.text_heading)) }
+        AlertKind.INFO -> { setBackgroundResource(R.drawable.bg_alert_info); setTextColor(attrColor(R.attr.cTextHeading)) }
     }
 }
 
@@ -88,11 +88,11 @@ fun Context.kvTable(rows: List<Pair<String, CharSequence>>, padV: Int = 8): Line
     LinearLayout(this).apply {
         orientation = LinearLayout.VERTICAL
         rows.forEachIndexed { i, (label, value) ->
-            if (i > 0) addView(View(context).apply { setBackgroundColor(color(R.color.divider)) },
+            if (i > 0) addView(View(context).apply { setBackgroundColor(attrColor(R.attr.cDivider)) },
                 LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 1))
             addView(LinearLayout(context).apply {
                 setPadding(0, dp(padV), 0, dp(padV))
-                addView(styled(R.style.Text, label).apply { setTextColor(color(R.color.text_muted)); setPadding(0, 0, dp(12), 0) })
+                addView(styled(R.style.Text, label).apply { setTextColor(attrColor(R.attr.cTextMuted)); setPadding(0, 0, dp(12), 0) })
                 addView(styled(R.style.Text_Heading, value).apply { gravity = Gravity.END },
                     LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
             })

@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <style name="Text" parent="android:Widget.TextView">
-        <item name="android:textColor">@color/text</item>
+        <item name="android:textColor">?attr/cText</item>
         <item name="android:textSize">14sp</item>
     </style>
 
     <style name="Text.Heading">
-        <item name="android:textColor">@color/text_heading</item>
+        <item name="android:textColor">?attr/cTextHeading</item>
         <item name="android:fontFamily">sans-serif-medium</item>
     </style>
 
     <style name="Text.Hint">
-        <item name="android:textColor">@color/text_muted</item>
+        <item name="android:textColor">?attr/cTextMuted</item>
         <item name="android:textSize">12sp</item>
     </style>
 
     <!-- Section header: small, uppercase, muted (h2 in the web client). -->
     <style name="Text.Section">
-        <item name="android:textColor">@color/text_muted</item>
+        <item name="android:textColor">?attr/cTextMuted</item>
         <item name="android:textSize">13sp</item>
         <item name="android:textAllCaps">true</item>
         <item name="android:letterSpacing">0.06</item>
@@ -72,8 +72,8 @@
         <item name="android:background">@drawable/bg_input</item>
         <item name="android:padding">10dp</item>
         <item name="android:textSize">15sp</item>
-        <item name="android:textColor">@color/text</item>
-        <item name="android:textColorHint">@color/text_muted</item>
+        <item name="android:textColor">?attr/cText</item>
+        <item name="android:textColorHint">?attr/cTextMuted</item>
         <item name="android:singleLine">true</item>
     </style>
 

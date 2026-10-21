@@ -91,7 +91,7 @@ class DfnActivity : BaseActivity() {
         host.text = uri.host ?: url
         val icon = resources.getDrawable(if (uri.scheme == "https") R.drawable.ic_lock else R.drawable.ic_warning, theme).mutate()
         icon.setBounds(0, 0, dp(14), dp(14))
-        icon.setTint(color(R.color.text_muted))
+        icon.setTint(attrColor(R.attr.cTextMuted))
         host.setCompoundDrawables(icon, null, null, null)
     }
 

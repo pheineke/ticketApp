@@ -8,4 +8,17 @@
     <attr name="brandInk" format="color" />
     <!-- Headings and the app bar title (brand dark, white in dark mode). -->
     <attr name="accentText" format="color" />
+    <!-- Page colours of the palette (light: white with the ink; dark: the ink as background). -->
+    <attr name="cBg" format="color" />
+    <attr name="cSurface" format="color" />
+    <attr name="cText" format="color" />
+    <attr name="cTextHeading" format="color" />
+    <attr name="cTextMuted" format="color" />
+    <attr name="cDivider" format="color" />
+    <attr name="cHover" format="color" />
+    <attr name="cCodeBg" format="color" />
+    <attr name="cTcardTop" format="color" />
+    <attr name="cTcardBody" format="color" />
+    <attr name="cTcardInk" format="color" />
+    <attr name="cTicketLine" format="color" />
 </resources>

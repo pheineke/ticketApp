@@ -2,6 +2,7 @@ package de.heineke.myvrnlite.data
 
 import android.content.Context
 import android.os.Handler
+import android.util.Base64
 import android.os.Looper
 import de.heineke.myvrnlite.net.ApiCall
 import de.heineke.myvrnlite.net.Efa
@@ -193,6 +194,7 @@ class Repo(context: Context) {
         loadingShop = false
         buying = false
         loadingQr.clear()
+        loadingInvoice.clear()
     }
 
     private fun clearData() {
@@ -212,7 +214,11 @@ class Repo(context: Context) {
         orderResult = null
         offlineSub = null
         offlineState = null
-        disk.execute { offlineFile.delete() }
+        invoiceCall = null
+        disk.execute {
+            offlineFile.delete()
+            invoiceDir.deleteRecursively()
+        }
     }
 
     /** Debug: refresh the access token now. */
@@ -443,6 +449,52 @@ class Repo(context: Context) {
     fun clearOrderResult() {
         orderResult = null
         changed()
+    }
+
+    // ---- Invoices ------------------------------------------------------------------------
+
+    /** Orders whose invoice is being fetched. */
+    val loadingInvoice = HashSet<Long>()
+    /** The last invoice request, for the debug panel. */
+    var invoiceCall: ApiCall? = null
+        private set
+
+    /** Saved invoices stay on the device, so they can be shown when the app can't reach the shop. */
+    fun invoiceFile(orderId: Long) = File(invoiceDir, "$orderId.pdf")
+
+    private val invoiceDir get() = File(app.filesDir, "invoices")
+
+    /** The order's invoice PDF: from disk if fetched before, else from the shop. */
+    fun invoice(orderId: Long, done: (Result<File>) -> Unit) {
+        val file = invoiceFile(orderId)
+        if (file.length() > 0) return done(Result.success(file))
+        if (!loggedIn) return done(Result.failure(NotLoggedIn()))
+        if (!loadingInvoice.add(orderId)) return
+        changed()
+        val s = session
+        background({
+            val call = authed { client.invoice(it, orderId) }
+            main.post { invoiceCall = call }
+            val json = call.json
+            val text = json?.takeUnless { it.isNull("Invoice") }?.optString("Invoice").orEmpty()
+            if (text.isEmpty()) {
+                throw VrnException("invoice", json?.optJSONObject("Error")?.optString("Message")?.ifEmpty { null } ?: "HTTP ${call.code}")
+            }
+            val pdf = try {
+                Base64.decode(text, Base64.DEFAULT)
+            } catch (e: IllegalArgumentException) {
+                null
+            }
+            if (pdf == null || pdf.size < 5 || String(pdf, 0, 5, Charsets.US_ASCII) != "%PDF-") {
+                throw VrnException("invoice", "Unbekanntes Format: ${text.take(40)}")
+            }
+            invoiceDir.mkdirs()
+            file.writeBytes(pdf)
+            file
+        }) { r ->
+            loadingInvoice -= orderId
+            if (s == session) done(r)
+        }
     }
 
     // ---- Offline copy ------------------------------------------------------------

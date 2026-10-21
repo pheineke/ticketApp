@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Bottom sheet over the map: page background, rounded top. -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="@color/bg" />
+    <solid android:color="?attr/cBg" />
     <corners android:topLeftRadius="14dp" android:topRightRadius="14dp" />
 </shape>

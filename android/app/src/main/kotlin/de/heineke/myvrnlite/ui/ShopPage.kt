@@ -240,7 +240,7 @@ class ShopPage(activity: MainActivity) : Page(activity, R.layout.page_shop) {
             }, LinearLayout.LayoutParams(a.dp(48), a.dp(48)))
             addView(a.styled(R.style.Text, a.getString(R.string.shop_login_first)).apply {
                 gravity = Gravity.CENTER
-                setTextColor(a.color(R.color.text_muted))
+                setTextColor(a.attrColor(R.attr.cTextMuted))
                 setPadding(0, a.dp(10), 0, a.dp(14))
             })
             addView(Button(a, null, 0, R.style.Button).apply {

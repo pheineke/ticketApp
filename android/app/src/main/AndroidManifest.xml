@@ -48,5 +48,12 @@
             android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden"
             android:exported="false"
             android:parentActivityName=".ui.MainActivity" />
+
+        <!-- Saved invoices for a PDF viewer: not exported, readable only by a per-URI grant. -->
+        <provider
+            android:name=".data.InvoiceProvider"
+            android:authorities="${applicationId}.invoices"
+            android:exported="false"
+            android:grantUriPermissions="true" />
     </application>
 </manifest>

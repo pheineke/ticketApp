@@ -61,7 +61,7 @@ fun Context.duration(minutes: Int?): CharSequence {
         val start = s.length
         s.append(n.toString())
         s.setSpan(StyleSpan(Typeface.BOLD), start, s.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-        s.setSpan(ForegroundColorSpan(color(R.color.text_heading)), start, s.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        s.setSpan(ForegroundColorSpan(attrColor(R.attr.cTextHeading)), start, s.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
         s.setSpan(AbsoluteSizeSpan(15, true), start, s.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
     }
     if (minutes >= 60) { num(minutes / 60); s.append(" ").append(getString(R.string.fp_std)).append(" ") }
@@ -113,7 +113,7 @@ private fun Context.timesColumn(j: Journey): View = LinearLayout(this).apply {
     for ((label, p) in listOf(R.string.fp_ab to j.depPoint, R.string.fp_an to j.arrPoint)) {
         addView(LinearLayout(context).apply {
             gravity = Gravity.CENTER_VERTICAL
-            addView(styled(R.style.Text, getString(label)).apply { setTextColor(color(R.color.text_muted)) },
+            addView(styled(R.style.Text, getString(label)).apply { setTextColor(attrColor(R.attr.cTextMuted)) },
                 LinearLayout.LayoutParams(dp(22), ViewGroup.LayoutParams.WRAP_CONTENT))
             addView(styled(R.style.Text_Heading, clock(p, j.cancelled)))
         }, LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, dp(30)))
@@ -124,7 +124,7 @@ private fun Context.timesColumn(j: Journey): View = LinearLayout(this).apply {
 private fun Context.summaryLine(j: Journey, extra: String? = null): View = FlowLayout(this).apply {
     hGap = dp(10)
     vGap = 0
-    addView(styled(R.style.Text, duration(j.minutes)).apply { setTextColor(color(R.color.text_muted)) })
+    addView(styled(R.style.Text, duration(j.minutes)).apply { setTextColor(attrColor(R.attr.cTextMuted)) })
     addView(styled(R.style.Text_Hint, resources.getQuantityString(R.plurals.fp_changes, j.changes, j.changes)).apply { setPadding(0, dp(2), 0, 0) })
     price(j.price)?.let { addView(styled(R.style.Text, it).apply { textSize = 13f; setTextColor(attrColor(R.attr.accentText)) }) }
     extra?.let { addView(styled(R.style.Text_Hint, it).apply { setPadding(0, dp(2), 0, 0) }) }
@@ -143,7 +143,7 @@ fun Context.journeyRow(j: Journey, onClick: () -> Unit): View = LinearLayout(thi
         addView(FlowLayout(context).apply {
             setPadding(0, dp(8), 0, 0)
             j.legs.forEachIndexed { i, leg ->
-                if (i > 0) addView(icon(R.drawable.ic_chevron_right, 16, color(R.color.text_muted)))
+                if (i > 0) addView(icon(R.drawable.ic_chevron_right, 16, attrColor(R.attr.cTextMuted)))
                 if (leg.mode == Mode.WALK) addView(icon(R.drawable.ic_mode_walk, 18, attrColor(R.attr.accentText)).apply {
                     contentDescription = getString(R.string.fp_walk, leg.minutes)
                 }) else addView(lineBadge(leg))
@@ -151,7 +151,7 @@ fun Context.journeyRow(j: Journey, onClick: () -> Unit): View = LinearLayout(thi
         })
         journeyNote(j)?.let { addView(it, LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply { topMargin = dp(6) }) }
     }, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
-    addView(icon(R.drawable.ic_chevron_right, 20, color(R.color.text_muted)), LinearLayout.LayoutParams(dp(20), dp(20)).apply { gravity = Gravity.CENTER_VERTICAL })
+    addView(icon(R.drawable.ic_chevron_right, 20, attrColor(R.attr.cTextMuted)), LinearLayout.LayoutParams(dp(20), dp(20)).apply { gravity = Gravity.CENTER_VERTICAL })
     setOnClickListener { onClick() }
 }
 
@@ -197,7 +197,7 @@ class RailView(context: Context, private val kind: Kind, private val lineColor: 
         }
         if (kind == Kind.START || kind == Kind.END) {
             paint.style = Paint.Style.FILL
-            paint.color = context.color(R.color.surface)
+            paint.color = context.attrColor(R.attr.cSurface)
             canvas.drawCircle(cx, dotY, 5.5f * d, paint)
             paint.style = Paint.Style.STROKE
             paint.strokeWidth = 3 * d
@@ -213,7 +213,7 @@ fun Context.timeline(j: Journey): View = LinearLayout(this).apply {
     setBackgroundResource(R.drawable.bg_panel)
     setPadding(dp(6), dp(12), dp(12), dp(12))
     j.legs.forEachIndexed { i, leg ->
-        val muted = color(R.color.text_muted)
+        val muted = attrColor(R.attr.cTextMuted)
         if (leg.mode == Mode.WALK) {
             val text = if (leg.distance != null) getString(R.string.fp_walk_dist, leg.minutes, leg.distance)
             else getString(R.string.fp_walk, leg.minutes)
@@ -279,7 +279,7 @@ private fun Context.rideBlock(leg: Leg): View = LinearLayout(this).apply {
             visibility = View.GONE
             for (s in leg.stops) {
                 addView(LinearLayout(context).apply {
-                    addView(styled(R.style.Text, clock(s, sizeSp = 13, bold = false)).apply { setTextColor(color(R.color.text_muted)) },
+                    addView(styled(R.style.Text, clock(s, sizeSp = 13, bold = false)).apply { setTextColor(attrColor(R.attr.cTextMuted)) },
                         LinearLayout.LayoutParams(dp(52), ViewGroup.LayoutParams.WRAP_CONTENT))
                     addView(styled(R.style.Text, s.name).apply { textSize = 13f })
                 }, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply { topMargin = dp(2) })

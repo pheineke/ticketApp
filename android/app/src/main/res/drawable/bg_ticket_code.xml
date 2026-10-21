@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The barcode always sits on white so it scans. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="@color/code_paper" />
+    <corners android:radius="2dp" />
+</shape>

@@ -54,20 +54,20 @@ abstract class BaseActivity : Activity() {
         titleView = findViewById(R.id.title)
         navButton = findViewById(R.id.nav_button)
         action = findViewById(R.id.action)
-        val ink = color(R.color.text)
+        val ink = attrColor(R.attr.cText)
         navButton.tint(ink)
         action.tint(ink)
         styleSystemBars()
         fitSystemBars(findViewById(R.id.root))
     }
 
-    /** Status/navigation bars in the app bar colour where the platform allows dark icons. */
+    /** Status/navigation bars in the page colour where the platform allows dark icons. */
     @Suppress("DEPRECATION")
     private fun styleSystemBars() {
         if (Build.VERSION.SDK_INT < 23) return  // 5.x: the theme's dark status bar
-        val surface = color(R.color.surface)
-        window.statusBarColor = surface
-        if (Build.VERSION.SDK_INT >= 27) window.navigationBarColor = surface
+        val page = attrColor(R.attr.cBg)
+        window.statusBarColor = page
+        if (Build.VERSION.SDK_INT >= 27) window.navigationBarColor = page
         if (Build.VERSION.SDK_INT >= 30) {
             val light = WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS or WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS
             window.insetsController?.setSystemBarsAppearance(if (isNight) 0 else light, light)

@@ -6,7 +6,7 @@
     <string name="tab_tickets">Tickets</string>
     <string name="tab_fahrplan">Fahrplan</string>
     <string name="tab_account">Konto</string>
-    <string name="tab_settings">Einstellen</string>
+    <string name="tab_settings">Einstellungen</string>
     <string name="title_tickets">Tickets</string>
     <string name="title_fahrplan">Fahrplan</string>
     <string name="title_connection">Verbindung</string>
@@ -116,23 +116,20 @@
     <string name="group_expired">Abgelaufen</string>
     <string name="group_unknown">Ohne Gültigkeitsdatum</string>
     <string name="group_debug">%1$s (%2$d) · Debug %3$s</string>
-    <string name="meta_current">Gültig bis %1$s</string>
-    <string name="meta_future">%1$s – %2$s</string>
     <string name="meta_quota">%1$s von %2$s genutzt</string>
-    <string name="meta_expired">Abgelaufen am %1$s</string>
-    <string name="meta_unknown">Gültigkeit unbekannt · Id %1$s</string>
+    <string name="meta_unknown">Id %1$s</string>
+    <string name="ticket_card_no">#%1$d %2$s</string>
+    <string name="tickets_check_account">Dir werden nicht alle Tickets angezeigt? Überprüfe in deinem %1$s, ob du eingeloggt bist.</string>
+    <string name="tickets_check_account_link">Konto</string>
     <string name="chip_current">Gültig</string>
-    <string name="chip_future">ab %1$s</string>
+    <string name="chip_future">Zukünftig</string>
     <string name="chip_quota">Guthaben</string>
     <string name="chip_expired">Abgelaufen</string>
     <string name="chip_unknown">\?</string>
 
     <!-- Ticket detail -->
-    <string name="ticket_sub_current">Gültig bis %1$s</string>
     <string name="ticket_sub_future">Gültig ab %1$s</string>
     <string name="ticket_sub_expired">Abgelaufen am %1$s</string>
-    <string name="ticket_sub_area">" · %1$s"</string>
-    <string name="ticket_sub_price">" · Preisstufe %1$s"</string>
     <string name="ticket_not_found">Ticket nicht gefunden. Bitte die Ticketliste aktualisieren.</string>
     <string name="ticket_code">Ticket QR Code</string>
     <string name="ticket_code_spin">Antippen zum Drehen</string>
@@ -146,9 +143,20 @@
     <string name="understood">Verstanden</string>
     <string name="kv_holder">Ticketinhaber</string>
     <string name="kv_dob">Geburtsdatum</string>
-    <string name="kv_validity">Gültigkeit</string>
     <string name="kv_number">Ticketnummer</string>
-    <string name="validity_range">%1$s – %2$s</string>
+    <string name="kv_valid">Gültig</string>
+    <string name="kv_booked">Kaufdatum</string>
+    <string name="kv_area">Geltungsbereich</string>
+    <string name="kv_price_level">Preisstufe</string>
+    <string name="kv_label">%1$s:</string>
+    <string name="invoice_download">Rechnung herunterladen →</string>
+    <string name="invoice_loading">Rechnung wird geladen …</string>
+    <string name="invoice_failed">Rechnung nicht verfügbar: %1$s</string>
+    <string name="invoice_no_viewer">Keine App zum Öffnen von PDFs gefunden.</string>
+    <string name="invoice_name">Rechnung-%1$s</string>
+    <string name="validity_until">%1$s bis %2$s</string>
+    <string name="ticket_terms_personal">Keine Mitnahme weiterer Personen. Nicht übertragbar. Nur gültig mit amtlichem Lichtbildausweis.</string>
+    <string name="ticket_terms_tariff">Es gelten die Tarif- und Beförderungsbestimmungen des jeweiligen Tarifanbieters.</string>
 
     <!-- Account -->
     <string name="hello">Hallo!</string>
@@ -192,7 +200,7 @@
     <string name="sec_colors">Farben</string>
     <string name="palette_lite">myVRN Lite</string>
     <string name="palette_vrn">VRN Original</string>
-    <string name="palette_hint">myVRN Lite: Rot · VRN Original: Blau/Navy wie in der offiziellen App.</string>
+    <string name="palette_hint">myVRN Lite: VRN-Rot · VRN Original: Navy wie in der offiziellen App. Im dunklen Design wird die Farbe zum Hintergrund.</string>
     <string name="sec_offline">Offline</string>
     <string name="offline_title">Tickets offline speichern</string>
     <string name="offline_desc">Speichert gültige Tickets inkl. QR-Code auf diesem Gerät, damit sie ohne Netz angezeigt werden können.</string>

@@ -1,24 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Dark theme (ClientTheme Mode 1). -->
 <resources>
-    <color name="bg">#272727</color>
-    <color name="surface">#414141</color>
-    <color name="text">#ffffff</color>
-    <color name="text_heading">#ffffff</color>
-    <color name="text_muted">#aaaaaa</color>
-    <color name="divider">#1affffff</color>
-    <color name="hover">#4a4a4a</color>
     <color name="success">#73d13d</color>
     <color name="warning">#ffa940</color>
     <color name="error">#ff6b6b</color>
-    <color name="code_bg">#1e1e1e</color>
     <color name="mode_train">#a8a8a8</color>
     <color name="mode_other">#a8a8a8</color>
 
-    <color name="lite_brand_soft">#29ff6b78</color>
-    <color name="lite_brand_ink">#ff6b78</color>
+    <color name="lite_brand_soft">#2eff9aa3</color>
+    <color name="lite_brand_ink">#ff9aa3</color>
     <color name="lite_accent_text">#ffffff</color>
     <color name="vrn_brand_soft">#294dbbe8</color>
     <color name="vrn_brand_ink">#4dbbe8</color>
     <color name="vrn_accent_text">#ffffff</color>
+    <color name="lite_bg">#59000a</color>
+    <color name="lite_surface">#6d1420</color>
+    <color name="lite_text">#ffffff</color>
+    <color name="lite_text_heading">#ffffff</color>
+    <color name="lite_text_muted">#b8ffffff</color>
+    <color name="lite_divider">#24ffffff</color>
+    <color name="lite_hover">#7c1f2b</color>
+    <color name="lite_code_bg">#43000a</color>
+    <color name="lite_tcard_top">#faf0f1</color>
+    <color name="lite_tcard_body">#f1d9dc</color>
+    <color name="lite_tcard_ink">#59000a</color>
+    <color name="lite_ticket_line">#80ffffff</color>
+    <color name="vrn_bg">#002d59</color>
+    <color name="vrn_surface">#0d3e6e</color>
+    <color name="vrn_text">#ffffff</color>
+    <color name="vrn_text_heading">#ffffff</color>
+    <color name="vrn_text_muted">#b8ffffff</color>
+    <color name="vrn_divider">#24ffffff</color>
+    <color name="vrn_hover">#17497c</color>
+    <color name="vrn_code_bg">#00213f</color>
+    <color name="vrn_tcard_top">#eef2f9</color>
+    <color name="vrn_tcard_body">#d9e2f1</color>
+    <color name="vrn_tcard_ink">#002d59</color>
+    <color name="vrn_ticket_line">#80ffffff</color>
 </resources>

@@ -72,6 +72,11 @@ class Ticket(
     val holder: String?,
     val dob: String?,
     val number: String?,
+    /** When the order was placed (Orders[].BookingDate). */
+    val booked: String?,
+    /** Orders[].Id: the invoice is per order. */
+    val orderId: Long?,
+    val orderNumber: String?,
     val usedQuota: String?,
     val allowedQuota: String?,
     val hidden: Boolean,
@@ -102,6 +107,9 @@ class Ticket(
                 holder = detail(t, "Holder"),
                 dob = detail(t, "Dob"),
                 number = detail(t, "AuthorizationNumber") ?: present(order, "OrderNumber")?.toString(),
+                booked = present(order, "BookingDate")?.toString(),
+                orderId = (order.opt("Id") as? Number)?.toLong(),
+                orderNumber = present(order, "OrderNumber")?.toString(),
                 usedQuota = present(t, "UsedQuota")?.toString(),
                 allowedQuota = allowed?.toString(),
                 hidden = present(t, "Canceled") != null || present(t, "Refunded") != null,
