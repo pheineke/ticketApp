@@ -13,6 +13,7 @@
 {% else %}
   {% if rec and rec.error %}<div class="alert bad">Tickets konnten nicht geladen werden: {{ rec.error }}</div>{% endif %}
 
+  <div class="tgrid">
   {% for g in groups %}
     {% set collapsed = g.key in ('expired', 'unknown') %}
     {% if collapsed %}<details class="group"><summary><h2>{{ g.label }} ({{ g.tickets|length }}) · Debug</h2></summary>{% else %}<h2>{{ g.label }}</h2>{% endif %}
@@ -46,6 +47,7 @@
       </div>
     {% endif %}
   {% endfor %}
+  </div>
 
   {% if hidden and not debug %}
     <p class="hint center">{{ hidden }} ältere{{ 's' if hidden == 1 }} Ticket{{ 's' if hidden != 1 }} ausgeblendet · im <a href="{{ url_for('settings') }}">Debug-Modus</a> sichtbar</p>

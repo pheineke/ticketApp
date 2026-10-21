@@ -336,7 +336,7 @@ a.jrow:active { background: var(--hover); }
 .clock .early { color: var(--success); }
 .clock.gone b { text-decoration: line-through; color: var(--text-muted); }
 .jmain { flex: 1; min-width: 0; display: grid; gap: 10px; }
-.jtop { display: flex; align-items: baseline; gap: 10px; line-height: 22px; }
+.jtop { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 10px; line-height: 22px; }
 .dur { color: var(--text-muted); white-space: nowrap; }
 .dur b { color: var(--text-heading); font-weight: 600; font-size: 15px; }
 .chg { color: var(--text-muted); font-size: 12px; white-space: nowrap; }
@@ -441,3 +441,55 @@ body.mapmode main.content { padding: 0; }
 .pc-stops li.on { background: var(--brand-soft); }
 .pc-stops .n { flex: 1; color: var(--text-heading); }
 .pc-stops .d { font-size: 12px; color: var(--text-muted); white-space: nowrap; }
+
+/* ---- Bigger screens ------------------------------------------------------ */
+/* Tablet portrait: the phone layout, with more room. */
+@media (min-width: 700px) {
+  .app, .tabbar .inner { max-width: 760px; }
+  body.mapmode .app { max-width: none; }  /* the app bar spans the full-width map */
+  .tgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); column-gap: 10px; }
+  .tgrid > :not(.tcard) { grid-column: 1 / -1; }
+  .bsheet-body > * { max-width: 600px; }
+  .placecard { padding-left: max(14px, calc(50% - 300px)); padding-right: max(14px, calc(50% - 300px)); }
+  /* Login, code and gate forms don't need the full width. */
+  .narrow { max-width: 440px; margin-left: auto; margin-right: auto; }
+}
+
+/* Tablet landscape and desktop: permanent sidebar instead of drawer + tab bar. */
+@media (min-width: 1000px) {
+  :root { --side: 272px; --panel: clamp(340px, 34vw, 420px); }
+  body.has-nav .drawer { transform: none; transition: none; width: var(--side); max-width: none; z-index: 15;
+                         border-right: 1px solid var(--divider); }
+  body.has-nav .scrim, body.has-nav .tabbar, body.has-nav .menubtn { display: none; }
+  body.has-nav .app { max-width: none; margin-left: var(--side); box-shadow: none; }
+  .appbar { padding: 0 20px; }
+  main.content { width: 100%; max-width: 920px; margin: 0 auto; padding: 24px 32px 40px; }
+  .navrow:hover { background: var(--hover); }
+  .tcard:hover, a.jrow:hover { border-color: var(--text-muted); }
+
+
+  /* Ticket detail: header across, code left, data right. */
+  .ticket-detail { margin: 0; display: grid; grid-template-columns: minmax(300px, 420px) 1fr; column-gap: 28px; align-items: start; }
+  .ticket-detail .head { grid-column: 1 / -1; border-radius: var(--radius); margin-bottom: 4px; }
+  .ticket-detail .codebox, .ticket-detail .counter, .ticket-detail > .alert { grid-column: 1; }
+  .ticket-detail .codebox { width: min(380px, 100%); }
+  .ticket-detail .kv { grid-column: 2; grid-row: 2 / span 2; margin: 12px 0; width: 100%; }
+  .ticket-detail .debug { grid-column: 1 / -1; margin: 12px 0; }
+  .ticket-detail .alert.bad { margin: 12px 0; }
+  .sheet { top: 50%; bottom: auto; left: 50%; right: auto; width: 440px; transform: translate(-50%, -50%);
+           border-radius: 12px; padding-bottom: 20px; }
+
+  /* Fahrplan: map fills the page; search/results/timeline in a fixed panel on the left. */
+  body.mapmode .fullmap { left: var(--side); bottom: 0; }
+  body.mapmode .bsheet, body.mapmode .bsheet[data-state] { left: calc(var(--side) + 16px); right: auto; top: 72px; bottom: 16px;
+      width: var(--panel); transform: none !important; border-radius: 12px; box-shadow: 0 2px 18px rgba(0, 0, 0, .22);
+      touch-action: auto; transition: none; }
+  body.mapmode .bsheet-grab { display: none; }
+  body.mapmode .bsheet .bsheet-body { overflow-y: auto; touch-action: auto; padding: 16px 14px 20px; }
+  body.mapmode .bsheet-body > * { max-width: none; }
+  body.mapmode .placecard { left: calc(var(--side) + var(--panel) + 32px); right: auto; bottom: 16px; width: min(380px, calc(100vw - var(--side) - var(--panel) - 48px));
+      padding: 14px; border-radius: 12px; }
+}
+@media (min-width: 1000px) {
+  body:not(.has-nav) .app { max-width: none; box-shadow: none; }  /* gate page: no phone column */
+}

@@ -4,6 +4,8 @@
  *   full  the whole area between app bar and tab bar; the content scrolls
  * Below "full" the whole sheet is a drag handle (taps on rows still work); in "full" only
  * the grab bar is, so the content can scroll. Fires "sheetchange" with the visible height.
+ * On wide screens (see style.css) the sheet is a fixed side panel: no dragging, and it
+ * covers the map from the left instead of from the bottom.
  */
 (function (w) {
   "use strict";
@@ -15,6 +17,7 @@
   var ORDER = ["full", "half", "peek"];
   var state = el.dataset.snap || "peek";
   var y = 0;  // current translateY in px (0 = full)
+  var wide = w.matchMedia("(min-width: 1000px)");
 
   function snaps() {
     var h = el.offsetHeight;
@@ -43,7 +46,14 @@
     setTimeout(announce, animate === false ? 0 : 260);
   }
 
-  function visible() { return Math.max(0, el.offsetHeight - y); }
+  /* How much of the map the sheet covers: from the bottom (phone) or the left (side panel). */
+  function visible() { return wide.matches ? 0 : Math.max(0, el.offsetHeight - y); }
+  function covered() {
+    if (!wide.matches) return { bottom: visible(), left: 0 };
+    var map = document.getElementById("map");
+    var left = map ? el.getBoundingClientRect().right - map.getBoundingClientRect().left : 0;
+    return { bottom: 0, left: Math.max(0, left) };
+  }
 
   function announce() {
     el.dispatchEvent(new CustomEvent("sheetchange", { bubbles: true, detail: { state: state, visible: visible() } }));
@@ -54,7 +64,7 @@
   var NO_DRAG = "input, textarea, select, .suggest, .leaflet-container";
 
   el.addEventListener("pointerdown", function (e) {
-    if (e.button > 0 || (e.target.closest && e.target.closest(NO_DRAG))) return;
+    if (wide.matches || e.button > 0 || (e.target.closest && e.target.closest(NO_DRAG))) return;
     if (state === "full" && !grab.contains(e.target)) return;  // content scrolls
     drag = { id: e.pointerId, startY: e.clientY, startPos: y, moved: false, samples: [[e.timeStamp, e.clientY]] };
     if (e.pointerType === "mouse") e.preventDefault();  // no text selection while dragging
@@ -111,6 +121,7 @@
   });
 
   w.addEventListener("resize", function () { set(state, false); });
+  if (wide.addEventListener) wide.addEventListener("change", function () { set(state, false); });
 
   set(state, false);
   el.classList.add("ready");
@@ -119,5 +130,6 @@
     set: set,
     get state() { return state; },
     visible: visible,
+    covered: covered,
   };
 })(window);

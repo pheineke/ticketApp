@@ -57,7 +57,7 @@
   {% endcall %}
 
 {% elif need_code %}
-  <div class="panel">
+  <div class="panel narrow">
     <h3>Bestätigungscode</h3>
     <p class="hint">Wir haben dir einen Code an {% if email %}<b>{{ email }}</b>{% else %}deine E-Mail-Adresse{% endif %} geschickt.</p>
     <form method="post" action="{{ url_for('login_direct_code') }}"><input type="hidden" name="_csrf" value="{{ csrf_token }}">
@@ -72,7 +72,7 @@
     <img class="only-light" src="{{ icon('vrn_logo.svg') }}" alt="VRN" style="height:52px">
     <img class="only-dark" src="{{ url_for('static', filename='icons/vrn_logo_dark.svg') }}" alt="VRN" style="height:52px">
   </div>
-  <form method="post" action="{{ url_for('login_direct') }}"><input type="hidden" name="_csrf" value="{{ csrf_token }}">
+  <form class="narrow" method="post" action="{{ url_for('login_direct') }}"><input type="hidden" name="_csrf" value="{{ csrf_token }}">
     <div class="field"><label for="email">E-Mail <small>(erforderlich)</small></label>
       <input type="email" id="email" name="email" value="{{ email or '' }}" autocomplete="username" placeholder="E-Mail" required></div>
     <div class="field"><label for="password">Passwort <small>(erforderlich)</small></label>

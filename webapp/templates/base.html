@@ -14,14 +14,14 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   {% block head %}{% endblock %}
 </head>
-<body class="{% block bodyclass %}{% endblock %}">
+<body class="{% if not hide_nav %}has-nav {% endif %}{% block bodyclass %}{% endblock %}">
 <div class="app">
   {% if not hide_nav %}
   <header class="appbar">
     {% if back %}
       <a class="iconbtn" href="{{ back }}" aria-label="Zurück">←</a>
     {% else %}
-      <button class="iconbtn" type="button" aria-label="Menü" onclick="document.body.classList.add('nav-open')"><span class="ic menu"></span></button>
+      <button class="iconbtn menubtn" type="button" aria-label="Menü" onclick="document.body.classList.add('nav-open')"><span class="ic menu"></span></button>
     {% endif %}
     <span class="title">{{ title or 'myVRN' }}</span>
     {% if debug %}<span class="dbg-flag">DEBUG</span>{% endif %}

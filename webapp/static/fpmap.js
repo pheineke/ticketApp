@@ -27,14 +27,15 @@
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>-Mitwirkende'
   }).addTo(map);
 
-  function sheetHeight() { return w.BSheet ? w.BSheet.visible() : 0; }
+  function covered() { return w.BSheet && w.BSheet.covered ? w.BSheet.covered() : { bottom: 0, left: 0 }; }
 
-  /* Fit bounds into the area above the sheet. */
+  /* Fit bounds into the part of the map the sheet leaves free (above it, or beside it). */
   function fit(bounds, maxZoom) {
     if (!bounds.isValid()) return;
+    var c = covered();
     map.fitBounds(bounds, {
-      paddingTopLeft: [28, 48],
-      paddingBottomRight: [28, Math.min(sheetHeight(), el.offsetHeight * 0.7) + 28],
+      paddingTopLeft: [Math.min(c.left, el.offsetWidth * 0.6) + 28, 48],
+      paddingBottomRight: [28, Math.min(c.bottom, el.offsetHeight * 0.7) + 28],
       maxZoom: maxZoom || 16,
     });
   }
