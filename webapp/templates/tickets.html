@@ -3,7 +3,9 @@
 {% block actions %}
   {% if meta.logged_in %}<a class="iconbtn" href="{{ url_for('tickets', reload=1) }}" aria-label="Aktualisieren" title="Aktualisieren">↻</a>{% endif %}
 {% endblock %}
+{% block bodyclass %}ticketpage{% endblock %}
 {% block content %}
+<div class="tickets-page">
 {% if not meta.logged_in %}
   <div class="empty">
     <span class="ic ticket"></span>
@@ -14,28 +16,28 @@
   {% if rec and rec.error %}<div class="alert bad">Tickets konnten nicht geladen werden: {{ rec.error }}</div>{% endif %}
 
   <div class="tgrid">
+  {% set n = namespace(i=0) %}
   {% for g in groups %}
     {% set collapsed = g.key in ('expired', 'unknown') %}
     {% if collapsed %}<details class="group"><summary><h2>{{ g.label }} ({{ g.tickets|length }}) · Debug</h2></summary>{% else %}<h2>{{ g.label }}</h2>{% endif %}
     {% for t in g.tickets %}
+      {% set n.i = n.i + 1 %}
       <a class="tcard {{ g.key }}" href="{{ url_for('ticket_detail', tid=t.id) }}">
-        {% if t.dticket %}
-          <span class="logo"><img class="only-light" src="{{ url_for('static', filename='icons/deutschlandticket.svg') }}" alt=""><img class="only-dark" src="{{ url_for('static', filename='icons/deutschlandticket_darkmode.svg') }}" alt=""></span>
-        {% else %}
-          <span class="logo round"><span class="ic ticket" style="width:22px;height:22px"></span></span>
-        {% endif %}
-        <span class="grow">
-          <div class="name">{{ t.name }}</div>
-          <div class="meta">
-            {% if g.key == 'future' %}{{ t.valid_from|dt(false) }} – {{ t.valid_to|dt }}
-            {% elif g.key == 'quota' %}{{ t.quota[0] or 0 }} von {{ t.quota[1] }} genutzt
-            {% elif g.key == 'expired' %}Abgelaufen am {{ t.valid_to|dt }}
-            {% elif g.key == 'unknown' %}Gültigkeit unbekannt · Id {{ t.id }}
-            {% else %}Gültig bis {{ t.valid_to|dt }}{% endif %}
-          </div>
+        <span class="ttop">
+          {% if t.dticket %}<span class="logo"><img src="{{ url_for('static', filename='icons/deutschlandticket.svg') }}" alt=""></span>
+          {% else %}<span class="logo"><span class="ic ticket"></span></span>{% endif %}
+          <span class="no">#{{ n.i }} {{ t.name }}</span>
         </span>
-        <span class="chip {{ g.key }}">{{ {'current': 'Gültig', 'future': 'ab ' ~ (t.valid_from|dt(false))[:6], 'quota': 'Guthaben', 'expired': 'Abgelaufen', 'unknown': '?'}[g.key] }}</span>
-        <span class="chev">›</span>
+        <span class="tbody">
+          <span class="name">{{ t.name }}</span>
+          <span class="meta">
+            <span class="chip {{ g.key }}">{{ {'current': 'Gültig', 'future': 'Zukünftig', 'quota': 'Guthaben', 'expired': 'Abgelaufen', 'unknown': '?'}[g.key] }}</span>
+            {% if g.key == 'quota' %}{{ t.quota[0] or 0 }} von {{ t.quota[1] }} genutzt
+            {% elif g.key == 'expired' %}{{ t.valid_to|dt }}
+            {% elif g.key == 'unknown' %}Id {{ t.id }}
+            {% else %}{{ t.valid_from|dt }} bis {{ t.valid_to|dt }}{% endif %}
+          </span>
+        </span>
       </a>
     {% endfor %}
     {% if collapsed %}</details>{% endif %}
@@ -49,6 +51,7 @@
   {% endfor %}
   </div>
 
+  <p class="hint">Dir werden nicht alle Tickets angezeigt? Überprüfe in deinem <a href="{{ url_for('account') }}">Profil</a>, ob du eingeloggt bist.</p>
   {% if hidden and not debug %}
     <p class="hint center">{{ hidden }} ältere{{ 's' if hidden == 1 }} Ticket{{ 's' if hidden != 1 }} ausgeblendet · im <a href="{{ url_for('settings') }}">Debug-Modus</a> sichtbar</p>
   {% endif %}
@@ -60,6 +63,7 @@
     {% else %}<div class="hint">Noch nicht geladen.</div>{% endif %}
   {% endcall %}
 {% endif %}
+</div>
 {% endblock %}
 {% block scripts %}
 {% if meta.logged_in and offline_on %}

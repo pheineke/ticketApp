@@ -3,7 +3,12 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="{{ '#0098d8' if palette == 'vrn' else '#d80019' }}">
+  {# The browser bar in the page colour: white, or the palette's ink in dark mode. #}
+  {% set ink = '#002d59' if palette == 'vrn' else '#59000a' %}
+  {% if theme == 'dark' %}<meta name="theme-color" content="{{ ink }}">
+  {% elif theme == 'light' %}<meta name="theme-color" content="#ffffff">
+  {% else %}<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="{{ ink }}" media="(prefers-color-scheme: dark)">{% endif %}
   <title>{% if title %}{{ title }} · {% endif %}myVRN Lite</title>
   <meta name="application-name" content="myVRN Lite">
   <meta name="apple-mobile-web-app-title" content="myVRN Lite">
@@ -76,8 +81,7 @@
     <a class="{{ 'on' if active == 'tickets' }}" href="{{ url_for('tickets') }}"><span class="ic ticket"></span>Tickets</a>
     <a class="{{ 'on' if active == 'fahrplan' }}" href="{{ url_for('connections') }}"><span class="ic route"></span>Fahrplan</a>
     <a class="{{ 'on' if active == 'account' }}" href="{{ url_for('account') }}"><span class="ic account"></span>Konto</a>
-    <a class="{{ 'on' if active == 'settings' }}" href="{{ url_for('settings') }}"><span class="ic gear"></span>Einstellen</a>
-    <a class="{{ 'on' if active == 'app' }}" href="{{ url_for('android_app') }}"><span class="ic download"></span>App</a>
+    <a class="{{ 'on' if active == 'settings' }}" href="{{ url_for('settings') }}"><span class="ic gear"></span>Einstellungen</a>
   </div>
 </nav>
 {% endif %}

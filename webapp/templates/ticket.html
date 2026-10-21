@@ -1,15 +1,18 @@
 {% extends "base.html" %}
 {% import "_macros.html" as m with context %}
 {% block actions %}<a class="iconbtn" href="{{ url_for('ticket_detail', tid=t.id, reload=1) }}" aria-label="Neu laden" title="Neu laden">↻</a>{% endblock %}
+{% block bodyclass %}ticketpage{% endblock %}
 {% block content %}
+{# Laid out as in the official app: name and timer, the code on white, conditions, ticket data,
+   invoice. White with VRN navy ink, navy with white in dark mode. #}
 <div class="ticket-detail">
-  <div class="head">
+  <div class="tk-head">
     <div class="name">{{ t.name }}</div>
-    <div class="sub">
-      {% if t.group == 'expired' %}Abgelaufen am {{ t.valid_to|dt }}{% elif t.group == 'future' %}Gültig ab {{ t.valid_from|dt }}{% else %}Gültig bis {{ t.valid_to|dt }}{% endif %}
-      {% if t.area %} · {{ t.area }}{% endif %}{% if t.price_level %} · Preisstufe {{ t.price_level }}{% endif %}
-    </div>
+    {% if qr.code_data %}<button type="button" class="timer" id="counter" title="Was bedeutet der Zähler?"
+      onclick="document.getElementById('sheet').hidden=false">00:00</button>{% endif %}
   </div>
+  {% if t.group == 'expired' %}<div class="alert bad">Abgelaufen am {{ t.valid_to|dt }}</div>
+  {% elif t.group == 'future' %}<div class="alert info">Gültig ab {{ t.valid_from|dt }}</div>{% endif %}
 
   {% if qr.code_data %}
     <div class="codebox" id="codebox" role="button" tabindex="0" aria-label="Code drehen" title="Antippen zum Drehen">
@@ -22,18 +25,33 @@
       {% endif %}
       <div class="codelabel" id="bcerr"></div>
     </div>
-    <div class="counter"><span id="counter">00:00</span>
-      <button type="button" onclick="document.getElementById('sheet').hidden=false">Was bedeutet der Zähler? ⓘ</button></div>
   {% else %}
     <div class="alert bad">Kein QR Code verfügbar.{% if qr.error %} {{ qr.error }}{% endif %}</div>
   {% endif %}
 
-  <table class="kv">
-    {% if t.holder %}<tr><td>Ticketinhaber</td><td>{{ t.holder }}</td></tr>{% endif %}
-    {% if t.dob %}<tr><td>Geburtsdatum</td><td>{{ t.dob|dt(false) }}</td></tr>{% endif %}
-    <tr><td>Gültigkeit</td><td>{{ t.valid_from|dt(false) }} – {{ t.valid_to|dt }}</td></tr>
-    {% if t.number %}<tr><td>Ticketnummer</td><td>{{ t.number }}</td></tr>{% endif %}
-  </table>
+  <div class="tk-info">
+    {% if t.dticket %}
+      <div class="tk-terms">
+        <p>Keine Mitnahme weiterer Personen. Nicht übertragbar. Nur gültig mit amtlichem Lichtbildausweis.</p>
+        <p>Es gelten die Tarif- und Beförderungsbestimmungen des jeweiligen Tarifanbieters.</p>
+      </div>
+    {% endif %}
+    <dl class="tk-data">
+      {% if t.holder %}<dt>Ticketinhaber:</dt><dd>{{ t.holder }}</dd>{% endif %}
+      {% if t.dob %}<dt>Geburtsdatum:</dt><dd>{{ t.dob|dt(false) }}</dd>{% endif %}
+      <dt>Gültig:</dt><dd>{{ t.valid_from|dt }} bis {{ t.valid_to|dt }}</dd>
+      {% if t.booked %}<dt>Kaufdatum:</dt><dd>{{ t.booked|dt }}</dd>{% endif %}
+      {% if t.area %}<dt>Geltungsbereich:</dt><dd>{{ t.area }}</dd>{% endif %}
+      {% if t.price_level %}<dt>Preisstufe:</dt><dd>{{ t.price_level }}</dd>{% endif %}
+      {% if t.number %}<dt>Ticketnummer:</dt><dd>{{ t.number }}</dd>{% endif %}
+    </dl>
+    {% if t.order_id %}
+      <div id="rechnung">
+        {% if invoice and invoice.error %}<div class="alert bad">Rechnung nicht verfügbar: {{ invoice.error }}</div>{% endif %}
+        <a class="tk-invoice" href="{{ url_for('ticket_invoice', tid=t.id) }}" target="_blank" rel="noopener">Rechnung herunterladen →</a>
+      </div>
+    {% endif %}
+  </div>
 
   {% call m.debug_panel('Barcode') %}
     {% if qr.code_data and qr.kind == 'data' %}
@@ -49,6 +67,13 @@
   {% call m.debug_panel('Ticketdaten (ListOrdersV2)') %}
     <pre>{{ t.raw|pretty }}</pre>
   {% endcall %}
+  {% if invoice %}
+    {% call m.debug_panel('Rechnung') %}
+      <div class="hint">Pdfconverter/Invoice → {{ invoice.status }}</div>
+      <pre>{{ invoice.request }}</pre>
+      <pre>{{ invoice.response }}</pre>
+    {% endcall %}
+  {% endif %}
 </div>
 
 <div class="sheet" id="sheet" hidden>

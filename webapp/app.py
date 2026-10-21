@@ -5,7 +5,7 @@ Three areas, like the app's bottom tab bar:
   Tickets   /tickets, /tickets/<id>   my tickets + QR code (Mentz TicketShop API)
   Konto     /account                  login (browserless, see vrn_client.py) and profile
   Fahrplan   /fahrplan                connection search + route map (VRN EFA API, efa.py)
-  Einstellen /settings                theme + debug mode
+  Einstellungen /settings             theme + debug mode
   App        /app                     download of the native Android app (APK from downloads/)
 
 Debug mode (Settings) adds the developer tools to each view: raw API responses,
@@ -20,6 +20,7 @@ from __future__ import annotations
 import base64
 import hashlib
 import json
+import sys
 import os
 import re
 import secrets
@@ -121,6 +122,8 @@ class Session:
     trips: dict | None = None                        # last connection search (Fahrplan)
     shop_unis: list | None = None                    # Dfn/GetAuthorities (Hochschul-Login)
     shop_result: dict | None = None                  # result of the last ticket order
+    invoices: dict = field(default_factory=dict)     # order id -> invoice PDF (Pdfconverter/Invoice)
+    invoice_rec: dict | None = None                  # the last invoice request (debug, error)
     csrf: str = field(default_factory=sec.new_csrf)  # per-session CSRF token
     gate_ok: bool = False                            # passed the ACCESS_PASSWORD gate
     device: str | None = None                        # persistent-login cookie value (remember.py)
@@ -591,6 +594,7 @@ def ticket_view(order: dict, t: dict) -> dict:
         "area": _detail(t, "AreaName") or _detail(t, "TariffArea"),
         "holder": _detail(t, "Holder"), "dob": _detail(t, "Dob"),
         "number": _detail(t, "AuthorizationNumber") or order.get("OrderNumber"),
+        "order_id": order.get("Id"), "order_number": order.get("OrderNumber"), "booked": order.get("BookingDate"),
         "quota": (t.get("UsedQuota"), t.get("AllowedQuota")),
         "hidden": bool(t.get("Canceled") or t.get("Refunded")),
         "order": order, "raw": t,
@@ -764,8 +768,41 @@ def ticket_detail(tid: int):
     rec = fetch_qr(sess, tid, force=bool(request.args.get("reload")))
     if request.args.get("reload"):
         return go(sid, "ticket_detail", tid=tid)
+    invoice = sess.invoice_rec if sess.invoice_rec and sess.invoice_rec.get("tid") == tid else None
     return page(sess, sid, "ticket.html", active="tickets", title="Ticketdetails",
-                back=url_for("tickets"), t=ticket, qr=rec)
+                back=url_for("tickets"), t=ticket, qr=rec, invoice=invoice)
+
+
+@app.route("/tickets/<int:tid>/rechnung")
+def ticket_invoice(tid: int):
+    """The ticket's order invoice as a PDF (the official app's "Rechnung herunterladen").
+    Kept in the session once fetched; on failure back to the ticket with the error."""
+    sess, sid = get_session()
+    if not sess.tokens:
+        return go(sid, "account")
+    if sess.orders is None:
+        load_orders(sess)
+    ticket = find_ticket(sess, tid)
+    if ticket is None or not ticket["order_id"]:
+        abort(404)
+    pdf = sess.invoices.get(ticket["order_id"])
+    if pdf is None:
+        rec = api_call(sess, "POST", shop.INVOICE_URL, {"TicketOrderId": [ticket["order_id"]], "IsGuestUser": False})
+        pdf, error = shop.invoice_pdf(rec)
+        sess.invoice_rec = {"tid": tid, "error": error, "request": rec.get("request"), "status": rec.get("status"),
+                            "response": (rec.get("text") or json.dumps(rec.get("json")))[:2000]}
+        if pdf is None:
+            data = rec.get("json")
+            shape = {k: (type(v).__name__, len(v) if isinstance(v, (str, list, dict)) else v if v is None or isinstance(v, (bool, int)) else "…")
+                     for k, v in data.items()} if isinstance(data, dict) else type(data).__name__
+            print(f"invoice: order {ticket['order_id']} -> {rec.get('status')} {error!r} {shape}", file=sys.stderr, flush=True)
+            return go(sid, "ticket_detail", tid=tid, _anchor="rechnung")
+        sess.invoices[ticket["order_id"]] = pdf
+    name = "Rechnung-" + re.sub(r"[^A-Za-z0-9-]", "_", str(ticket["order_number"] or ticket["order_id"])) + ".pdf"
+    resp = make_response(pdf)
+    resp.headers["Content-Type"] = "application/pdf"
+    resp.headers["Content-Disposition"] = f'inline; filename="{name}"'
+    return attach_cookie(resp, sid)
 
 
 # --------------------------------------------------------------------------
@@ -1095,7 +1132,7 @@ def ticketshop():
     st = shop_state(sess) if sess.tokens else None
     unis = shop_authorities(sess) if sess.tokens else []
     return page(sess, sid, "ticketshop.html", active="shop", title="Ticketshop", st=st, unis=unis,
-                result=sess.shop_result, saved=request.args.get("saved"))
+                result=sess.shop_result, saved=request.args.get("saved"), verified=request.args.get("verifiziert"))
 
 
 @app.route("/ticketshop/verifizieren")
@@ -1105,7 +1142,8 @@ def ticketshop_verify():
     entity = request.args.get("uni", "")
     if not sess.tokens or entity not in {u["id"] for u in shop_authorities(sess)}:
         return go(sid, "ticketshop")
-    return attach_cookie(make_response(redirect(shop.verify_url(entity))), sid)
+    back = url_for("ticketshop", verifiziert=1, _external=True)
+    return attach_cookie(make_response(redirect(shop.verify_url(entity, back))), sid)
 
 
 def _semester_order(sess: Session, st: dict) -> dict:

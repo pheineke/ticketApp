@@ -2,6 +2,10 @@
 {% import "_macros.html" as m with context %}
 {% block content %}
 {% if saved %}<div class="alert ok">Daten gespeichert. Danke!</div>{% endif %}
+{% if verified and st %}
+  {% if st.current %}<div class="alert ok">Studierendenstatus bestätigt – gültig bis {{ st.current.EligibleUntil|dt(false) }}.</div>
+  {% else %}<div class="alert bad">Nach dem Hochschul-Login ist kein gültiger Nachweis für heute da. Siehe <a href="#verify">Studierendenstatus</a>.</div>{% endif %}
+{% endif %}
 {% if not meta.logged_in %}
   <div class="empty">
     <span class="ic ticket"></span>
@@ -67,14 +71,14 @@
         Wichtig: im VRN-Shop mit <b>demselben VRN-Konto</b> anmelden wie hier ({{ meta.claims.get('email') or 'siehe Konto' }}).</p>
     {% endif %}
     {% if unis %}
-      <form method="get" action="{{ url_for('ticketshop_verify') }}" target="_blank" class="verify">
+      <form method="get" action="{{ url_for('ticketshop_verify') }}" class="verify" id="verify-form">
         <label class="lbl" for="uni">{{ 'Erneut verifizieren' if st.current else 'Hochschule' }}</label>
         <select id="uni" name="uni">
           {% for u in unis %}<option value="{{ u.id }}"{{ ' selected' if 'uni-kl.de' in u.id }}>{{ u.name }}</option>{% endfor %}
         </select>
         <button class="btn{{ ' outline' if st.current }}" type="submit">Hochschul-Login starten</button>
       </form>
-      <p class="hint">Öffnet den VRN-Shop in einem neuen Tab. Danach hier die Seite neu laden.</p>
+      <p class="hint">Du wirst zum VRN-Shop und zu deiner Hochschule weitergeleitet und landest danach wieder hier.</p>
     {% else %}
       <div class="alert bad">Die Liste der Hochschulen konnte nicht geladen werden.</div>
     {% endif %}
@@ -101,4 +105,17 @@
     </form>
   {% endcall %}
 {% endif %}
+{% endblock %}
+{% block scripts %}
+<script>
+  // The CSP's form-action 'self' also covers the redirects after a form submit, so the
+  // Hochschul-Login (shop.myvrn.de, then the university) has to start as a plain navigation.
+  (function () {
+    var f = document.getElementById("verify-form");
+    if (f) f.addEventListener("submit", function (e) {
+      e.preventDefault();
+      location.assign(f.action + "?uni=" + encodeURIComponent(f.elements.uni.value));
+    });
+  })();
+</script>
 {% endblock %}

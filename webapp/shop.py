@@ -21,6 +21,7 @@ All calls carry the user's bearer token (the web shop uses its cookie session in
 """
 from __future__ import annotations
 
+import base64
 import json
 import time
 from urllib.parse import quote
@@ -40,6 +41,8 @@ CREATE_ORDER_URL = BASE + "TicketShop/Shop/CreateOrder"
 # The web shop's way (AuthenticationPrivatePersonalizationService): a POST that reads.
 # Usage 0 = WITH_AUTHORIZATION (entitlements), 1 = BAHN_CARD (discounts). -> {Count, Values: [...]}
 ENTITLEMENTS_POST_URL = BASE + "Personalization/Entitlement/TicketEntitlements"
+# On the shop's root (the web shop's PERSO base), not under TicketShop/ like the app's other shop calls.
+INVOICE_URL = BASE + "Pdfconverter/Invoice"
 ENTITLEMENTS_POST_BODY = {"Usage": 0, "Index": 0, "MaxNumber": 20, "ExpandEntitlementDocument": False,
                           "AnnotationIsAscending": True, "CreatedIsAscending": False}
 
@@ -57,11 +60,11 @@ def federate_path(entity_id: str, return_url: str = ENTITLEMENTS_PAGE) -> str:
     return f"/Dfn/Federate?entityId={quote(entity_id, safe='')}&returnUrl={quote(return_url, safe='')}"
 
 
-def verify_url(entity_id: str) -> str:
+def verify_url(entity_id: str, return_url: str = ENTITLEMENTS_PAGE) -> str:
     """Hochschul-Login from outside the shop: sign in at shop.myvrn.de, then straight on to the
     university (Dfn/Federate runs on the shop's own cookie session, which only the shop's pages
-    have). The shop shows the new entitlement afterwards."""
-    return LOGIN_URL + quote(federate_path(entity_id), safe="")
+    have), then back to return_url (absolute URLs to other sites work too)."""
+    return LOGIN_URL + quote(federate_path(entity_id, return_url), safe="")
 
 
 def authorities(data) -> list[dict]:
@@ -88,6 +91,23 @@ def snapshot(call) -> dict:
     rec = call("POST", ENTITLEMENTS_POST_URL, ENTITLEMENTS_POST_BODY)
     out["entitlements_post"] = {"status": rec.get("status"), "json": rec.get("json"), "text": (rec.get("text") or "")[:4000]}
     return out
+
+
+def invoice_pdf(rec: dict) -> tuple[bytes | None, str | None]:
+    """Pdfconverter/Invoice {TicketOrderId: [order Id], IsGuestUser} -> {Success, Invoice, Error}:
+    the order's invoice, a base64 PDF (web shop CommonOrderInvoicePdf). -> (pdf, error)."""
+    data = rec.get("json") if isinstance(rec.get("json"), dict) else {}
+    text = data.get("Invoice") or ""
+    if not text:
+        err = data.get("Error") or {}
+        return None, err.get("Message") or rec.get("status") or "keine Rechnung"
+    try:
+        pdf = base64.b64decode(text)
+    except (ValueError, TypeError):
+        pdf = b""
+    if not pdf.startswith(b"%PDF-"):
+        return None, "Unbekanntes Format: " + str(text)[:40]
+    return pdf, None
 
 
 # ---- Deutschland-Semesterticket -----------------------------------------------------------

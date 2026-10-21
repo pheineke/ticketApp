@@ -1,5 +1,7 @@
 {% extends "base.html" %}
+{% block bodyclass %}ticketpage{% endblock %}
 {% block content %}
+<div class="tickets-page">
 <div class="alert info row" style="justify-content:space-between">
   <span id="offline-banner">Offline</span>
   <button class="btn small outline" type="button" onclick="location.href='/tickets'">Erneut versuchen</button>
@@ -10,6 +12,7 @@
   <span class="ic ticket"></span>
   <p id="empty-text">Keine Offline-Tickets gespeichert. Öffne die Ticketübersicht einmal mit Internetverbindung.</p>
   <button class="btn" type="button" onclick="location.href='/tickets'">Erneut versuchen</button>
+</div>
 </div>
 <div class="sheet" id="sheet" hidden>
   <h3>Was bedeutet der Zähler?</h3>
@@ -70,13 +73,12 @@
     return "current";
   }
   function logo(t) {
-    var span = el("span", t.dticket ? "logo" : "logo round");
+    var span = el("span", "logo");
     if (t.dticket) {
-      var a = el("img", "only-light"); a.src = DTICKET.light; a.alt = "";
-      var b = el("img", "only-dark"); b.src = DTICKET.dark; b.alt = "";
-      span.appendChild(a); span.appendChild(b);
+      var a = el("img"); a.src = DTICKET.light; a.alt = "";  // the card is always light
+      span.appendChild(a);
     } else {
-      var i = el("span", "ic ticket"); i.style.width = i.style.height = "22px"; span.appendChild(i);
+      span.appendChild(el("span", "ic ticket"));
     }
     return span;
   }
@@ -97,19 +99,24 @@
   function renderList() {
     detail.hidden = true; list.hidden = false; list.textContent = "";
     document.querySelector(".appbar .title").textContent = "Tickets";
+    var n = 0;
     [["current", "Aktuell gültig"], ["future", "Zukünftig gültig"]].forEach(function (g) {
       var items = tickets.filter(function (t) { return status(t) === g[0]; });
       if (!items.length) return;
       list.appendChild(el("h2", null, g[1]));
       items.forEach(function (t) {
         var a = el("a", "tcard " + g[0]); a.href = "#t=" + t.id;
-        a.appendChild(logo(t));
-        var grow = el("span", "grow");
-        grow.appendChild(el("div", "name", t.name));
-        grow.appendChild(el("div", "meta", g[0] === "future" ? fmt(t.start, false) + " – " + fmt(t.end) : "Gültig bis " + fmt(t.end)));
-        a.appendChild(grow);
-        a.appendChild(el("span", "chip " + g[0], g[0] === "future" ? "ab " + fmt(t.start, false).slice(0, 6) : "Gültig"));
-        a.appendChild(el("span", "chev", "›"));
+        var top = el("span", "ttop");
+        top.appendChild(logo(t));
+        top.appendChild(el("span", "no", "#" + (++n) + " " + t.name));
+        a.appendChild(top);
+        var body = el("span", "tbody");
+        body.appendChild(el("span", "name", t.name));
+        var meta = el("span", "meta");
+        meta.appendChild(el("span", "chip " + g[0], g[0] === "future" ? "Zukünftig" : "Gültig"));
+        meta.appendChild(document.createTextNode(fmt(t.start) + " bis " + fmt(t.end)));
+        body.appendChild(meta);
+        a.appendChild(body);
         list.appendChild(a);
       });
     });
@@ -119,14 +126,15 @@
     list.hidden = true; detail.hidden = false; detail.textContent = "";
     document.querySelector(".appbar .title").textContent = "Ticketdetails";
     var wrap = el("div", "ticket-detail");
-    var head = el("div", "head");
+    var head = el("div", "tk-head");
     head.appendChild(el("div", "name", t.name));
-    var sub = (status(t) === "future" ? "Gültig ab " + fmt(t.start) : "Gültig bis " + fmt(t.end)) +
-      (t.area ? " · " + t.area : "") + (t.price_level ? " · Preisstufe " + t.price_level : "");
-    head.appendChild(el("div", "sub", sub));
     wrap.appendChild(head);
+    if (status(t) === "future") wrap.appendChild(el("div", "alert info", "Gültig ab " + fmt(t.start)));
 
     if (t.qr) {
+      var timer = el("button", "timer", "00:00"); timer.type = "button"; timer.title = "Was bedeutet der Zähler?";
+      timer.onclick = function () { document.getElementById("sheet").hidden = false; };
+      head.appendChild(timer);
       var box = el("div", "codebox"); box.setAttribute("role", "button"); box.tabIndex = 0;
       box.setAttribute("aria-label", "Code drehen");
       var err = el("div", "codelabel");
@@ -139,25 +147,29 @@
       }
       box.appendChild(err);
       wrap.appendChild(box);
-      var counter = el("div", "counter"); var num = el("span", null, "00:00"); counter.appendChild(num);
-      var info = el("button", null, "Was bedeutet der Zähler? ⓘ"); info.type = "button";
-      info.onclick = function () { document.getElementById("sheet").hidden = false; };
-      counter.appendChild(info); wrap.appendChild(counter);
       detail.appendChild(wrap);
       if (t.kind !== "png" && t.kind !== "jpeg" && t.kind !== "svg") VRN.drawBarcode("bc", t.qr, VRN.barcodeOpts(t.qr), err);
-      VRN.spin(box); VRN.countUp(num); VRN.wake();
+      VRN.spin(box); VRN.countUp(timer); VRN.wake();
     } else {
       wrap.appendChild(el("div", "alert bad", "Für dieses Ticket ist kein QR Code offline gespeichert."));
       detail.appendChild(wrap);
     }
 
-    var table = el("table", "kv");
-    [["Ticketinhaber", t.holder], ["Geburtsdatum", t.dob], ["Gültigkeit", fmt(t.start, false) + " – " + fmt(t.end)],
-     ["Ticketnummer", t.number]].forEach(function (r) {
+    var info = el("div", "tk-info");
+    if (/deutschland/i.test(t.name || "")) {
+      var terms = el("div", "tk-terms");
+      terms.appendChild(el("p", null, "Keine Mitnahme weiterer Personen. Nicht übertragbar. Nur gültig mit amtlichem Lichtbildausweis."));
+      terms.appendChild(el("p", null, "Es gelten die Tarif- und Beförderungsbestimmungen des jeweiligen Tarifanbieters."));
+      info.appendChild(terms);
+    }
+    var data = el("dl", "tk-data");
+    [["Ticketinhaber", t.holder], ["Geburtsdatum", t.dob], ["Gültig", fmt(t.start) + " bis " + fmt(t.end)],
+     ["Geltungsbereich", t.area], ["Preisstufe", t.price_level], ["Ticketnummer", t.number]].forEach(function (r) {
       if (!r[1]) return;
-      var tr = el("tr"); tr.appendChild(el("td", null, r[0])); tr.appendChild(el("td", null, String(r[1]))); table.appendChild(tr);
+      data.appendChild(el("dt", null, r[0] + ":")); data.appendChild(el("dd", null, String(r[1])));
     });
-    wrap.appendChild(table);
+    info.appendChild(data);
+    wrap.appendChild(info);
   }
 
   function route() {

@@ -1,43 +1,171 @@
-/* myVRN Lite — tokens from the VRN ClientTheme (Mode 0/1) and the APK's assets. */
+/* myVRN Lite — colours: one ink per palette, used everywhere (as the official app's ticket
+   screens): white with the ink in light mode, the ink as the background in dark mode.
+   myVRN Lite = VRN red (#59000a), VRN Original = VRN navy (#002d59). Generated: every block
+   sets every token, so palette and theme blocks never leave a value from another behind. */
 :root {
   --brand: #d80019;
   --brand-dark: #59000a;
-  --bg: #f4f4f4;
-  --surface: #ffffff;
-  --text: #414141;
-  --text-heading: rgba(0, 0, 0, .85);
-  --text-muted: #767676;
-  --divider: rgba(5, 5, 5, .08);
-  --hover: #eeeeee;
+  --bg: #ffffff;
+  --surface: #faf0f1;
+  --text: #59000a;
+  --text-heading: #59000a;
+  --text-muted: rgba(89, 0, 10, .68);
+  --divider: rgba(89, 0, 10, .13);
+  --hover: #f3e2e4;
+  --code-bg: #faf0f1;
   --success: #389e0d;
-  --success-soft: rgba(82, 196, 26, .14);
   --warning: #d46b08;
-  --warning-soft: rgba(250, 140, 22, .14);
   --error: #f5222d;
-  --error-soft: rgba(245, 34, 45, .1);
   --brand-soft: rgba(216, 0, 25, .12);
-  --brand-ink: #d80019;      /* brand red for text/icons on surfaces */
-  --code-bg: #f0f2f5;
+  --brand-ink: #d80019;
   --accent-text: #59000a;
+  --tcard-top: #faf0f1;
+  --tcard-body: #f1d9dc;
+  --tcard-ink: #59000a;
+  --ticket-bg: #ffffff;
+  --ticket-bg2: #ffffff;
+  --ticket-ink: #59000a;
+  --ticket-line: rgba(89, 0, 10, .25);
+  color-scheme: light;
+  --success-soft: rgba(82, 196, 26, .14);
+  --warning-soft: rgba(250, 140, 22, .14);
+  --error-soft: rgba(245, 34, 45, .1);
   --radius: 4px;
   --font: Roboto, -apple-system, "Segoe UI", "Noto Sans", Arial, sans-serif;
   --mono: ui-monospace, "Roboto Mono", Menlo, Consolas, monospace;
-  color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #272727; --surface: #414141; --text: #ffffff; --text-heading: #ffffff;
-    --text-muted: #aaaaaa; --divider: rgba(255, 255, 255, .1); --hover: #4a4a4a;
-    --error: #ff6b6b; --success: #73d13d; --warning: #ffa940; --code-bg: #1e1e1e;
-    --accent-text: #ffffff; --brand-ink: #ff6b78; --brand-soft: rgba(255, 107, 120, .16);
+    --brand: #d80019;
+    --brand-dark: #59000a;
+    --bg: #59000a;
+    --surface: #6d1420;
+    --text: #ffffff;
+    --text-heading: #ffffff;
+    --text-muted: rgba(255, 255, 255, .72);
+    --divider: rgba(255, 255, 255, .14);
+    --hover: #7c1f2b;
+    --code-bg: #43000a;
+    --success: #73d13d;
+    --warning: #ffa940;
+    --error: #ff7875;
+    --brand-soft: rgba(255, 154, 163, .18);
+    --brand-ink: #ff9aa3;
+    --accent-text: #ffffff;
+    --tcard-top: #faf0f1;
+    --tcard-body: #f1d9dc;
+    --tcard-ink: #59000a;
+    --ticket-bg: #59000a;
+    --ticket-bg2: #59000a;
+    --ticket-ink: #ffffff;
+    --ticket-line: rgba(255, 255, 255, .5);
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #272727; --surface: #414141; --text: #ffffff; --text-heading: #ffffff;
-  --text-muted: #aaaaaa; --divider: rgba(255, 255, 255, .1); --hover: #4a4a4a;
-  --error: #ff6b6b; --success: #73d13d; --warning: #ffa940; --code-bg: #1e1e1e;
-  --accent-text: #ffffff; --brand-ink: #ff6b78; --brand-soft: rgba(255, 107, 120, .16);
+  --brand: #d80019;
+  --brand-dark: #59000a;
+  --bg: #59000a;
+  --surface: #6d1420;
+  --text: #ffffff;
+  --text-heading: #ffffff;
+  --text-muted: rgba(255, 255, 255, .72);
+  --divider: rgba(255, 255, 255, .14);
+  --hover: #7c1f2b;
+  --code-bg: #43000a;
+  --success: #73d13d;
+  --warning: #ffa940;
+  --error: #ff7875;
+  --brand-soft: rgba(255, 154, 163, .18);
+  --brand-ink: #ff9aa3;
+  --accent-text: #ffffff;
+  --tcard-top: #faf0f1;
+  --tcard-body: #f1d9dc;
+  --tcard-ink: #59000a;
+  --ticket-bg: #59000a;
+  --ticket-bg2: #59000a;
+  --ticket-ink: #ffffff;
+  --ticket-line: rgba(255, 255, 255, .5);
+  color-scheme: dark;
+}
+:root[data-palette="vrn"] {
+  --brand: #0098d8;
+  --brand-dark: #002d59;
+  --bg: #ffffff;
+  --surface: #eef2f9;
+  --text: #002d59;
+  --text-heading: #002d59;
+  --text-muted: rgba(0, 45, 89, .68);
+  --divider: rgba(0, 45, 89, .13);
+  --hover: #e1e8f3;
+  --code-bg: #eef2f9;
+  --success: #389e0d;
+  --warning: #d46b08;
+  --error: #f5222d;
+  --brand-soft: rgba(0, 152, 216, .12);
+  --brand-ink: #0098d8;
+  --accent-text: #002d59;
+  --tcard-top: #eef2f9;
+  --tcard-body: #d9e2f1;
+  --tcard-ink: #002d59;
+  --ticket-bg: #ffffff;
+  --ticket-bg2: #ffffff;
+  --ticket-ink: #002d59;
+  --ticket-line: rgba(0, 45, 89, .25);
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root[data-palette="vrn"]:not([data-theme="light"]) {
+    --brand: #0098d8;
+    --brand-dark: #002d59;
+    --bg: #002d59;
+    --surface: #0d3e6e;
+    --text: #ffffff;
+    --text-heading: #ffffff;
+    --text-muted: rgba(255, 255, 255, .72);
+    --divider: rgba(255, 255, 255, .14);
+    --hover: #17497c;
+    --code-bg: #00213f;
+    --success: #73d13d;
+    --warning: #ffa940;
+    --error: #ff7875;
+    --brand-soft: rgba(77, 187, 232, .16);
+    --brand-ink: #4dbbe8;
+    --accent-text: #ffffff;
+    --tcard-top: #eef2f9;
+    --tcard-body: #d9e2f1;
+    --tcard-ink: #002d59;
+    --ticket-bg: #002d59;
+    --ticket-bg2: #002d59;
+    --ticket-ink: #ffffff;
+    --ticket-line: rgba(255, 255, 255, .5);
+    color-scheme: dark;
+  }
+}
+:root[data-palette="vrn"][data-theme="dark"] {
+  --brand: #0098d8;
+  --brand-dark: #002d59;
+  --bg: #002d59;
+  --surface: #0d3e6e;
+  --text: #ffffff;
+  --text-heading: #ffffff;
+  --text-muted: rgba(255, 255, 255, .72);
+  --divider: rgba(255, 255, 255, .14);
+  --hover: #17497c;
+  --code-bg: #00213f;
+  --success: #73d13d;
+  --warning: #ffa940;
+  --error: #ff7875;
+  --brand-soft: rgba(77, 187, 232, .16);
+  --brand-ink: #4dbbe8;
+  --accent-text: #ffffff;
+  --tcard-top: #eef2f9;
+  --tcard-body: #d9e2f1;
+  --tcard-ink: #002d59;
+  --ticket-bg: #002d59;
+  --ticket-bg2: #002d59;
+  --ticket-ink: #ffffff;
+  --ticket-line: rgba(255, 255, 255, .5);
   color-scheme: dark;
 }
 
@@ -52,10 +180,8 @@ h2:first-child { margin-top: 4px; }
 .app { max-width: 520px; min-height: 100%; margin: 0 auto; display: flex; flex-direction: column; background: var(--bg); }
 @media (min-width: 560px) { .app { box-shadow: 0 0 0 1px var(--divider); } }
 .appbar { position: sticky; top: 0; z-index: 10; height: 56px; display: flex; align-items: center; gap: 8px;
-          padding: 0 8px; background: var(--surface); border-bottom: 1px solid var(--divider); }
-.appbar .title { flex: 1; font-size: 19px; font-weight: 500; color: var(--brand-dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-:root[data-theme="dark"] .appbar .title { color: #fff; }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .appbar .title { color: #fff; } }
+          padding: 0 8px; background: var(--bg); border-bottom: 1px solid var(--divider); }
+.appbar .title { flex: 1; font-size: 19px; font-weight: 500; color: var(--text-heading); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .iconbtn { width: 40px; height: 40px; display: grid; place-items: center; border: 0; background: none; color: var(--text);
            border-radius: 50%; cursor: pointer; text-decoration: none; font-size: 22px; }
 .iconbtn:active { background: var(--hover); }
@@ -63,7 +189,7 @@ h2:first-child { margin-top: 4px; }
 /* Bottom padding = tab bar height, so short pages don't scroll. */
 main.content { flex: 1; padding: 12px 12px calc(68px + env(safe-area-inset-bottom)); }
 .tabbar { position: fixed; bottom: 0; left: 0; right: 0; z-index: 10; height: 60px; display: flex; justify-content: center;
-          background: var(--surface); border-top: 1px solid var(--divider); padding-bottom: env(safe-area-inset-bottom); }
+          background: var(--bg); border-top: 1px solid var(--divider); padding-bottom: env(safe-area-inset-bottom); }
 .tabbar .inner { display: flex; width: 100%; max-width: 520px; }
 .tabbar a { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
             font-size: 12px; color: var(--text-muted); text-decoration: none; }
@@ -125,7 +251,7 @@ body.nav-open .drawer { transform: none; }
 .field label small { color: var(--error); font-size: 11px; }
 input[type=text], input[type=email], input[type=password], input[type=url], input[type=date], input[type=time], select, textarea {
   width: 100%; padding: 10px; border: 1px solid var(--text-muted); border-radius: var(--radius);
-  background: var(--surface); color: var(--text); font: 14px var(--font); }
+  background: var(--bg); color: var(--text); font: 14px var(--font); }
 input:focus, select:focus, textarea:focus { outline: 2px solid var(--brand); outline-offset: -1px; border-color: var(--brand); }
 textarea { min-height: 80px; font-family: var(--mono); font-size: 12px; }
 .pw { position: relative; }
@@ -161,17 +287,33 @@ textarea { min-height: 80px; font-family: var(--mono); font-size: 12px; }
 .switch.on { background: var(--brand); }
 .switch.on::after { left: 21px; }
 
-/* ---- Ticket list ------------------------------------------------------ */
-.tcard { display: flex; gap: 12px; align-items: center; padding: 12px; margin-bottom: 8px; background: var(--surface);
-         border: 1px solid var(--divider); border-radius: var(--radius); color: inherit; text-decoration: none; }
-.tcard:active { background: var(--hover); }
-.tcard .logo { width: 42px; height: 42px; flex: none; display: grid; place-items: center; }
-.tcard .logo img { width: 32px; }
-.tcard .logo.round { border-radius: 50%; background: var(--brand); color: #fff; }
-.tcard .grow { flex: 1; min-width: 0; }
-.tcard .name { font-size: 15px; font-weight: 600; color: var(--text-heading); }
-.tcard .meta { font-size: 12px; color: var(--text-muted); }
-.tcard .chev { color: var(--text-muted); font-size: 20px; }
+/* ---- Ticket list: ticket-shaped cards on the ticket page colours (as the official app) ---- */
+.tickets-page h2 { color: var(--ticket-ink); font-size: 24px; font-weight: 700; text-transform: none; letter-spacing: 0; margin: 14px 2px 12px; }
+.tickets-page .hint, .tickets-page .empty { color: var(--ticket-ink); opacity: .85; }
+.tickets-page .hint a, .tickets-page .empty a { color: var(--ticket-ink); font-weight: 700; text-decoration: none; }
+.tickets-page .empty .ic { color: var(--ticket-ink); }
+.tcard { position: relative; display: block; margin-bottom: 14px; border-radius: 14px; background: var(--tcard-body);
+         color: var(--tcard-ink); text-decoration: none; }
+/* The notches: page-coloured circles where the stub meets the body. */
+.tcard::before, .tcard::after { content: ""; position: absolute; top: 34px; width: 22px; height: 22px; border-radius: 50%;
+                                background: var(--ticket-bg); }
+.tcard::before { left: -11px; }
+.tcard::after { right: -11px; }
+.tcard .ttop { display: flex; align-items: center; gap: 10px; height: 45px; padding: 0 16px; background: var(--tcard-top);
+               border-radius: 14px 14px 0 0; font-size: 13px; font-weight: 600; }
+.tcard .ttop .no { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tcard .logo { width: 28px; height: 28px; flex: none; display: grid; place-items: center; }
+.tcard .logo img { width: 26px; }
+.tcard .logo .ic { width: 22px; height: 22px; }
+.tcard .tbody { display: block; padding: 12px 18px 14px; }
+.tcard .name { display: block; font-size: 18px; font-weight: 700; }
+.tcard .meta { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; font-size: 14px; margin-top: 6px; }
+/* The cards are always light: their pills keep light-mode colours in dark mode too. */
+.tcard .chip { font-size: 12px; padding: 2px 9px; }
+.tcard .chip.current { background: #237804; color: #ffffff; }
+.tcard .chip.future, .tcard .chip.quota { background: var(--tcard-top); color: var(--tcard-ink); box-shadow: inset 0 0 0 1px var(--tcard-ink); }
+.tcard .chip.expired, .tcard .chip.unknown { background: rgba(0, 0, 0, .08); color: var(--tcard-ink); }
+.tcard:active { filter: brightness(.96); }
 .tcard.expired { opacity: .6; }
 .chip { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 10px; white-space: nowrap; }
 .chip.current { background: var(--success-soft); color: var(--success); }
@@ -184,19 +326,26 @@ details.group > summary::-webkit-details-marker { display: none; }
 details.group > summary h2::after { content: " ▾"; }
 details.group:not([open]) > summary h2::after { content: " ▸"; }
 
-/* ---- Ticket detail (follows the theme; the code itself stays on white so it scans) ---- */
-.ticket-detail { margin: -12px -12px 0; background: var(--bg); color: var(--text); }
-.ticket-detail .head { background: var(--brand); color: #fff; padding: 16px; }
-.ticket-detail .head .name { font-size: 19px; font-weight: 600; }
-.ticket-detail .head .sub { font-size: 13px; opacity: .92; }
-/* The code fills the width but shrinks on short screens so header, code, timer and data
-   fit without scrolling (min 220px keeps it reliably scannable). ~415px = app bar, ticket
-   header, timer, data rows and tab bar. dvh follows the mobile browser's visible area. */
-.ticket-detail .codebox { margin: 12px auto 2px; padding: 12px; background: #fff; border-radius: var(--radius);
-                          text-align: center; border: 1px solid var(--divider);
-                          width: max(220px, min(84vw, 380px, calc(100vh - 415px))); }
+/* ---- Ticket detail: as in the official app. White with VRN navy ink; navy with white
+   in dark mode. The code itself always sits on white so it scans. ---- */
+body.ticketpage, body.ticketpage .app { background: linear-gradient(var(--ticket-bg), var(--ticket-bg2)) fixed; }
+body.ticketpage .appbar { background: transparent; border-bottom: 0; }
+body.ticketpage .appbar .title, body.ticketpage .appbar .iconbtn { color: var(--ticket-ink); }
+body.ticketpage .tabbar { background: var(--ticket-bg2); border-top-color: var(--ticket-line); }
+body.ticketpage .tabbar a { color: var(--ticket-ink); opacity: .7; }
+body.ticketpage .tabbar a.on { color: var(--ticket-ink); opacity: 1; }
+.ticket-detail { color: var(--ticket-ink); padding: 0 12px 8px; }
+.ticket-detail .tk-head { display: flex; align-items: center; gap: 12px; padding-top: 4px; }
+.ticket-detail .tk-head .name { flex: 1; font-size: 21px; font-weight: 700; }
+.ticket-detail .timer { flex: none; width: 60px; height: 60px; border-radius: 50%; border: 2px solid var(--ticket-ink);
+                        background: none; color: var(--ticket-ink); font: 600 15px/1 var(--font); cursor: pointer; padding: 0; }
+/* The code fills the width but shrinks on short screens so name, timer and code fit without
+   scrolling (min 220px keeps it reliably scannable). ~250px = app bar, name and tab bar.
+   dvh follows the mobile browser's visible area. */
+.ticket-detail .codebox { margin: 20px auto 0; padding: 12px; background: #fff; border-radius: 2px; text-align: center;
+                          width: max(220px, min(100%, 400px, calc(100vh - 250px))); }
 @supports (height: 100dvh) {
-  .ticket-detail .codebox { width: max(220px, min(84vw, 380px, calc(100dvh - 415px))); }
+  .ticket-detail .codebox { width: max(220px, min(100%, 400px, calc(100dvh - 250px))); }
 }
 .ticket-detail .codebox canvas, .ticket-detail .codebox img { width: 100%; image-rendering: pixelated; background: #fff; display: block; }
 .ticket-detail .codelabel { font-size: 12px; color: #cf1322; margin-top: 6px; }
@@ -205,12 +354,15 @@ details.group:not([open]) > summary h2::after { content: " ▸"; }
 /* Tap spins the whole card a full turn; toggling 0deg <-> 360deg alternates the direction. */
 .ticket-detail .codebox { transition: transform .6s ease-in-out; }
 .ticket-detail .codebox.turned { transform: rotate(360deg); }
-.counter { text-align: center; margin: 8px 0 0; font: 600 24px/1 var(--mono); color: var(--accent-text); }
-.counter button { font: 12px var(--font); color: var(--text-muted); border: 0; background: none; cursor: pointer; display: block; margin: 4px auto 0; }
-.ticket-detail .kv { margin: 4px 16px 8px; width: calc(100% - 32px); }
-.ticket-detail .kv td { padding: 6px 0; }
-.ticket-detail .alert.bad { margin: 16px; }
-.ticket-detail .pad { padding: 0 16px 16px; }
+.ticket-detail .alert { margin: 12px 0 0; }
+.ticket-detail .tk-terms, .ticket-detail .tk-data { border-top: 1px solid var(--ticket-line); margin: 20px 0 0; padding-top: 14px; }
+.ticket-detail .tk-terms p { margin: 0 0 10px; font-size: 15px; line-height: 1.5; }
+.ticket-detail .tk-data { display: grid; grid-template-columns: auto 1fr; gap: 8px 14px; font-size: 15px; }
+.ticket-detail .tk-data dt { margin: 0; }
+.ticket-detail .tk-data dd { margin: 0; font-weight: 600; overflow-wrap: anywhere; }
+.ticket-detail .tk-invoice { display: block; width: max-content; margin: 20px 0 0 auto; padding: 8px 0; color: var(--ticket-ink);
+                             font-size: 16px; font-weight: 600; text-decoration: none; }
+.ticket-detail .debug { margin: 12px 0; }
 .sheet { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; max-width: 520px; margin: 0 auto; background: var(--surface); color: var(--text);
          border-radius: 12px 12px 0 0; padding: 18px 18px 28px; box-shadow: 0 -8px 30px rgba(0, 0, 0, .2); }
 .sheet h3 { margin: 0 0 8px; }
@@ -226,20 +378,6 @@ pre { margin: 0; padding: 10px; background: var(--code-bg); color: var(--text); 
 .ticket-detail .debug { margin: 12px 16px; }
 code { font-family: var(--mono); font-size: 12px; }
 iframe.vnc { width: 100%; height: 640px; border: 1px solid var(--divider); border-radius: var(--radius); background: #000; }
-
-/* VRN original palette (Settings > Farben): the official app's blue/navy. */
-:root[data-palette="vrn"] {
-  --brand: #0098d8; --brand-dark: #002d59; --brand-soft: rgba(0, 152, 216, .12);
-  --brand-ink: #0098d8; --accent-text: #002d59;
-}
-@media (prefers-color-scheme: dark) {
-  :root[data-palette="vrn"]:not([data-theme="light"]) {
-    --brand-ink: #4dbbe8; --brand-soft: rgba(77, 187, 232, .16); --accent-text: #ffffff;
-  }
-}
-:root[data-palette="vrn"][data-theme="dark"] {
-  --brand-ink: #4dbbe8; --brand-soft: rgba(77, 187, 232, .16); --accent-text: #ffffff;
-}
 
 /* Theme-dependent images */
 .only-dark { display: none; }
@@ -447,7 +585,7 @@ body.mapmode main.content { padding: 0; }
 @media (min-width: 700px) {
   .app, .tabbar .inner { max-width: 760px; }
   body.mapmode .app { max-width: none; }  /* the app bar spans the full-width map */
-  .tgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); column-gap: 10px; }
+  .tgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); column-gap: 16px; }
   .tgrid > :not(.tcard) { grid-column: 1 / -1; }
   .bsheet-body > * { max-width: 600px; }
   .placecard { padding-left: max(14px, calc(50% - 300px)); padding-right: max(14px, calc(50% - 300px)); }
@@ -465,17 +603,16 @@ body.mapmode main.content { padding: 0; }
   .appbar { padding: 0 20px; }
   main.content { width: 100%; max-width: 920px; margin: 0 auto; padding: 24px 32px 40px; }
   .navrow:hover { background: var(--hover); }
-  .tcard:hover, a.jrow:hover { border-color: var(--text-muted); }
+  .tcard:hover { filter: brightness(.97); }
+  a.jrow:hover { border-color: var(--text-muted); }
 
 
-  /* Ticket detail: header across, code left, data right. */
-  .ticket-detail { margin: 0; display: grid; grid-template-columns: minmax(300px, 420px) 1fr; column-gap: 28px; align-items: start; }
-  .ticket-detail .head { grid-column: 1 / -1; border-radius: var(--radius); margin-bottom: 4px; }
-  .ticket-detail .codebox, .ticket-detail .counter, .ticket-detail > .alert { grid-column: 1; }
-  .ticket-detail .codebox { width: min(380px, 100%); }
-  .ticket-detail .kv { grid-column: 2; grid-row: 2 / span 2; margin: 12px 0; width: 100%; }
-  .ticket-detail .debug { grid-column: 1 / -1; margin: 12px 0; }
-  .ticket-detail .alert.bad { margin: 12px 0; }
+  /* Ticket detail: name and timer across, code left, conditions and data right. */
+  .ticket-detail { display: grid; grid-template-columns: minmax(300px, 420px) 1fr; column-gap: 40px; align-items: start; padding: 0; }
+  .ticket-detail .tk-head, .ticket-detail > .alert, .ticket-detail .debug { grid-column: 1 / -1; }
+  .ticket-detail .codebox { grid-column: 1; width: min(400px, 100%); }
+  .ticket-detail .tk-info { grid-column: 2; }
+  .ticket-detail .tk-info > :first-child { margin-top: 20px; }
   .sheet { top: 50%; bottom: auto; left: 50%; right: auto; width: 440px; transform: translate(-50%, -50%);
            border-radius: 12px; padding-bottom: 20px; }
 
