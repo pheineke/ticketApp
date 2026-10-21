@@ -17,6 +17,7 @@
 <div class="sheet" id="sheet" hidden>
   <h3>Was bedeutet der Zähler?</h3>
   <p>Der Zähler läuft seit dem Öffnen des Tickets hoch. So kann das Kontrollpersonal ein live angezeigtes Ticket von einem Screenshot unterscheiden.</p>
+  <p id="sheet-booked" hidden><b></b></p>
   <button class="btn" type="button" onclick="document.getElementById('sheet').hidden=true">Verstanden</button>
 </div>
 {% endblock %}
@@ -133,7 +134,12 @@
 
     if (t.qr) {
       var timer = el("button", "timer", "00:00"); timer.type = "button"; timer.title = "Was bedeutet der Zähler?";
-      timer.onclick = function () { document.getElementById("sheet").hidden = false; };
+      timer.onclick = function () {
+        var booked = document.getElementById("sheet-booked");
+        booked.hidden = !t.booked;
+        booked.firstChild.textContent = t.booked ? "Genauer Kaufzeitpunkt: " + t.booked : "";
+        document.getElementById("sheet").hidden = false;
+      };
       head.appendChild(timer);
       var box = el("div", "codebox"); box.setAttribute("role", "button"); box.tabIndex = 0;
       box.setAttribute("aria-label", "Code drehen");

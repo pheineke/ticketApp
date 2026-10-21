@@ -139,6 +139,7 @@
     <string name="render_failed">Darstellung fehlgeschlagen: %1$s</string>
     <string name="svg_unsupported">SVG-Codes werden nicht unterstützt.</string>
     <string name="counter_info">Was bedeutet der Zähler?</string>
+    <string name="counter_info_booked">Genauer Kaufzeitpunkt: %1$s</string>
     <string name="counter_info_text">Der Zähler läuft seit dem Öffnen des Tickets hoch. So kann das Kontrollpersonal ein live angezeigtes Ticket von einem Screenshot unterscheiden.</string>
     <string name="understood">Verstanden</string>
     <string name="kv_holder">Ticketinhaber</string>

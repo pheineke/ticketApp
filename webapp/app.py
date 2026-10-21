@@ -681,6 +681,7 @@ def offline_snapshot(sess: Session) -> dict | None:
             "end": t["end"].isoformat() if t["end"] else None,
             "area": t["area"], "price_level": t["price_level"], "holder": t["holder"],
             "dob": fmt_dt(t["dob"], False) if t["dob"] else None, "number": t["number"],
+            "booked": fmt_dt(t["booked"]) if t["booked"] else None,
             "qr": rec.get("code_data") or None, "kind": rec.get("kind"),
         })
     prof = (sess.profile or {}).get("profile") or {}

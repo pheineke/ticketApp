@@ -70,7 +70,9 @@ class TicketActivity : BaseActivity() {
         navButton.setOnClickListener { finish() }
         action.setOnClickListener { repo.loadQr(ticketId, force = true) }
         counter.setOnClickListener {
-            AlertDialog.Builder(this).setTitle(R.string.counter_info).setMessage(R.string.counter_info_text)
+            val booked = repo.findTicket(ticketId)?.booked?.let { getString(R.string.counter_info_booked, Dates.formatRaw(it)) }
+            AlertDialog.Builder(this).setTitle(R.string.counter_info)
+                .setMessage(listOfNotNull(getString(R.string.counter_info_text), booked).joinToString("\n\n"))
                 .setPositiveButton(R.string.understood, null).show()
         }
         // Tap spins the code card a full turn; the next tap spins it back the other way.
