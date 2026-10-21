@@ -105,8 +105,11 @@ class ShopTest {
                 .put("DisplayNames", JSONArray().put(JSONObject().put("Language", "de").put("Name", "Hochschule Kaiserslautern"))))
             .put(JSONObject().put("EntityId", "https://idp.uni-kl.de/idp/shibboleth")
                 .put("DisplayNames", JSONArray().put(JSONObject().put("Language", "en").put("Name", "RPTU Kaiserslautern-Landau")))))
-        val unis = Shop.universities(json)
+        val unis = Shop.universities(json.toString())
         assertEquals(listOf("Hochschule Kaiserslautern", "RPTU Kaiserslautern-Landau"), unis.map { it.name })
         assertEquals("https://idp.uni-kl.de/idp/shibboleth", Shop.preferred(unis)!!.id)
+        // The shop answers with a plain array.
+        assertEquals(unis.map { it.id }, Shop.universities(json.getJSONArray("value").toString()).map { it.id })
+        assertTrue(Shop.universities("<html>").isEmpty())
     }
 }

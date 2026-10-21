@@ -146,14 +146,14 @@ class TicketActivity : BaseActivity() {
         findViewById<LinearLayout>(R.id.ticket_terms).apply {
             removeAllViews()
             if (t.dticket) {
-                add(rule(), top = 20)
+                rule(top = 20)
                 add(ink(getString(R.string.ticket_terms_personal)), top = 14)
                 add(ink(getString(R.string.ticket_terms_tariff)), top = 10)
             }
         }
         findViewById<LinearLayout>(R.id.ticket_kv).apply {
             removeAllViews()
-            add(rule(), top = 20)
+            rule(top = 20)
             listOfNotNull(
                 t.holder?.let { R.string.kv_holder to it },
                 t.dob?.let { R.string.kv_dob to Dates.formatRaw(it, false) },
@@ -227,10 +227,9 @@ class TicketActivity : BaseActivity() {
         alpha = 0.8f
     }
 
-    private fun rule() = View(this).apply {
-        setBackgroundColor(attrColor(R.attr.cTicketLine))
-        minimumHeight = dp(1)
-    }
+    /** A 1dp line. Added with its own height: a plain View under WRAP_CONTENT takes all the room there is. */
+    private fun LinearLayout.rule(top: Int) = addView(View(context).apply { setBackgroundColor(attrColor(R.attr.cTicketLine)) },
+        LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(1)).apply { topMargin = dp(top) })
 
     /** "Label:  value" with the values lined up, as on the official ticket. */
     private fun row(label: String, value: String) = LinearLayout(this).apply {

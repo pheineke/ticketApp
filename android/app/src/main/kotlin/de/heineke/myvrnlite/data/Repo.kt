@@ -389,7 +389,7 @@ class Repo(context: Context) {
         loadingShop = true
         changed()
         val s = session
-        val needUnis = universities == null
+        val needUnis = universities.isNullOrEmpty()  // an empty list is tried again on the next refresh
         background({ authed { t -> client.entitlements(t) to (if (needUnis) client.authorities(t) else null) } }) { r ->
             if (s != session) return@background
             loadingShop = false
@@ -405,7 +405,7 @@ class Repo(context: Context) {
                 } else {
                     shopError = "HTTP ${last.code}"
                 }
-                if (unis != null && unis.code == 200) universities = Shop.universities(unis.json)
+                if (unis != null && unis.code == 200) universities = Shop.universities(unis.body)
             }.onFailure { e ->
                 if (e is IOException) offline = true
                 else if (e !is SessionExpired) shopError = e.message

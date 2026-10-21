@@ -32,9 +32,14 @@ object Shop {
 
     class University(val id: String, val name: String)
 
-    /** Dfn/GetAuthorities → universities sorted by name (German name preferred). */
-    fun universities(json: JSONObject?): List<University> {
-        val list = json?.optJSONArray("value") ?: return emptyList()
+    /**
+     * Dfn/GetAuthorities → universities sorted by name (German name preferred). The answer is a
+     * plain array, or {value: [...]} (OData), as webapp/shop.py accepts both.
+     */
+    fun universities(body: String?): List<University> {
+        val text = body?.trim().orEmpty()
+        val list = runCatching { if (text.startsWith("[")) JSONArray(text) else JSONObject(text).optJSONArray("value") }.getOrNull()
+            ?: return emptyList()
         return (0 until list.length()).mapNotNull { list.optJSONObject(it) }.mapNotNull { a ->
             val id = a.optString("EntityId").ifEmpty { return@mapNotNull null }
             val names = a.optJSONArray("DisplayNames")?.let { n -> (0 until n.length()).mapNotNull(n::optJSONObject) }.orEmpty()
