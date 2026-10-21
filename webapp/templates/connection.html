@@ -1,9 +1,16 @@
 {% extends "base.html" %}
 {% import "_macros.html" as m with context %}
+{% block bodyclass %}mapmode{% endblock %}
 {% block head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='vendor/leaflet/leaflet.css') }}">
 {% endblock %}
 {% block content %}
+<div id="map" class="fullmap" role="img" aria-label="Karte der Route"></div>
+<script type="application/json" id="map-data">{{ map_legs|tojson }}</script>
+
+<section class="bsheet" id="sheet" data-snap="half" data-peek=".summary">
+  <div class="bsheet-grab" aria-hidden="true"><span></span></div>
+  <div class="bsheet-body">
 <div class="jrow summary{{ ' cancelled' if j.cancelled }}">
   <div class="jtimes">
     <div><span class="lbl">ab</span>{{ m.clock(j.dep, j.dep_rt, j.dep_delay, j.cancelled) }}</div>
@@ -14,9 +21,6 @@
     <div class="jdate">{{ j.dep.strftime('%d.%m.%Y') if j.dep }}</div>
   </div>
 </div>
-
-<div id="map" class="routemap" role="img" aria-label="Karte der Route"></div>
-<script type="application/json" id="map-data">{{ map_legs|tojson }}</script>
 
 {% if j.cancelled %}<div class="alert bad">Diese Verbindung fällt laut Echtzeitdaten (teilweise) aus.</div>{% endif %}
 {% if j.long_distance %}<div class="alert info">Enthält Fernverkehr ({{ j.long_distance|join(', ') }}). Deutschlandticket und Semesterticket gelten dort nicht.</div>{% endif %}
@@ -76,8 +80,11 @@
 {% call m.debug_panel('XML_TRIP_REQUEST2') %}
   <pre>{{ rec.url }}</pre>
 {% endcall %}
+  </div>
+</section>
 {% endblock %}
 {% block scripts %}
 <script src="{{ url_for('static', filename='vendor/leaflet/leaflet.js') }}"></script>
-<script src="{{ url_for('static', filename='routemap.js') }}"></script>
+<script src="{{ url_for('static', filename='bsheet.js') }}"></script>
+<script src="{{ url_for('static', filename='fpmap.js') }}"></script>
 {% endblock %}

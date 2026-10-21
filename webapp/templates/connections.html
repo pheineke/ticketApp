@@ -1,84 +1,116 @@
 {% extends "base.html" %}
 {% import "_macros.html" as m with context %}
+{% block bodyclass %}mapmode{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='vendor/leaflet/leaflet.css') }}">
+{% endblock %}
 {% block content %}
-<form class="panel search" method="get" action="{{ url_for('connections') }}" id="search" autocomplete="off">
-  <div class="places">
-    <div class="place">
-      <span class="pin from" aria-hidden="true"></span>
-      <input type="text" name="from_name" value="{{ p.from_name }}" placeholder="Start: Haltestelle, Adresse, Ort"
-             aria-label="Start" enterkeyhint="next" spellcheck="false">
-      <input type="hidden" name="from" value="{{ p['from'] }}">
-      <button type="button" class="iconbtn locate" title="Mein Standort" aria-label="Mein Standort als Start"><span class="ic locate"></span></button>
-      <ul class="suggest" role="listbox" hidden></ul>
-    </div>
-    <div class="place">
-      <span class="pin to" aria-hidden="true"></span>
-      <input type="text" name="to_name" value="{{ p.to_name }}" placeholder="Ziel: Haltestelle, Adresse, Ort"
-             aria-label="Ziel" enterkeyhint="search" spellcheck="false">
-      <input type="hidden" name="to" value="{{ p.to }}">
-      <ul class="suggest" role="listbox" hidden></ul>
-    </div>
-    <button type="button" class="iconbtn swap" title="Start und Ziel tauschen" aria-label="Start und Ziel tauschen">⇅</button>
-  </div>
-  <div class="when">
-    <div class="seg small" role="radiogroup" aria-label="Abfahrt oder Ankunft">
-      <label><input type="radio" name="arr" value="0"{{ ' checked' if not p.arr }}><span>Abfahrt</span></label>
-      <label><input type="radio" name="arr" value="1"{{ ' checked' if p.arr }}><span>Ankunft</span></label>
-    </div>
-    <input type="date" name="date" value="{{ p.date }}" aria-label="Datum" required>
-    <input type="time" name="time" value="{{ p.time }}" aria-label="Uhrzeit" required>
-    <button type="button" class="btn small outline now">Jetzt</button>
-  </div>
-  <button class="btn" type="submit">Verbindungen suchen</button>
-</form>
+<div id="map" class="fullmap" data-pick="1" aria-label="Karte: lange drücken, um einen Ort zu wählen"></div>
+<script type="application/json" id="map-pins">{{ pins|tojson }}</script>
 
-{% if error %}<div class="alert bad">{{ error }}</div>{% endif %}
-
-{% if journeys %}
-  <div class="jhead">
-    <h2>{{ 'Ankunft bis' if p.arr else 'Ab' }} {{ p.time }} · {{ journeys[0].dep.strftime('%d.%m.%Y') if journeys[0].dep else p.date }}</h2>
-  </div>
-  <a class="shift" href="{{ url_for('connections', **earlier) }}"><span class="ic chev-up"></span>früher</a>
-  <div class="jlist">
-  {% for j in journeys %}
-    <a class="jrow{{ ' cancelled' if j.cancelled }}" href="{{ url_for('connection_detail', idx=loop.index0, **query) }}">
-      <div class="jtimes">
-        <div><span class="lbl">ab</span>{{ m.clock(j.dep, j.dep_rt, j.dep_delay, j.cancelled) }}</div>
-        <div><span class="lbl">an</span>{{ m.clock(j.arr, j.arr_rt, j.arr_delay, j.cancelled) }}</div>
-      </div>
-      <div class="jmain">
-        <div class="jtop">{{ m.duration(j.minutes) }}<span class="chg">{{ j.changes }} Umstieg{{ 'e' if j.changes != 1 }}</span>{{ m.price(j.price) }}</div>
-        <div class="jseq">
-          {%- for leg in j.legs -%}
-            {% if not loop.first %}<span class="ic chev-right sep"></span>{% endif %}
-            {%- if leg.mode == 'walk' %}<span class="ic mode-walk walk" title="Fußweg {{ leg.minutes }} Min."></span>
-            {%- else %}{{ m.line(leg) }}{% endif -%}
-          {%- endfor -%}
+{# Search card: drag up to see results / recent searches. #}
+<section class="bsheet" id="sheet" data-snap="{{ 'half' if journeys or error else 'peek' }}" data-peek="#search">
+  <div class="bsheet-grab" aria-hidden="true"><span></span></div>
+  <div class="bsheet-body">
+    <form class="search" method="get" action="{{ url_for('connections') }}" id="search" autocomplete="off">
+      <div class="places">
+        <div class="place">
+          <span class="pin from" aria-hidden="true"></span>
+          <input type="text" name="from_name" value="{{ p.from_name }}" placeholder="Start: Haltestelle, Adresse, Ort"
+                 aria-label="Start" enterkeyhint="next" spellcheck="false">
+          <input type="hidden" name="from" value="{{ p['from'] }}">
+          <button type="button" class="iconbtn locate" title="Mein Standort" aria-label="Mein Standort als Start"><span class="ic locate"></span></button>
+          <ul class="suggest" role="listbox" hidden></ul>
         </div>
-        {% if j.cancelled %}<div class="jnote bad"><span class="ic warn"></span>Fällt laut Echtzeit (teilweise) aus</div>
-        {% elif j.long_distance %}<div class="jnote"><span class="ic warn"></span>Fernverkehr ({{ j.long_distance|join(', ') }}): Deutschlandticket nicht gültig</div>
-        {% elif j.infos %}<div class="jnote"><span class="ic warn"></span>{{ j.infos }} Hinweis{{ 'e' if j.infos != 1 }} zur Fahrt</div>{% endif %}
+        <div class="place">
+          <span class="pin to" aria-hidden="true"></span>
+          <input type="text" name="to_name" value="{{ p.to_name }}" placeholder="Ziel: Haltestelle, Adresse, Ort"
+                 aria-label="Ziel" enterkeyhint="search" spellcheck="false">
+          <input type="hidden" name="to" value="{{ p.to }}">
+          <ul class="suggest" role="listbox" hidden></ul>
+        </div>
+        <button type="button" class="iconbtn swap" title="Start und Ziel tauschen" aria-label="Start und Ziel tauschen">⇅</button>
       </div>
-      <span class="ic chev-right go"></span>
-    </a>
-  {% endfor %}
-  </div>
-  <a class="shift" href="{{ url_for('connections', **later) }}"><span class="ic chev-down"></span>später</a>
-  <p class="hint center">Echtzeitdaten der VRN-Fahrplanauskunft · Angaben ohne Gewähr</p>
-{% else %}
-  <div id="recent" hidden>
-    <h2>Zuletzt gesucht</h2>
-    <div class="recent"></div>
-  </div>
-{% endif %}
+      <div class="when">
+        <div class="seg small" role="radiogroup" aria-label="Abfahrt oder Ankunft">
+          <label><input type="radio" name="arr" value="0"{{ ' checked' if not p.arr }}><span>Ab</span></label>
+          <label><input type="radio" name="arr" value="1"{{ ' checked' if p.arr }}><span>An</span></label>
+        </div>
+        <input type="date" name="date" value="{{ p.date }}" aria-label="Datum" required>
+        <input type="time" name="time" value="{{ p.time }}" aria-label="Uhrzeit" required>
+        <button type="button" class="btn small outline now">Jetzt</button>
+      </div>
+      <button class="btn" type="submit">Verbindungen suchen</button>
+    </form>
 
-{% if rec %}
-  {% call m.debug_panel('XML_TRIP_REQUEST2') %}
-    <pre>{{ rec.url }}</pre>
-    <pre>{{ rec.raw|pretty }}</pre>
-  {% endcall %}
-{% endif %}
+    {% if error %}<div class="alert bad">{{ error }}</div>{% endif %}
+
+    {% if journeys %}
+      <div class="jhead">
+        <h2>{{ 'Ankunft bis' if p.arr else 'Ab' }} {{ p.time }} · {{ journeys[0].dep.strftime('%d.%m.%Y') if journeys[0].dep else p.date }}</h2>
+        <a class="shift" id="earlier" href="{{ url_for('connections', **earlier) }}"><span class="ic chev-up"></span>früher</a>
+      </div>
+      <div class="jlist">
+      {% for j in journeys %}
+        <a class="jrow{{ ' cancelled' if j.cancelled }}" data-key="{{ j.dep|hm }} {{ j.arr|hm }} {{ j.legs|map(attribute='label')|join('/') }}" href="{{ url_for('connection_detail', idx=loop.index0, **query) }}">
+          <div class="jtimes">
+            <div><span class="lbl">ab</span>{{ m.clock(j.dep, j.dep_rt, j.dep_delay, j.cancelled) }}</div>
+            <div><span class="lbl">an</span>{{ m.clock(j.arr, j.arr_rt, j.arr_delay, j.cancelled) }}</div>
+          </div>
+          <div class="jmain">
+            <div class="jtop">{{ m.duration(j.minutes) }}<span class="chg">{{ j.changes }} Umstieg{{ 'e' if j.changes != 1 }}</span>{{ m.price(j.price) }}</div>
+            <div class="jseq">
+              {%- for leg in j.legs -%}
+                {% if not loop.first %}<span class="ic chev-right sep"></span>{% endif %}
+                {%- if leg.mode == 'walk' %}<span class="ic mode-walk walk" title="Fußweg {{ leg.minutes }} Min."></span>
+                {%- else %}{{ m.line(leg) }}{% endif -%}
+              {%- endfor -%}
+            </div>
+            {% if j.cancelled %}<div class="jnote bad"><span class="ic warn"></span>Fällt laut Echtzeit (teilweise) aus</div>
+            {% elif j.long_distance %}<div class="jnote"><span class="ic warn"></span>Fernverkehr ({{ j.long_distance|join(', ') }}): Deutschlandticket nicht gültig</div>
+            {% elif j.infos %}<div class="jnote"><span class="ic warn"></span>{{ j.infos }} Hinweis{{ 'e' if j.infos != 1 }} zur Fahrt</div>{% endif %}
+          </div>
+          <span class="ic chev-right go"></span>
+        </a>
+      {% endfor %}
+      </div>
+      <a class="shift" id="later" href="{{ url_for('connections', **later) }}"><span class="ic chev-down"></span>später</a>
+      <p class="hint center">Echtzeitdaten der VRN-Fahrplanauskunft · Angaben ohne Gewähr</p>
+    {% else %}
+      <div id="recent" hidden>
+        <h2>Zuletzt gesucht</h2>
+        <div class="recent"></div>
+      </div>
+      <p class="hint center maphint">Tipp: Lange auf die Karte drücken, um einen Ort als Start oder Ziel zu wählen.</p>
+    {% endif %}
+
+    {% if rec %}
+      {% call m.debug_panel('XML_TRIP_REQUEST2') %}
+        <pre>{{ rec.url }}</pre>
+        <pre>{{ rec.raw|pretty }}</pre>
+      {% endcall %}
+    {% endif %}
+  </div>
+</section>
+
+{# Long-press card: the place on the map, nearby stops, use as origin/destination. #}
+<section class="placecard" id="placecard" hidden aria-live="polite">
+  <button type="button" class="iconbtn close" aria-label="Schließen">×</button>
+  <div class="pc-kind">Ort auf der Karte</div>
+  <div class="pc-name">…</div>
+  <div class="pc-actions">
+    <button type="button" class="btn small" data-use="from"><span class="pin from"></span>Von hier</button>
+    <button type="button" class="btn small outline" data-use="to"><span class="pin to"></span>Nach hier</button>
+  </div>
+  <div class="pc-near" hidden>
+    <div class="pc-sub">Haltestellen in der Nähe</div>
+    <ul class="pc-stops"></ul>
+  </div>
+</section>
 {% endblock %}
 {% block scripts %}
+<script src="{{ url_for('static', filename='vendor/leaflet/leaflet.js') }}"></script>
+<script src="{{ url_for('static', filename='bsheet.js') }}"></script>
+<script src="{{ url_for('static', filename='fpmap.js') }}"></script>
 <script src="{{ url_for('static', filename='fahrplan.js') }}"></script>
 {% endblock %}

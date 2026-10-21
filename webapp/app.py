@@ -1135,7 +1135,21 @@ def connections():
         earlier = _shifted(p, (journeys[0]["dep"] or _search_when(p)) - timedelta(minutes=45))
         later = _shifted(p, (journeys[-1]["dep"] or _search_when(p)) + timedelta(minutes=1))
     return page(sess, sid, "connections.html", active="fahrplan", title="Fahrplan", p=p, error=error,
-                journeys=journeys, rec=rec, earlier=earlier, later=later, query=_query(p))
+                journeys=journeys, rec=rec, earlier=earlier, later=later, query=_query(p),
+                pins=_pins(p, journeys))
+
+
+def _pins(p: dict, journeys: list) -> dict:
+    """Origin/destination coordinates for the map pins: from the trip, else from coord ids."""
+    pins = {}
+    for key, end in (("from", "origin"), ("to", "destination")):
+        leg = journeys[0]["legs"][0 if key == "from" else -1] if journeys else None
+        coord = leg[end]["coord"] if leg else None
+        if not coord and p[key].startswith("coord:"):
+            coord = [float(x) for x in p[key][6:].split(",")]
+        if coord:
+            pins[key] = {"coord": coord, "name": p[key + "_name"]}
+    return pins
 
 
 @app.route("/fahrplan/verbindung/<int:idx>")
@@ -1170,6 +1184,22 @@ def connection_places():
         return jsonify(efa.stops(http.get, q[:80], timeout=HTTP_TIMEOUT))
     except Exception:
         return jsonify([]), 502
+
+
+@app.route("/fahrplan/hier")
+def connection_here():
+    """Long-press on the map: the address there and the nearest stops."""
+    try:
+        lat, lon = float(request.args["lat"]), float(request.args["lon"])
+    except (KeyError, ValueError):
+        abort(400)
+    if not (-90 <= lat <= 90 and -180 <= lon <= 180):
+        abort(400)
+    try:
+        return jsonify(efa.here(http.get, lat, lon, timeout=HTTP_TIMEOUT))
+    except Exception:
+        return jsonify({"place": {"id": efa.coord_id(lat, lon), "name": "Punkt auf der Karte",
+                                  "coord": [lat, lon]}, "stops": []}), 502
 
 
 @app.template_filter("hm")

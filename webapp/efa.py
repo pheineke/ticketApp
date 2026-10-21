@@ -99,8 +99,41 @@ def stops(get, query: str, timeout: int = 15, limit: int = 8) -> list[dict]:
             "type": loc.get("type") or "",
             "kind": LOCATION_TYPES.get(loc.get("type"), "Ort"),
             "best": bool(loc.get("isBest")),
+            "coord": loc.get("coord"),
         })
     return out[:limit]
+
+
+def here(get, lat: float, lon: float, timeout: int = 15, max_stops: int = 4) -> dict:
+    """What's at a point on the map: the nearest address and the stops around it.
+
+    XML_STOPFINDER_REQUEST with type_sf=coord answers the address; XML_COORD_REQUEST
+    lists stops within a radius, nearest first, with properties.distance in metres.
+    """
+    point = f"{lon:.6f}:{lat:.6f}:{COORD_FMT}"
+    place = {"id": coord_id(lat, lon), "name": "Punkt auf der Karte", "coord": [lat, lon]}
+    try:
+        data, _ = _call(get, "XML_STOPFINDER_REQUEST", {"type_sf": "coord", "name_sf": point}, timeout)
+        loc = (data.get("locations") or [None])[0]
+        if loc and loc.get("name"):
+            place["name"] = loc["name"]
+    except EfaError:
+        pass
+    data, _ = _call(get, "XML_COORD_REQUEST", {
+        "coord": point, "inclFilter": 1, "type_1": "STOP", "radius_1": 1000, "max": max_stops,
+    }, timeout)
+    stops_near = []
+    for loc in data.get("locations") or []:
+        if not loc.get("id"):
+            continue
+        props = loc.get("properties") or {}
+        name = loc.get("name") or "?"
+        stops_near.append({
+            "id": loc["id"], "name": props.get("STOP_NAME_WITH_PLACE") or name,
+            "short": name, "coord": loc.get("coord"), "distance": props.get("distance"),
+        })
+    stops_near.sort(key=lambda s: s["distance"] if s["distance"] is not None else 1e9)
+    return {"place": place, "stops": stops_near[:max_stops]}
 
 
 def _time(value: str | None) -> datetime | None:
