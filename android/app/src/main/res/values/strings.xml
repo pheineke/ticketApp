@@ -13,6 +13,7 @@
     <string name="title_account">Konto</string>
     <string name="title_settings">Einstellungen</string>
     <string name="title_ticket">Ticketdetails</string>
+    <string name="title_shop">Ticketshop</string>
     <string name="menu">Menü</string>
     <string name="back">Zurück</string>
     <string name="refresh">Aktualisieren</string>
@@ -27,6 +28,8 @@
     <string name="nav_account_sub">Meine Benutzerdaten und Login.</string>
     <string name="nav_settings">Einstellungen</string>
     <string name="nav_settings_sub">Meine individuellen Einstellungen.</string>
+    <string name="nav_shop">Ticketshop</string>
+    <string name="nav_shop_sub">Tickets kaufen, Berechtigungen.</string>
     <string name="nav_help">Hilfe &amp; Kontakt</string>
     <string name="nav_privacy">Datenschutz &amp; AGB</string>
     <string name="nav_imprint">Impressum</string>
@@ -227,4 +230,66 @@
     <string name="dbg_token_refresh">Token erneuern</string>
     <string name="dbg_claims_access">Access-Token Claims (unverifiziert)</string>
     <string name="dbg_claims_id">ID-Token Claims</string>
+
+    <!-- Ticketshop -->
+    <string name="shop_login_first">Für den Ticketkauf bitte zuerst im Konto anmelden.</string>
+    <string name="shop_to_account">Zum Konto</string>
+    <string name="shop_semester">Deutschland-Semesterticket</string>
+    <string name="shop_semester_sub">Deutschlandweit im Nahverkehr, 2. Klasse · monatlich, bis Semesterende · 0,00 €</string>
+    <string name="shop_loading">Wird geladen …</string>
+    <string name="shop_load_failed">Berechtigungen konnten nicht geladen werden (%1$s).</string>
+    <string name="shop_running">Dein Semesterticket-Abo läuft%1$s. Es verlängert sich monatlich bis Semesterende (%2$s).</string>
+    <string name="shop_running_until">" (aktuell gültig bis %1$s)"</string>
+    <string name="shop_can_buy">Berechtigt bis %1$s. Das Ticket gilt ab %2$s und verlängert sich monatlich bis Semesterende.</string>
+    <string name="shop_buy">Semesterticket buchen (0,00 €)</string>
+    <string name="shop_buying">Wird gebucht …</string>
+    <string name="shop_no_entitlement">Für dieses Semester ist noch kein Studierendenstatus nachgewiesen.%1$s Bitte zuerst unten per Hochschul-Login verifizieren.</string>
+    <string name="shop_last_entitlement">" Letzte Berechtigung: bis %1$s."</string>
+    <string name="shop_booked">Dein Deutschland-Semesterticket wurde gebucht.</string>
+    <string name="shop_to_tickets">Zu meinen Tickets</string>
+    <string name="shop_payment">Der Shop verlangt eine Zahlung. Abgebrochen: das Semesterticket sollte 0 € kosten.</string>
+    <string name="shop_failed">Kauf fehlgeschlagen: %1$s</string>
+    <string name="shop_status">Studierendenstatus</string>
+    <string name="shop_status_current">" · aktuell"</string>
+    <string name="shop_status_created">angelegt %1$s</string>
+    <string name="shop_status_dfn">" · Hochschul-Login"</string>
+    <string name="shop_none_today">Keiner dieser Nachweise gilt heute (%1$s).</string>
+    <string name="shop_none_today_pending">Keiner dieser Nachweise gilt heute (%1$s): der neueste ist noch nicht genehmigt.</string>
+    <plurals name="shop_no_student">
+        <item quantity="one">Für dieses Konto ist kein Studierenden-Nachweis gespeichert (%d andere Berechtigung).</item>
+        <item quantity="other">Für dieses Konto ist kein Studierenden-Nachweis gespeichert (%d andere Berechtigungen).</item>
+    </plurals>
+    <string name="shop_no_student_plain">Für dieses Konto ist kein Studierenden-Nachweis gespeichert.</string>
+    <string name="shop_verify_explain">Mit dem Hochschul-Login bestätigt deine Hochschule, dass du in diesem Semester eingeschrieben bist. Du meldest dich dazu zuerst im VRN-Shop und dann bei deiner Hochschule an; danach ist die Berechtigung sofort aktiv.</string>
+    <string name="shop_same_account">Wichtig: im VRN-Shop mit demselben VRN-Konto anmelden wie hier (%1$s).</string>
+    <string name="shop_same_account_plain">Wichtig: im VRN-Shop mit demselben VRN-Konto anmelden wie hier.</string>
+    <string name="shop_university">Hochschule</string>
+    <string name="shop_reverify">Erneut verifizieren</string>
+    <string name="shop_verify_start">Hochschul-Login starten</string>
+    <string name="shop_no_universities">Die Liste der Hochschulen konnte nicht geladen werden.</string>
+    <string name="shop_verified">Studierendenstatus bestätigt – gültig bis %1$s.</string>
+    <string name="shop_not_verified">Nach dem Hochschul-Login ist kein gültiger Nachweis für heute da. Siehe Studierendenstatus.</string>
+    <string name="shop_history">Bisherige Semestertickets</string>
+    <string name="shop_order">Bestellung %1$s</string>
+    <string name="shop_confirm_title">Ticketkauf überprüfen</string>
+    <string name="shop_valid_from">Gültig ab</string>
+    <string name="shop_renewal">Verlängerung</string>
+    <string name="shop_renewal_value">monatlich bis Semesterende (%1$s)</string>
+    <string name="shop_holder">Ticketinhaber</string>
+    <string name="shop_price">Preis</string>
+    <string name="shop_price_free">0,00 €</string>
+    <string name="shop_agb">Mit dem Kauf akzeptiere ich die AGB. Der Digitalkauf wird über die Rhein-Neckar-Verkehr GmbH abgewickelt.</string>
+    <string name="shop_agb_read">AGB lesen</string>
+    <string name="shop_confirm">Jetzt kostenlos buchen</string>
+    <string name="shop_payload">Die Bestellung wird genau so an den VRN-Shop gesendet:</string>
+    <!-- TicketEntitlement.Status, as the app labels them (entitlement_status_*). -->
+    <string name="entitlement_approved">Genehmigt</string>
+    <string name="entitlement_pending">In Bearbeitung (bis zu 3 Werktage)</string>
+    <string name="entitlement_refused">Abgelehnt</string>
+    <string name="entitlement_locked">Gesperrt</string>
+    <string name="entitlement_unknown">Unbekannt</string>
+    <string name="dfn_title">Hochschul-Login</string>
+    <string name="account_student">Studierendenstatus</string>
+    <string name="account_student_sub">Für das Deutschland-Semesterticket: per Hochschul-Login verifizieren.</string>
+    <string name="account_verify">Verifizieren</string>
 </resources>

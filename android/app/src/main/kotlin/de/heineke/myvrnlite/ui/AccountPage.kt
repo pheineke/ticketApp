@@ -3,6 +3,7 @@ package de.heineke.myvrnlite.ui
 import android.text.InputType
 import android.view.View
 import android.view.inputmethod.EditorInfo
+import android.webkit.CookieManager
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
@@ -60,9 +61,12 @@ class AccountPage(activity: MainActivity) : Page(activity, R.layout.page_account
             error = null
             repo.cancelLogin()
         }
+        view.findViewById<View>(R.id.account_verify).setOnClickListener { a.select(MainActivity.Tab.SHOP) }
         view.findViewById<View>(R.id.logout).setOnClickListener {
             error = null
             repo.logout()
+            // The Hochschul-Login's shop session (WebView cookies) belongs to this login too.
+            CookieManager.getInstance().removeAllCookies(null)
         }
         view.findViewById<TextView>(R.id.change_login).apply {
             val icon = a.resources.getDrawable(R.drawable.ic_open_in_new, a.theme).mutate()

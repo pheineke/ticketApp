@@ -261,6 +261,43 @@
                 android:layout_marginTop="12dp"
                 android:orientation="vertical" />
 
+            <!-- Student status: to the Ticketshop's Hochschul-Login. -->
+            <LinearLayout
+                style="@style/Panel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="6dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        style="@style/Text.Heading"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/account_student" />
+
+                    <TextView
+                        style="@style/Text.Hint"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/account_student_sub" />
+                </LinearLayout>
+
+                <Button
+                    android:id="@+id/account_verify"
+                    style="@style/Button.Small.Outline"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:text="@string/account_verify" />
+            </LinearLayout>
+
             <TextView
                 android:id="@+id/remember_state"
                 style="@style/Text.Hint"

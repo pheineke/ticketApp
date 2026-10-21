@@ -92,6 +92,7 @@
 
             <include android:id="@+id/nav_tickets" layout="@layout/nav_row" />
             <include android:id="@+id/nav_fahrplan" layout="@layout/nav_row" />
+            <include android:id="@+id/nav_shop" layout="@layout/nav_row" />
             <include android:id="@+id/nav_account" layout="@layout/nav_row" />
             <include android:id="@+id/nav_settings" layout="@layout/nav_row" />
             <include android:id="@+id/nav_help" layout="@layout/nav_row" />

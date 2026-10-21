@@ -107,8 +107,27 @@ class VrnClient(private val http: OkHttpClient) {
         return ProfileResult(null, null, calls)
     }
 
-    private fun shop(accessToken: String, path: String, payload: JSONObject): ApiCall {
-        val url = "$BASE/TicketShop/$path"
+    /**
+     * The user's entitlements: the app's OData GET (403 for some accounts), else the web
+     * shop's POST. → calls made, the last one holding {value} or {Values}.
+     */
+    fun entitlements(accessToken: String): List<ApiCall> {
+        val first = get(accessToken, ENTITLEMENTS_URL)
+        if (first.code == 200 && first.json != null) return listOf(first)
+        return listOf(first, post(accessToken, ENTITLEMENTS_POST_URL, JSONObject()
+            .put("Usage", 0).put("Index", 0).put("MaxNumber", 20).put("ExpandEntitlementDocument", false)
+            .put("AnnotationIsAscending", true).put("CreatedIsAscending", false)))
+    }
+
+    /** Universities for the Hochschul-Login: {value: [{EntityId, DisplayNames}]}. */
+    fun authorities(accessToken: String): ApiCall = get(accessToken, "$BASE/Dfn/GetAuthorities")
+
+    /** POST TicketShop/Shop/CreateOrder → {Orders} | {RedirectUrl} | {Error}. Buys: only on the user's tap. */
+    fun createOrder(accessToken: String, payload: JSONObject): ApiCall = shop(accessToken, "Shop/CreateOrder", payload)
+
+    private fun shop(accessToken: String, path: String, payload: JSONObject): ApiCall = post(accessToken, "$BASE/TicketShop/$path", payload)
+
+    private fun post(accessToken: String, url: String, payload: JSONObject): ApiCall {
         val req = Request.Builder().url(url)
             .header("Authorization", "Bearer $accessToken").header("Accept", "application/json")
             .post(payload.toString().toRequestBody("application/json".toMediaType())).build()
@@ -132,6 +151,10 @@ class VrnClient(private val http: OkHttpClient) {
         const val SCOPE = "ticketing offline_access"
         private const val PROFILE_URL = "$BASE/Identity/OData/UserProfile?\$expand=User(\$select=Name),User(\$expand=UserProperty)"
         private const val PAYMENT_INFO_URL = "$BASE/Payment/Customer/PaymentInfos"
+        // The app selects these fields: without $select the answer includes the uploaded document (403).
+        private const val ENTITLEMENTS_URL = "$BASE/Personalization/OData/TicketEntitlement?\$expand=Ticket" +
+            "&\$select=ID,UserID,Created,Annotation,EligibleUntil,EligibleFrom,Approved,Usage,Status"
+        private const val ENTITLEMENTS_POST_URL = "$BASE/Personalization/Entitlement/TicketEntitlements"
 
         // ListOrdersV2 bitmasks: TimeFilter{Active, Historic, Future}, TicketFilter{Quota, Abo, Classic, CiBo}.
         private const val TIME_ACTIVE = 1

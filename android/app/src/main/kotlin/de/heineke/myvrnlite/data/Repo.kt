@@ -26,6 +26,11 @@ class SessionExpired : VrnException("session_expired")
 /** A ticket's barcode payload (Shop/QRCode → QrCode). [call] is null for the offline copy. */
 class QrCode(val code: String, val savedAt: Long, val call: ApiCall? = null)
 
+/** Outcome of a CreateOrder, for the Ticketshop page: booked, payment asked (not followed), or failed with [error]. */
+class OrderResult(val kind: Kind, val error: String?, val call: ApiCall?) {
+    enum class Kind { BOOKED, PAYMENT, FAILED }
+}
+
 /**
  * App state and the work behind the screens: tokens, tickets, barcodes and profile.
  *
@@ -90,6 +95,22 @@ class Repo(context: Context) {
     var profileResult: ProfileResult? = null
         private set
     var loadingProfile = false
+        private set
+
+    /** Ticketshop: the user's entitlements (null until loaded) and the Hochschul-Login universities. */
+    var entitlements: List<Shop.Entitlement>? = null
+        private set
+    var entitlementCalls: List<ApiCall> = emptyList()
+        private set
+    var shopError: String? = null
+        private set
+    var loadingShop = false
+        private set
+    var universities: List<Shop.University>? = null
+        private set
+    var buying = false
+        private set
+    var orderResult: OrderResult? = null
         private set
 
     /** What the offline copy on disk holds: (tickets, saved at), or null if there is none. */
@@ -169,6 +190,8 @@ class Repo(context: Context) {
         session++
         loadingTickets = false
         loadingProfile = false
+        loadingShop = false
+        buying = false
         loadingQr.clear()
     }
 
@@ -182,6 +205,11 @@ class Repo(context: Context) {
         qrError.clear()
         profile = null
         profileResult = null
+        entitlements = null
+        entitlementCalls = emptyList()
+        shopError = null
+        universities = null
+        orderResult = null
         offlineSub = null
         offlineState = null
         disk.execute { offlineFile.delete() }
@@ -343,6 +371,78 @@ class Repo(context: Context) {
                 }
             }.onFailure { if (it is IOException) offline = true }
         }
+    }
+
+    // ---- Ticketshop ------------------------------------------------------------------
+
+    fun shopState(now: Long = System.currentTimeMillis()): Shop.State? = entitlements?.let { Shop.State(it, orders, now) }
+
+    /** Entitlements (and, once, the universities for the Hochschul-Login). */
+    fun refreshShop() {
+        if (!loggedIn || loadingShop) return
+        loadingShop = true
+        changed()
+        val s = session
+        val needUnis = universities == null
+        background({ authed { t -> client.entitlements(t) to (if (needUnis) client.authorities(t) else null) } }) { r ->
+            if (s != session) return@background
+            loadingShop = false
+            r.onSuccess { (calls, unis) ->
+                entitlementCalls = calls
+                val last = calls.last()
+                val json = last.json
+                val list = json?.optJSONArray("value") ?: json?.optJSONArray("Values")
+                    ?: json?.optJSONObject("Value")?.let { JSONArray().put(it) }
+                if (last.code == 200 && json != null) {
+                    entitlements = (0 until (list?.length() ?: 0)).mapNotNull { list!!.optJSONObject(it) }.map(Shop::Entitlement)
+                    shopError = null
+                } else {
+                    shopError = "HTTP ${last.code}"
+                }
+                if (unis != null && unis.code == 200) universities = Shop.universities(unis.json)
+            }.onFailure { e ->
+                if (e is IOException) offline = true
+                else if (e !is SessionExpired) shopError = e.message
+            }
+        }
+    }
+
+    /** The order [buySemesterTicket] sends, for the confirmation. Null if there's nothing to buy. */
+    fun semesterOrder(): JSONObject? {
+        val st = shopState()?.takeIf { it.canBuy } ?: return null
+        val template = st.tickets.firstOrNull()
+        val p = profile
+        return Shop.semesterOrder(template, Shop.person(p?.first, p?.last, p?.dob, template), st.now)
+    }
+
+    /** CreateOrder for this month's Semesterticket (0 €). Only on the user's confirmed tap. */
+    fun buySemesterTicket(payload: JSONObject) {
+        if (!loggedIn || buying) return
+        buying = true
+        orderResult = null
+        changed()
+        val s = session
+        background({ authed { client.createOrder(it, payload) } }) { r ->
+            if (s != session) return@background
+            buying = false
+            orderResult = r.fold({ call ->
+                val json = call.json
+                val error = json?.optJSONObject("Error")
+                when {
+                    (json?.optJSONArray("Orders")?.length() ?: 0) > 0 -> OrderResult(OrderResult.Kind.BOOKED, null, call)
+                    // A payment step: never followed (the Semesterticket is free; something is off).
+                    json?.optString("RedirectUrl")?.let { it.isNotEmpty() && it != "null" } == true -> OrderResult(OrderResult.Kind.PAYMENT, null, call)
+                    else -> OrderResult(OrderResult.Kind.FAILED, listOfNotNull(error?.optString("Message")?.ifEmpty { null } ?: "HTTP ${call.code}",
+                        error?.opt("MessageID")?.takeIf { it != JSONObject.NULL }?.let { "Code $it" }).joinToString(" · "), call)
+                }
+            }, { e -> OrderResult(OrderResult.Kind.FAILED, e.message ?: e.javaClass.simpleName, null) })
+            refreshTickets()  // the new ticket shows up in "Tickets", and the page sees the running subscription
+        }
+    }
+
+    fun clearOrderResult() {
+        orderResult = null
+        changed()
     }
 
     // ---- Offline copy ------------------------------------------------------------

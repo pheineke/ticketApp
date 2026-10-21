@@ -1,6 +1,7 @@
 package de.heineke.myvrnlite.ui
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
@@ -39,7 +40,9 @@ abstract class Page(protected val activity: MainActivity, layout: Int) {
 class MainActivity : BaseActivity() {
     enum class Tab(val title: Int) {
         TICKETS(R.string.title_tickets), FAHRPLAN(R.string.title_fahrplan), ACCOUNT(R.string.title_account),
-        SETTINGS(R.string.title_settings)
+        SETTINGS(R.string.title_settings),
+        /** Drawer only (no bottom tab), as in the web client. */
+        SHOP(R.string.title_shop)
     }
 
     private var tab = Tab.TICKETS
@@ -57,7 +60,7 @@ class MainActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         setContent(R.layout.activity_main)
         pages = mapOf(Tab.TICKETS to TicketsPage(this), Tab.FAHRPLAN to FahrplanPage(this),
-            Tab.ACCOUNT to AccountPage(this), Tab.SETTINGS to SettingsPage(this))
+            Tab.ACCOUNT to AccountPage(this), Tab.SETTINGS to SettingsPage(this), Tab.SHOP to ShopPage(this))
         val container = findViewById<FrameLayout>(R.id.pages)
         for (page in pages.values) container.addView(page.view, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
         navButton.setOnClickListener { openDrawer(true) }
@@ -65,6 +68,7 @@ class MainActivity : BaseActivity() {
             when (tab) {
                 Tab.TICKETS -> repo.refreshTickets()
                 Tab.ACCOUNT -> repo.refreshProfile()
+                Tab.SHOP -> repo.refreshShop()
                 Tab.FAHRPLAN, Tab.SETTINGS -> Unit
             }
         }
@@ -103,6 +107,13 @@ class MainActivity : BaseActivity() {
         }
     }
 
+    @Deprecated("Framework Activity: no Activity Result API without AndroidX")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        @Suppress("DEPRECATION")
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == REQ_DFN) (pages.getValue(Tab.SHOP) as ShopPage).onVerifyResult(resultCode)
+    }
+
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putString(STATE_TAB, tab.name)
@@ -112,6 +123,7 @@ class MainActivity : BaseActivity() {
         this.tab = tab
         for ((t, page) in pages) page.view.visibility = if (t == tab) View.VISIBLE else View.GONE
         if (tab == Tab.ACCOUNT && repo.loggedIn && repo.profileResult == null) repo.refreshProfile()
+        if (tab == Tab.SHOP) (pages.getValue(Tab.SHOP) as ShopPage).onShown()
         if (drawerOpen) openDrawer(false)
         render()
     }
@@ -119,8 +131,12 @@ class MainActivity : BaseActivity() {
     fun render() {
         titleView.setText(tab.title)
         findViewById<View>(R.id.debug_flag).visibility = if (repo.prefs.debug) View.VISIBLE else View.GONE
-        action.visibility = if ((tab == Tab.TICKETS || tab == Tab.ACCOUNT) && repo.loggedIn) View.VISIBLE else View.GONE
-        spin(action, if (tab == Tab.TICKETS) repo.loadingTickets else repo.loadingProfile)
+        action.visibility = if ((tab == Tab.TICKETS || tab == Tab.ACCOUNT || tab == Tab.SHOP) && repo.loggedIn) View.VISIBLE else View.GONE
+        spin(action, when (tab) {
+            Tab.TICKETS -> repo.loadingTickets
+            Tab.SHOP -> repo.loadingShop || repo.loadingTickets
+            else -> repo.loadingProfile
+        })
         styleTabs()
         findViewById<TextView>(R.id.drawer_state).setText(if (repo.loggedIn) R.string.drawer_logged_in else R.string.drawer_logged_out)
         for ((id, t) in NAV_TABS) findViewById<View>(id).isSelected = t == tab
@@ -172,6 +188,7 @@ class MainActivity : BaseActivity() {
         navRow(R.id.nav_fahrplan, R.drawable.nav_fahrplan, R.string.nav_fahrplan, R.string.nav_fahrplan_sub) { select(Tab.FAHRPLAN) }
         navRow(R.id.nav_account, R.drawable.nav_account, R.string.nav_account, R.string.nav_account_sub) { select(Tab.ACCOUNT) }
         navRow(R.id.nav_settings, R.drawable.nav_settings, R.string.nav_settings, R.string.nav_settings_sub) { select(Tab.SETTINGS) }
+        navRow(R.id.nav_shop, R.drawable.nav_shop, R.string.nav_shop, R.string.nav_shop_sub) { select(Tab.SHOP) }
         navRow(R.id.nav_help, R.drawable.nav_help, R.string.nav_help, external = true) { openUrl(URL_HELP) }
         navRow(R.id.nav_privacy, R.drawable.nav_privacy, R.string.nav_privacy, external = true) { openUrl(URL_PRIVACY) }
         navRow(R.id.nav_imprint, R.drawable.nav_imprint, R.string.nav_imprint, external = true) { openUrl(URL_IMPRINT) }
@@ -262,6 +279,7 @@ class MainActivity : BaseActivity() {
 
     companion object {
         const val REQ_LOCATION = 1
+        const val REQ_DFN = 2
         private const val WIDE_DP = 900
         private const val STATE_TAB = "tab"
         private const val ANIM_MS = 200L
@@ -269,6 +287,6 @@ class MainActivity : BaseActivity() {
         private const val URL_PRIVACY = "https://www.vrn.de/_inc/app/agb/"
         private const val URL_IMPRINT = "https://www.vrn.de/_inc/app/impressum/index.html"
         private val NAV_TABS = listOf(R.id.nav_tickets to Tab.TICKETS, R.id.nav_fahrplan to Tab.FAHRPLAN,
-            R.id.nav_account to Tab.ACCOUNT, R.id.nav_settings to Tab.SETTINGS)
+            R.id.nav_account to Tab.ACCOUNT, R.id.nav_settings to Tab.SETTINGS, R.id.nav_shop to Tab.SHOP)
     }
 }

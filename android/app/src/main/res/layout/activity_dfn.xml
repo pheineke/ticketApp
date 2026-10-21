@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Hochschul-Login: the shop's login and the university's SAML login in a WebView. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg"
+    android:orientation="vertical">
+
+    <include layout="@layout/app_bar" />
+
+    <!-- Where the user is typing their password: the page's host, always visible. -->
+    <TextView
+        android:id="@+id/dfn_host"
+        style="@style/Text.Hint"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/surface"
+        android:drawablePadding="6dp"
+        android:ellipsize="middle"
+        android:gravity="center_vertical"
+        android:paddingStart="16dp"
+        android:paddingTop="6dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="6dp"
+        android:singleLine="true" />
+
+    <ProgressBar
+        android:id="@+id/dfn_progress"
+        style="@android:style/Widget.Material.ProgressBar.Horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:indeterminate="false"
+        android:max="100" />
+
+    <WebView
+        android:id="@+id/dfn_web"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+</LinearLayout>

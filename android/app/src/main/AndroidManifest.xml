@@ -41,5 +41,12 @@
             android:name=".ui.TicketActivity"
             android:exported="false"
             android:parentActivityName=".ui.MainActivity" />
+
+        <!-- Hochschul-Login (WebView). Handles rotation itself so the login page keeps its state. -->
+        <activity
+            android:name=".ui.DfnActivity"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden"
+            android:exported="false"
+            android:parentActivityName=".ui.MainActivity" />
     </application>
 </manifest>

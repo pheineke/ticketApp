@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- webapp/static/icons/home_navigator_ticket_shop_page.svg -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="36dp"
+    android:height="36dp"
+    android:viewportWidth="36"
+    android:viewportHeight="36">
+  <group
+      android:translateX="3.918"
+      android:translateY="5.873">
+    <path
+        android:pathData="M21.966,6.053a0.578,0.578 0,0 1,0.564 0.564v6.742a0.7,0.7 0,0 1,-0.24 0.549,1.131 1.131,0 0,1 -0.578,0.268L9.2,15.979l0.366,1.47h12.118a0.564,0.564 0,0 1,0 1.127H9a0.454,0.454 0,0 1,-0.366 -0.169,0.97 0.97,0 0,1 -0.2,-0.395L6.463,6.25l-2.2,-3.387a0.521,0.521 0,0 1,-0.042 -0.423,0.557 0.557,0 0,1 0.3,-0.31 0.53,0.53 0,0 1,0.761 0.282L7.59,6.053h14.376ZM7.59,7.18l0.536,2.514h3.326V7.18ZM8.971,14.627l2.481,-0.31v-3.5H8.323ZM11.141,19.705a1.588,1.588 0,1 1,-1.113 0.465,1.52 1.52,0 0,1 1.114,-0.47ZM16.356,9.694V7.18h-3.777v2.514ZM12.579,10.821v3.354l3.777,-0.479v-2.875ZM17.479,7.18v2.514H21.4V7.18ZM21.397,13.08v-2.259h-3.913v2.734ZM19.542,19.7a1.588,1.588 0,1 1,-1.113 0.465,1.52 1.52,0 0,1 1.113,-0.465Z"
+        android:fillColor="#59000a" />
+  </group>
+  <path
+      android:strokeWidth="1"
+      android:pathData="M18,18m-17.5,0a17.5,17.5 0,1 1,35 0a17.5,17.5 0,1 1,-35 0"
+      android:fillColor="#00000000"
+      android:strokeColor="#59000a" />
+</vector>
