@@ -58,6 +58,9 @@ class MainActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // The system draws the startup screen before any of our code runs, from the manifest's
+        // (red) theme. Android 13+ remembers a theme for the next start: the chosen palette.
+        if (Build.VERSION.SDK_INT >= 33) splashScreen.setSplashScreenTheme(paletteTheme)
         setContent(R.layout.activity_main)
         pages = mapOf(Tab.TICKETS to TicketsPage(this), Tab.FAHRPLAN to FahrplanPage(this),
             Tab.ACCOUNT to AccountPage(this), Tab.SETTINGS to SettingsPage(this), Tab.SHOP to ShopPage(this))

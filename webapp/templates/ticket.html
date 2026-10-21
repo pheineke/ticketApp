@@ -76,11 +76,13 @@
   {% endif %}
 </div>
 
-<div class="sheet" id="sheet" hidden>
-  <h3>Was bedeutet der Zähler?</h3>
-  <p>Der Zähler läuft seit dem Öffnen des Tickets hoch. So kann das Kontrollpersonal ein live angezeigtes Ticket von einem Screenshot unterscheiden.</p>
-  {% if t.booked %}<p><b>Genauer Kaufzeitpunkt: {{ t.booked|dt }}</b></p>{% endif %}
-  <button class="btn" type="button" onclick="document.getElementById('sheet').hidden=true">Verstanden</button>
+<div class="sheet-wrap" id="sheet" hidden>
+  <div class="sheet" role="dialog" aria-label="Was bedeutet der Zähler?">
+    <h3>Was bedeutet der Zähler?</h3>
+    <p>Der Zähler läuft seit dem Öffnen des Tickets hoch. So kann das Kontrollpersonal ein live angezeigtes Ticket von einem Screenshot unterscheiden.</p>
+    {% if t.booked %}<p><b>Genauer Kaufzeitpunkt: {{ t.booked|dt }}</b></p>{% endif %}
+    <button class="sheet-close" type="button">Schließen</button>
+  </div>
 </div>
 {% endblock %}
 
@@ -89,6 +91,7 @@
 <script src="{{ url_for('static', filename='ticket.js') }}"></script>
 <script>
   VRN.countUp(document.getElementById("counter"));
+  VRN.sheet(document.getElementById("sheet"));
   VRN.spin(document.getElementById("codebox"));
   VRN.wake();
   {% if offline_on %}VRN.refreshOffline("{{ url_for('offline_data') }}");{% endif %}

@@ -363,10 +363,21 @@ body.ticketpage .tabbar a.on { color: var(--ticket-ink); opacity: 1; }
 .ticket-detail .tk-invoice { display: block; width: max-content; margin: 20px 0 0 auto; padding: 8px 0; color: var(--ticket-ink);
                              font-size: 16px; font-weight: 600; text-decoration: none; }
 .ticket-detail .debug { margin: 12px 0; }
-.sheet { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; max-width: 520px; margin: 0 auto; background: var(--surface); color: var(--text);
-         border-radius: 12px 12px 0 0; padding: 18px 18px 28px; box-shadow: 0 -8px 30px rgba(0, 0, 0, .2); }
-.sheet h3 { margin: 0 0 8px; }
-.sheet[hidden] { display: none; }
+/* Slide-up card (as the official app's info sheets): dimmed page, tap outside or swipe down
+   to close (VRN.sheet in ticket.js). */
+.sheet-wrap { position: fixed; inset: 0; z-index: 30; display: flex; align-items: flex-end; justify-content: center;
+              background: rgba(0, 0, 0, .45); animation: fadein .2s ease-out; }
+.sheet-wrap[hidden] { display: none; }
+.sheet { width: 100%; max-width: 520px; background: var(--surface); color: var(--text-heading); border-radius: 18px 18px 0 0;
+         padding: 10px 24px calc(22px + env(safe-area-inset-bottom)); box-shadow: 0 -8px 30px rgba(0, 0, 0, .25);
+         animation: sheetup .22s ease-out; touch-action: none; }
+.sheet::before { content: ""; display: block; width: 40px; height: 5px; border-radius: 3px; background: var(--text-muted); margin: 0 auto 20px; }
+.sheet h3 { margin: 0; font-size: 17px; font-weight: 700; text-transform: uppercase; letter-spacing: .02em; }
+.sheet p { margin: 14px 0 0; font-size: 16px; line-height: 1.45; }
+.sheet .sheet-close { display: block; width: 100%; height: 50px; margin-top: 26px; border: 0; border-radius: 26px; cursor: pointer;
+                      background: var(--tcard-top); color: var(--tcard-ink); font: 600 16px var(--font); }
+@keyframes sheetup { from { transform: translateY(100%); } }
+@keyframes fadein { from { opacity: 0; } }
 
 /* ---- Debug ------------------------------------------------------------ */
 .debug { border: 1px dashed var(--warning); border-radius: var(--radius); background: var(--surface); margin: 12px 0; }
@@ -613,8 +624,8 @@ body.mapmode main.content { padding: 0; }
   .ticket-detail .codebox { grid-column: 1; width: min(400px, 100%); }
   .ticket-detail .tk-info { grid-column: 2; }
   .ticket-detail .tk-info > :first-child { margin-top: 20px; }
-  .sheet { top: 50%; bottom: auto; left: 50%; right: auto; width: 440px; transform: translate(-50%, -50%);
-           border-radius: 12px; padding-bottom: 20px; }
+  .sheet-wrap { align-items: center; }
+  .sheet { width: 440px; border-radius: 18px; padding-bottom: 22px; }
 
   /* Fahrplan: map fills the page; search/results/timeline in a fixed panel on the left. */
   body.mapmode .fullmap { left: var(--side); bottom: 0; }

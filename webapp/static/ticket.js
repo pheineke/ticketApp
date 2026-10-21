@@ -38,6 +38,32 @@
   }
 
   /* Count-up timer (as TicketDetailCountUpView). */
+  // Slide-up card (.sheet-wrap > .sheet): closes by its button, a tap outside, Escape, or a
+  // swipe down (the card follows the finger; a quarter of its height closes it).
+  function sheet(wrap) {
+    if (!wrap) return;
+    var card = wrap.querySelector(".sheet"), y0 = null;
+    function close() { wrap.hidden = true; card.style.transform = ""; }
+    wrap.addEventListener("click", function (e) { if (e.target === wrap) close(); });
+    wrap.querySelector(".sheet-close").addEventListener("click", close);
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !wrap.hidden) close(); });
+    card.addEventListener("pointerdown", function (e) {
+      if (e.target.closest("button")) return;
+      y0 = e.clientY; card.setPointerCapture(e.pointerId); card.style.transition = "none";
+    });
+    card.addEventListener("pointermove", function (e) {
+      if (y0 !== null) card.style.transform = "translateY(" + Math.max(0, e.clientY - y0) + "px)";
+    });
+    function end(e) {
+      if (y0 === null) return;
+      var d = Math.max(0, e.clientY - y0); y0 = null;
+      card.style.transition = "transform .15s ease-out";
+      if (d > card.offsetHeight / 4) close(); else card.style.transform = "";
+    }
+    card.addEventListener("pointerup", end);
+    card.addEventListener("pointercancel", end);
+  }
+
   function countUp(el) {
     if (!el) return;
     var t0 = Date.now();
@@ -98,7 +124,7 @@
 
   w.VRN = {
     barcodeOpts: barcodeOpts, saveBarcodeOpts: saveBarcodeOpts, drawBarcode: drawBarcode,
-    countUp: countUp, spin: spin, wake: wake,
+    countUp: countUp, spin: spin, wake: wake, sheet: sheet,
     loadOffline: loadOffline, saveOffline: saveOffline, refreshOffline: refreshOffline, clearOffline: clearOffline,
   };
 })(window);

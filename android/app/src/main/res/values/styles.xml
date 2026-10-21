@@ -90,4 +90,10 @@
         <item name="android:scaleType">fitCenter</item>
         <item name="android:background">?android:attr/selectableItemBackgroundBorderless</item>
     </style>
+
+    <!-- Slide-up card (InfoSheet): a dialog window at the bottom that slides in and out. -->
+    <style name="SheetAnimation">
+        <item name="android:windowEnterAnimation">@anim/sheet_in</item>
+        <item name="android:windowExitAnimation">@anim/sheet_out</item>
+    </style>
 </resources>

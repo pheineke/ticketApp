@@ -31,6 +31,10 @@ abstract class BaseActivity : Activity() {
     val isNight: Boolean
         get() = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
 
+    /** The theme of the chosen palette (Settings > Farben). */
+    protected val paletteTheme: Int
+        get() = if (repo.prefs.palette == "vrn") R.style.Theme_MyVrn_Vrn else R.style.Theme_MyVrn_Lite
+
     override fun attachBaseContext(newBase: Context) {
         super.attachBaseContext(newBase)
         // "System" follows the device (dark mode exists from Android 10); otherwise force it.
@@ -45,7 +49,7 @@ abstract class BaseActivity : Activity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(if (repo.prefs.palette == "vrn") R.style.Theme_MyVrn_Vrn else R.style.Theme_MyVrn_Lite)
+        setTheme(paletteTheme)
         super.onCreate(savedInstanceState)
     }
 

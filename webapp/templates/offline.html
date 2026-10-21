@@ -14,11 +14,13 @@
   <button class="btn" type="button" onclick="location.href='/tickets'">Erneut versuchen</button>
 </div>
 </div>
-<div class="sheet" id="sheet" hidden>
-  <h3>Was bedeutet der Zähler?</h3>
-  <p>Der Zähler läuft seit dem Öffnen des Tickets hoch. So kann das Kontrollpersonal ein live angezeigtes Ticket von einem Screenshot unterscheiden.</p>
-  <p id="sheet-booked" hidden><b></b></p>
-  <button class="btn" type="button" onclick="document.getElementById('sheet').hidden=true">Verstanden</button>
+<div class="sheet-wrap" id="sheet" hidden>
+  <div class="sheet" role="dialog" aria-label="Was bedeutet der Zähler?">
+    <h3>Was bedeutet der Zähler?</h3>
+    <p>Der Zähler läuft seit dem Öffnen des Tickets hoch. So kann das Kontrollpersonal ein live angezeigtes Ticket von einem Screenshot unterscheiden.</p>
+    <p id="sheet-booked" hidden><b></b></p>
+    <button class="sheet-close" type="button">Schließen</button>
+  </div>
 </div>
 {% endblock %}
 
@@ -183,6 +185,7 @@
     var t = m && tickets.filter(function (x) { return String(x.id) === m[1]; })[0];
     if (t) renderDetail(t); else renderList();
   }
+  VRN.sheet(document.getElementById("sheet"));
   window.addEventListener("hashchange", route);
   route();
   // Back online: go to the live app again — on the "online" event or as soon as the server
