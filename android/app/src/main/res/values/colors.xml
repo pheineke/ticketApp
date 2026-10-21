@@ -101,4 +101,6 @@
     <color name="modern_brand_soft">#1a1f4bdb</color>
     <color name="modern_brand_ink">#1f4bdb</color>
     <color name="modern_accent_text">#111418</color>
+    <!-- Background of the Modern design's launcher icon (as in its logo). -->
+    <color name="modern_icon_bg">#1e6feb</color>
 </resources>

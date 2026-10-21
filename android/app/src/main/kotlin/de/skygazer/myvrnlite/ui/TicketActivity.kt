@@ -11,11 +11,14 @@ import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
 import android.view.Gravity
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.view.animation.AccelerateDecelerateInterpolator
+import android.view.animation.DecelerateInterpolator
 import android.widget.CheckBox
+import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -75,6 +78,14 @@ class TicketActivity : BaseActivity() {
             turned = !turned
             codebox.animate().rotation(if (turned) 360f else 0f).setDuration(600)
                 .setInterpolator(AccelerateDecelerateInterpolator()).start()
+        }
+        if (modern) {
+            // Modern: holding the code lifts it to the front, as large as fits; letting go puts it back.
+            codebox.setOnLongClickListener { liftCode() }
+            codebox.setOnTouchListener { _, e ->
+                if (e.actionMasked == MotionEvent.ACTION_UP || e.actionMasked == MotionEvent.ACTION_CANCEL) dropCode()
+                false  // click and long click still run
+            }
         }
 
         // As large as possible (scanners read big codes best), but with name and timer on screen;
@@ -318,6 +329,50 @@ class TicketActivity : BaseActivity() {
 
     private fun options(code: String) =
         repo.prefs.barcode?.let { Barcode.Options(it.first, it.second) } ?: Barcode.defaultOptions(code)
+
+    // ---- Modern: the code lifted to the front while held ------------------------------
+
+    private var lifted: View? = null
+
+    /** A dimmed page and the code on a white card in the middle, rendered for its size (sharp). */
+    private fun liftCode(): Boolean {
+        val (code, opts) = drawn ?: return false
+        if (lifted != null) return true
+        val dm = resources.displayMetrics
+        val size = minOf(dm.widthPixels, dm.heightPixels) - dp(48)
+        val bitmap = try {
+            Barcode.render(code, opts, size - dp(32))
+        } catch (e: Exception) {
+            return false
+        }
+        val card = FrameLayout(this).apply {
+            background = GradientDrawable().apply { cornerRadius = dp(20).toFloat(); setColor(color(R.color.code_paper)) }
+            setPadding(dp(16), dp(16), dp(16), dp(16))
+            elevation = dp(12).toFloat()
+            addView(ImageView(this@TicketActivity).apply {
+                setImageDrawable(BitmapDrawable(resources, bitmap).apply { isFilterBitmap = false })
+                contentDescription = getString(R.string.ticket_code)
+            }, FrameLayout.LayoutParams(size - dp(32), size - dp(32)))
+        }
+        val overlay = FrameLayout(this).apply {
+            setBackgroundColor(0x99000000.toInt())
+            alpha = 0f
+            addView(card, FrameLayout.LayoutParams(size, size, Gravity.CENTER))
+        }
+        (window.decorView as ViewGroup).addView(overlay, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+        overlay.animate().alpha(1f).setDuration(120).start()
+        card.scaleX = 0.85f
+        card.scaleY = 0.85f
+        card.animate().scaleX(1f).scaleY(1f).setDuration(160).setInterpolator(DecelerateInterpolator()).start()
+        lifted = overlay
+        return true  // consumes the long click: no spin on release
+    }
+
+    private fun dropCode() {
+        val overlay = lifted ?: return
+        lifted = null
+        overlay.animate().alpha(0f).setDuration(120).withEndAction { (overlay.parent as? ViewGroup)?.removeView(overlay) }.start()
+    }
 
     private fun draw(code: String) {
         val opts = options(code)

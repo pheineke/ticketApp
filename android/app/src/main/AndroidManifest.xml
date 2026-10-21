@@ -24,13 +24,34 @@
 
         <activity
             android:name=".ui.MainActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <!-- Launcher entries, one per icon: the app enables the one of the chosen design
+             (Settings > Farben, see ui/AppIcon.kt). Both open MainActivity. -->
+        <activity-alias
+            android:name=".Launcher"
+            android:enabled="true"
             android:exported="true"
-            android:windowSoftInputMode="adjustResize">
+            android:icon="@mipmap/ic_launcher"
+            android:targetActivity=".ui.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
+        </activity-alias>
+
+        <activity-alias
+            android:name=".LauncherModern"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher_modern"
+            android:targetActivity=".ui.MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
 
         <activity
             android:name=".ui.ConnectionActivity"

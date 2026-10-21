@@ -63,6 +63,8 @@ class MainActivity : BaseActivity() {
         // The system draws the startup screen before any of our code runs, from the manifest's
         // (red) theme. Android 13+ remembers a theme for the next start: the chosen palette.
         if (Build.VERSION.SDK_INT >= 33) splashScreen.setSplashScreenTheme(paletteTheme)
+        // The launcher icon of the chosen design (also after an update or a restored setting).
+        if (savedInstanceState == null) AppIcon.apply(this, repo.prefs.palette)
         setContent(R.layout.activity_main)
         pages = mapOf(Tab.TICKETS to TicketsPage(this), Tab.FAHRPLAN to FahrplanPage(this),
             Tab.ACCOUNT to AccountPage(this), Tab.SETTINGS to SettingsPage(this), Tab.SHOP to ShopPage(this))

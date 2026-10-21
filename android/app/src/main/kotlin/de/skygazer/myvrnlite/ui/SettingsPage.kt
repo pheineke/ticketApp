@@ -44,7 +44,11 @@ class SettingsPage(activity: MainActivity) : Page(activity, R.layout.page_settin
             removeAllViews()
             addView(a.segmented(listOf("lite" to a.getString(R.string.palette_lite), "vrn" to a.getString(R.string.palette_vrn),
                 "modern" to a.getString(R.string.palette_modern)),
-                prefs.palette) { prefs.palette = it; a.recreate() })
+                prefs.palette) {
+                prefs.palette = it
+                AppIcon.apply(a, it)
+                a.recreate()
+            })
         }
         offlineSwitch.isChecked = prefs.offline
         debugSwitch.isChecked = prefs.debug
