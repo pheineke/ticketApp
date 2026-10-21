@@ -10,6 +10,13 @@
         android:orientation="vertical"
         android:padding="@dimen/page_pad">
 
+        <!-- Modern: the large page title (filled in code). -->
+        <FrameLayout
+            android:id="@+id/page_head"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone" />
+
         <TextView
             style="@style/Text.Section"
             android:layout_width="match_parent"

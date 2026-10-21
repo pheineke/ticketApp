@@ -84,7 +84,33 @@ class Ticket(
 ) {
     val dticket: Boolean get() = "deutschland" in name.lowercase(Locale.ROOT)
 
+    /** Month and year (Calendar month 0–11) of a calendar-month ticket, as webapp's ticket_period. */
+    val month: Pair<Int, Int>?
+        get() {
+            val s = start ?: return null
+            val last = (end ?: return null) - LAST_DAY_SLACK  // validity ends a few hours into the next day
+            val a = Calendar.getInstance(BERLIN).apply { timeInMillis = s }
+            val b = Calendar.getInstance(BERLIN).apply { timeInMillis = last }
+            val firstAtMidnight = a.get(Calendar.DAY_OF_MONTH) == 1 && a.get(Calendar.HOUR_OF_DAY) == 0 && a.get(Calendar.MINUTE) == 0
+            val sameMonth = a.get(Calendar.YEAR) == b.get(Calendar.YEAR) && a.get(Calendar.MONTH) == b.get(Calendar.MONTH)
+            val toMonthEnd = b.get(Calendar.DAY_OF_MONTH) == b.getActualMaximum(Calendar.DAY_OF_MONTH)
+            return if (firstAtMidnight && sameMonth && toMonthEnd) a.get(Calendar.MONTH) to a.get(Calendar.YEAR) else null
+        }
+
+    /** "01.10. – 31.10.2026" (the last day, not the hours after it). */
+    val period: String?
+        get() {
+            val s = start ?: return null
+            val last = (end ?: return null) - LAST_DAY_SLACK
+            val year = { ms: Long -> Calendar.getInstance(BERLIN).apply { timeInMillis = ms }.get(Calendar.YEAR) }
+            val from = SimpleDateFormat(if (year(s) == year(last)) "dd.MM." else "dd.MM.yyyy", Locale.GERMANY).apply { timeZone = BERLIN }
+            val to = SimpleDateFormat("dd.MM.yyyy", Locale.GERMANY).apply { timeZone = BERLIN }
+            return "${from.format(Date(s))} – ${to.format(Date(last))}"
+        }
+
     companion object {
+        private const val LAST_DAY_SLACK = 6 * 3_600_000L
+
         fun from(order: JSONObject, t: JSONObject, now: Long): Ticket {
             val (startRaw, start) = firstDate(t, "ValidFrom", "ActivationFrom")
             val (endRaw, end) = firstDate(t, "ValidTo", "ValidUntil", "ActivationUntil")

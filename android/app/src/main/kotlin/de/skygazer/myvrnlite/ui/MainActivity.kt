@@ -3,12 +3,14 @@ package de.skygazer.myvrnlite.ui
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Outline
 import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
 import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewOutlineProvider
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
@@ -133,6 +135,8 @@ class MainActivity : BaseActivity() {
 
     fun render() {
         titleView.setText(tab.title)
+        // Modern: the title is the page's own large heading.
+        titleView.visibility = if (modern && tab != Tab.FAHRPLAN) View.INVISIBLE else View.VISIBLE
         findViewById<View>(R.id.debug_flag).visibility = if (repo.prefs.debug) View.VISIBLE else View.GONE
         action.visibility = if ((tab == Tab.TICKETS || tab == Tab.ACCOUNT || tab == Tab.SHOP) && repo.loggedIn) View.VISIBLE else View.GONE
         spin(action, when (tab) {
@@ -159,7 +163,7 @@ class MainActivity : BaseActivity() {
     private fun setupTabs() {
         for ((id, t, res) in tabViews) {
             val v = findViewById<View>(id)
-            v.findViewById<ImageView>(R.id.tab_icon).setImageResource(res.first)
+            v.findViewById<ImageView>(R.id.tab_icon).setImageResource(if (modern) MODERN_TABS.getValue(res.first) else res.first)
             v.findViewById<TextView>(R.id.tab_label).setText(res.second)
             v.setOnClickListener { select(t) }
         }
@@ -185,8 +189,24 @@ class MainActivity : BaseActivity() {
         drawer = findViewById(R.id.drawer)
         scrim = findViewById(R.id.scrim)
         drawer.layoutParams.width = minOf(dp(300), (resources.displayMetrics.widthPixels * 0.85f).toInt())
-        findViewById<View>(R.id.drawer_brand).background =
-            GradientDrawable(GradientDrawable.Orientation.TL_BR, intArrayOf(attrColor(R.attr.brand), attrColor(R.attr.brandDark)))
+        if (modern) {
+            // Modern: the logo on the page colour instead of a gradient band.
+            drawer.setBackgroundColor(attrColor(R.attr.cBg))
+            findViewById<ImageView>(R.id.drawer_logo).apply {
+                setImageResource(R.drawable.m_logo)
+                layoutParams.height = dp(44)
+                outlineProvider = object : ViewOutlineProvider() {
+                    override fun getOutline(view: View, outline: Outline) =
+                        outline.setRoundRect(0, 0, view.width, view.height, view.height * 0.22f)
+                }
+                clipToOutline = true
+            }
+            findViewById<TextView>(R.id.drawer_appname).apply { setTextColor(attrColor(R.attr.cTextHeading)); textSize = 20f }
+            findViewById<TextView>(R.id.drawer_state).setTextColor(attrColor(R.attr.cTextMuted))
+        } else {
+            findViewById<View>(R.id.drawer_brand).background =
+                GradientDrawable(GradientDrawable.Orientation.TL_BR, intArrayOf(attrColor(R.attr.brand), attrColor(R.attr.brandDark)))
+        }
         navRow(R.id.nav_tickets, R.drawable.nav_tickets, R.string.nav_tickets, R.string.nav_tickets_sub) { select(Tab.TICKETS) }
         navRow(R.id.nav_fahrplan, R.drawable.nav_fahrplan, R.string.nav_fahrplan, R.string.nav_fahrplan_sub) { select(Tab.FAHRPLAN) }
         navRow(R.id.nav_account, R.drawable.nav_account, R.string.nav_account, R.string.nav_account_sub) { select(Tab.ACCOUNT) }
@@ -200,7 +220,18 @@ class MainActivity : BaseActivity() {
 
     private fun navRow(id: Int, icon: Int, title: Int, sub: Int = 0, external: Boolean = false, onClick: () -> Unit) {
         val row = findViewById<View>(id)
-        row.findViewById<ImageView>(R.id.nav_icon).apply { setImageResource(icon); tint(attrColor(R.attr.accentText)) }
+        row.findViewById<ImageView>(R.id.nav_icon).apply {
+            if (modern) {
+                // Modern: the icon without its circle, on a soft square.
+                setImageResource(MODERN_NAV.getValue(icon))
+                tint(attrColor(R.attr.brandInk))
+                background = GradientDrawable().apply { cornerRadius = dp(12).toFloat(); setColor(attrColor(R.attr.brandSoft)) }
+                setPadding(dp(6), dp(6), dp(6), dp(6))
+            } else {
+                setImageResource(icon)
+                tint(attrColor(R.attr.accentText))
+            }
+        }
         row.findViewById<TextView>(R.id.nav_title).setText(title)
         if (sub != 0) row.findViewById<TextView>(R.id.nav_sub).apply { setText(sub); visibility = View.VISIBLE }
         if (external) row.findViewById<ImageView>(R.id.nav_external).apply { visibility = View.VISIBLE; tint(attrColor(R.attr.cTextMuted)) }
@@ -289,6 +320,13 @@ class MainActivity : BaseActivity() {
         private const val URL_HELP = "https://www.vrn.de/service/kontakt/feedback/index.html"
         private const val URL_PRIVACY = "https://www.vrn.de/_inc/app/agb/"
         private const val URL_IMPRINT = "https://www.vrn.de/_inc/app/impressum/index.html"
+        /** Modern: line icons in the tab bar, the drawer icons without their circles. */
+        private val MODERN_TABS = mapOf(R.drawable.ic_ticket to R.drawable.mi_tickets, R.drawable.ic_route to R.drawable.mi_route,
+            R.drawable.nav_account to R.drawable.mi_account, R.drawable.ic_settings to R.drawable.mi_settings)
+        private val MODERN_NAV = mapOf(R.drawable.nav_tickets to R.drawable.navm_tickets, R.drawable.nav_fahrplan to R.drawable.navm_fahrplan,
+            R.drawable.nav_shop to R.drawable.navm_shop, R.drawable.nav_account to R.drawable.navm_account,
+            R.drawable.nav_settings to R.drawable.navm_settings, R.drawable.nav_help to R.drawable.navm_help,
+            R.drawable.nav_privacy to R.drawable.navm_privacy, R.drawable.nav_imprint to R.drawable.navm_imprint)
         private val NAV_TABS = listOf(R.id.nav_tickets to Tab.TICKETS, R.id.nav_fahrplan to Tab.FAHRPLAN,
             R.id.nav_account to Tab.ACCOUNT, R.id.nav_settings to Tab.SETTINGS, R.id.nav_shop to Tab.SHOP)
     }

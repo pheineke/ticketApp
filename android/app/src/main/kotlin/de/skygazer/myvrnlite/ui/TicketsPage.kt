@@ -1,8 +1,10 @@
 package de.skygazer.myvrnlite.ui
 
+import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
+import android.graphics.drawable.RippleDrawable
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.StyleSpan
@@ -28,6 +30,11 @@ class TicketsPage(activity: MainActivity) : Page(activity, R.layout.page_tickets
         val a = activity
         val tickets = repo.tickets()
         val hasCopy = repo.orders != null
+        if (a.modern) {
+            val valid = tickets.groups.firstOrNull { it.group == Group.CURRENT }?.tickets?.size ?: 0
+            list.add(a.pageHead(a.getString(R.string.title_tickets),
+                if (hasCopy) a.resources.getQuantityString(R.plurals.tickets_valid_count, valid, valid) else null))
+        }
         if (!repo.loggedIn && !hasCopy) {
             empty(a.getString(R.string.tickets_logged_out), a.getString(R.string.login)) { a.select(MainActivity.Tab.ACCOUNT) }
             return
@@ -53,14 +60,14 @@ class TicketsPage(activity: MainActivity) : Page(activity, R.layout.page_tickets
             val open = !debugOnly || g.group in expanded
             val header = list.add(heading(if (!debugOnly) label(g.group)
             else a.getString(R.string.group_debug, label(g.group), g.tickets.size, if (open) "▾" else "▸")))
-            if (list.childCount == 1) header.setPadding(header.paddingLeft, a.dp(2), header.paddingRight, header.paddingBottom)
+            if (list.childCount == 1 || (a.modern && list.childCount == 2)) header.setPadding(header.paddingLeft, a.dp(2), header.paddingRight, header.paddingBottom)
             if (debugOnly) {
                 header.setOnClickListener {
                     if (!expanded.remove(g.group)) expanded += g.group
                     render()
                 }
             }
-            if (open) addCards(g.tickets.map { card(it, ++n) })
+            if (open) addCards(g.tickets.map { if (a.modern) modernCard(it) else card(it, ++n) })
         }
         if (repo.loggedIn && hasCopy) list.add(accountHint(), top = 4)
 
@@ -112,8 +119,8 @@ class TicketsPage(activity: MainActivity) : Page(activity, R.layout.page_tickets
         Group.UNKNOWN -> R.string.group_unknown
     })
 
-    /** Group heading, large as "Tickets" in the official app. */
-    private fun heading(text: String) = activity.styled(R.style.Text_Heading, text).apply {
+    /** Group heading, large as "Tickets" in the official app (Modern: the small section label). */
+    private fun heading(text: String) = if (activity.modern) activity.section(text) else activity.styled(R.style.Text_Heading, text).apply {
         textSize = 24f
         setTypeface(typeface, Typeface.BOLD)
         setPadding(activity.dp(2), activity.dp(14), activity.dp(2), activity.dp(12))
@@ -133,6 +140,44 @@ class TicketsPage(activity: MainActivity) : Page(activity, R.layout.page_tickets
             setPadding(a.dp(2), a.dp(10), a.dp(2), a.dp(10))
             setOnClickListener { a.select(MainActivity.Tab.ACCOUNT) }
         }
+    }
+
+    /** Modern: the ticket as a card; valid ones in the accent colour (lime). */
+    private fun modernCard(t: Ticket): View {
+        val a = activity
+        val v = a.layoutInflater.inflate(R.layout.item_ticket_modern, list, false)
+        val valid = t.group == Group.CURRENT
+        val ink = a.attrColor(if (valid) R.attr.cAccentInk else R.attr.cTextHeading)
+        val shape = GradientDrawable().apply {
+            cornerRadius = a.dp(20).toFloat()
+            if (valid) setColor(a.attrColor(R.attr.cAccent))
+            else {
+                setColor(a.attrColor(R.attr.cSurface))
+                setStroke(a.dp(1), a.attrColor(R.attr.cDivider))
+            }
+        }
+        v.background = RippleDrawable(ColorStateList.valueOf(a.attrColor(R.attr.cHover)), shape, null)
+        val month = t.month?.let { (m, y) -> "${a.getString(R.string.months).split(',')[m]} $y" }
+        val where = if (t.dticket) a.getString(R.string.dticket_where) else t.area
+        val texts = mapOf(
+            R.id.m_label to (if (t.dticket) a.getString(R.string.dticket_label) else t.name),
+            R.id.m_state to a.getString(when (t.group) {
+                Group.CURRENT -> R.string.state_current
+                Group.FUTURE -> R.string.state_future
+                Group.QUOTA -> R.string.chip_quota
+                Group.EXPIRED -> R.string.chip_expired
+                Group.UNKNOWN -> R.string.chip_unknown
+            }),
+            R.id.m_title to (month ?: t.name),
+            R.id.m_period to (if (t.group == Group.QUOTA) a.getString(R.string.meta_quota, t.usedQuota ?: "0", t.allowedQuota)
+            else listOfNotNull(t.period ?: Dates.formatRaw(t.validTo), where).joinToString(" · ")),
+        )
+        for ((id, text) in texts) v.findViewById<TextView>(id).apply { this.text = text; setTextColor(ink) }
+        v.findViewById<TextView>(R.id.m_show).setTextColor(ink)
+        v.findViewById<ImageView>(R.id.m_chevron).tint(ink)
+        if (t.group == Group.EXPIRED) v.alpha = 0.6f
+        t.id?.let { id -> v.setOnClickListener { a.startActivity(TicketActivity.intent(a, id)) } }
+        return v
     }
 
     /**

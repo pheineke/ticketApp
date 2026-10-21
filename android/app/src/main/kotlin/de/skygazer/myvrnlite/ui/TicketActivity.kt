@@ -3,8 +3,9 @@ package de.skygazer.myvrnlite.ui
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
-import android.graphics.drawable.BitmapDrawable
 import android.graphics.Typeface
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -54,7 +55,7 @@ class TicketActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContent(R.layout.activity_ticket)
+        setContent(if (modern) R.layout.activity_ticket_modern else R.layout.activity_ticket)
         ticketId = intent.getLongExtra(EXTRA_ID, -1)
         shownAt = savedInstanceState?.getLong(STATE_SHOWN_AT) ?: SystemClock.elapsedRealtime()
         codebox = findViewById(R.id.codebox)
@@ -63,10 +64,7 @@ class TicketActivity : BaseActivity() {
         counter = findViewById(R.id.counter)
         styleBars()
 
-        titleView.setText(R.string.title_ticket)
-        navButton.setImageResource(R.drawable.ic_arrow_back)
-        navButton.contentDescription = getString(R.string.back)
-        navButton.setOnClickListener { finish() }
+        backBar(R.string.title_ticket)
         action.setOnClickListener { repo.loadQr(ticketId, force = true) }
         counter.setOnClickListener {
             val booked = repo.findTicket(ticketId)?.booked?.let { getString(R.string.counter_info_booked, Dates.formatRaw(it)) }
@@ -82,7 +80,14 @@ class TicketActivity : BaseActivity() {
         // As large as possible (scanners read big codes best), but with name and timer on screen;
         // the ticket data below may scroll.
         val dm = resources.displayMetrics
-        val box = maxOf(dp(220), minOf(dm.widthPixels - dp(48), dp(400), dm.heightPixels - dp(220)))
+        val box = if (modern) {
+            // Inside the ticket card (page and card padding), below its header row.
+            counter.background = GradientDrawable().apply {
+                cornerRadius = dp(99).toFloat()
+                setStroke(dp(1), attrColor(R.attr.cDivider))
+            }
+            maxOf(dp(220), minOf(dm.widthPixels - dp(74), dp(340), dm.heightPixels - dp(260)))
+        } else maxOf(dp(220), minOf(dm.widthPixels - dp(48), dp(400), dm.heightPixels - dp(220)))
         codebox.layoutParams.width = box
         codeSize = box - dp(24)
 
@@ -120,7 +125,8 @@ class TicketActivity : BaseActivity() {
             alerts.add(alert(AlertKind.BAD, getString(R.string.ticket_not_found)))
             return
         }
-        findViewById<TextView>(R.id.ticket_name).text = t.name
+        findViewById<TextView>(R.id.ticket_name).text = if (modern && t.dticket) getString(R.string.dticket_label) else t.name
+        if (modern) renderModernHead(t)
         when (t.group) {
             Group.EXPIRED -> alerts.add(alert(AlertKind.BAD, getString(R.string.ticket_sub_expired, Dates.formatRaw(t.validTo))), top = 8)
             Group.FUTURE -> alerts.add(alert(AlertKind.INFO, getString(R.string.ticket_sub_future, Dates.formatRaw(t.validFrom))), top = 8)
@@ -144,13 +150,19 @@ class TicketActivity : BaseActivity() {
 
         findViewById<LinearLayout>(R.id.ticket_terms).apply {
             removeAllViews()
-            if (t.dticket) {
+            if (t.dticket && modern) {
+                add(styled(R.style.Text, getString(R.string.ticket_terms_modern)).apply {
+                    textSize = 13f
+                    setTextColor(attrColor(R.attr.cTextMuted))
+                    setLineSpacing(0f, 1.2f)
+                }, top = 16)
+            } else if (t.dticket) {
                 rule(top = 20)
                 add(ink(getString(R.string.ticket_terms_personal)), top = 14)
                 add(ink(getString(R.string.ticket_terms_tariff)), top = 10)
             }
         }
-        findViewById<LinearLayout>(R.id.ticket_kv).apply {
+        if (modern) renderTiles(t) else findViewById<LinearLayout>(R.id.ticket_kv).apply {
             removeAllViews()
             rule(top = 20)
             listOfNotNull(
@@ -165,6 +177,73 @@ class TicketActivity : BaseActivity() {
         }
         renderInvoice(t)
         renderDebug(t, code)
+    }
+
+    // ---- Modern: state pill, number, name and the data as tiles ---------------------------
+
+    private fun renderModernHead(t: Ticket) {
+        findViewById<TextView>(R.id.ticket_pill).apply {
+            val valid = t.group == Group.CURRENT
+            setText(when (t.group) {
+                Group.CURRENT -> R.string.state_current
+                Group.FUTURE -> R.string.state_future
+                Group.QUOTA -> R.string.chip_quota
+                Group.EXPIRED -> R.string.chip_expired
+                Group.UNKNOWN -> R.string.chip_unknown
+            })
+            setTextColor(attrColor(if (valid) R.attr.cAccentInk else R.attr.cTextHeading))
+            background = GradientDrawable().apply {
+                cornerRadius = dp(99).toFloat()
+                setColor(attrColor(if (valid) R.attr.cAccent else R.attr.cTrack))
+            }
+        }
+        findViewById<TextView>(R.id.ticket_number).apply {
+            text = t.number
+            visibility = if (t.number != null) View.VISIBLE else View.GONE
+        }
+        findViewById<View>(R.id.ticket_hint).visibility = if (t.dticket) View.VISIBLE else View.GONE
+        val month = t.month?.let { (m, y) -> "${getString(R.string.months).split(',')[m]} $y" }
+        findViewById<TextView>(R.id.ticket_title).text = month ?: t.name
+        findViewById<TextView>(R.id.ticket_sub).text =
+            listOfNotNull(if (month != null) t.name else null, t.period ?: Dates.formatRaw(t.validTo)).joinToString(" · ")
+    }
+
+    /** Label/value tiles, two per row. */
+    private fun renderTiles(t: Ticket) {
+        val tiles = listOfNotNull(
+            t.holder?.let { R.string.kv_holder to it },
+            t.dob?.let { R.string.kv_dob to Dates.formatRaw(it, false) },
+            R.string.kv_valid_from to Dates.formatRaw(t.validFrom),
+            R.string.kv_valid_to to Dates.formatRaw(t.validTo),
+            if (t.dticket) R.string.kv_valid_in to getString(R.string.valid_in_germany) else t.area?.let { R.string.kv_area to it },
+            t.booked?.let { R.string.kv_booked to Dates.formatRaw(it) },
+            t.priceLevel?.let { R.string.kv_price_level to it },
+        )
+        findViewById<LinearLayout>(R.id.ticket_kv).apply {
+            removeAllViews()
+            tiles.chunked(2).forEach { pair ->
+                add(LinearLayout(context).apply {
+                    pair.forEachIndexed { i, (label, value) ->
+                        addView(tile(getString(label), value), LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1f).apply {
+                            if (i > 0) marginStart = dp(12)
+                        })
+                    }
+                    if (pair.size == 1) addView(View(context), LinearLayout.LayoutParams(0, 0, 1f).apply { marginStart = dp(12) })
+                }, top = 12)
+            }
+        }
+    }
+
+    private fun tile(label: String, value: String) = LinearLayout(this).apply {
+        orientation = LinearLayout.VERTICAL
+        setBackgroundResource(R.drawable.m_tile)
+        setPadding(dp(14), dp(14), dp(14), dp(14))
+        addView(styled(R.style.Text, label).apply { textSize = 13f; setTextColor(attrColor(R.attr.cTextMuted)) })
+        add(styled(R.style.Text, value).apply {
+            textSize = 16f
+            typeface = Typeface.DEFAULT_BOLD
+            setTextColor(attrColor(R.attr.cTextHeading))
+        }, top = 4)
     }
 
     // ---- Invoice: for showing what was bought when the ticket itself won't load ----------

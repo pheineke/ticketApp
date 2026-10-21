@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Modern: white tab bar with a hairline at the top. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item><shape><solid android:color="?attr/cDivider" /></shape></item>
+    <item android:top="1dp"><shape><solid android:color="?attr/cSurface" /></shape></item>
+</layer-list>

@@ -42,6 +42,7 @@ class ShopPage(activity: MainActivity) : Page(activity, R.layout.page_shop) {
     override fun render() {
         body.removeAllViews()
         val a = activity
+        if (a.modern) body.add(a.pageHead(a.getString(R.string.title_shop)))
         if (!repo.loggedIn) return empty()
         val st = repo.shopState()
 

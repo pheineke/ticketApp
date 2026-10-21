@@ -33,7 +33,11 @@ abstract class BaseActivity : Activity() {
 
     /** The theme of the chosen palette (Settings > Farben). */
     protected val paletteTheme: Int
-        get() = if (repo.prefs.palette == "vrn") R.style.Theme_MyVrn_Vrn else R.style.Theme_MyVrn_Lite
+        get() = when (repo.prefs.palette) {
+            "vrn" -> R.style.Theme_MyVrn_Vrn
+            "modern" -> R.style.Theme_MyVrn_Modern
+            else -> R.style.Theme_MyVrn_Lite
+        }
 
     override fun attachBaseContext(newBase: Context) {
         super.attachBaseContext(newBase)
@@ -63,6 +67,30 @@ abstract class BaseActivity : Activity() {
         action.tint(ink)
         styleSystemBars()
         fitSystemBars(findViewById(R.id.root))
+        if (modern) {
+            // DM Sans/Mono for whatever the screen shows, also views added later.
+            val decor = window.decorView
+            decor.viewTreeObserver.addOnGlobalLayoutListener { Fonts.apply(decor) }
+        }
+    }
+
+    /**
+     * The bar of a detail screen: back arrow and [title]; Modern shows "‹ Zurück" there instead
+     * (the content starts right below, as in the web client).
+     */
+    protected fun backBar(title: Int) {
+        navButton.contentDescription = getString(R.string.back)
+        navButton.setOnClickListener { finish() }
+        if (modern) {
+            navButton.setImageResource(R.drawable.mi_back)
+            titleView.setText(R.string.back)
+            titleView.textSize = 15f
+            titleView.setTextColor(attrColor(R.attr.cTextHeading))
+            titleView.setOnClickListener { finish() }
+        } else {
+            navButton.setImageResource(R.drawable.ic_arrow_back)
+            titleView.setText(title)
+        }
     }
 
     /** Status/navigation bars in the page colour where the platform allows dark icons. */

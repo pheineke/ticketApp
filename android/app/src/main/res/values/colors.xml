@@ -64,4 +64,41 @@
     <color name="vrn_brand_soft">#1f0098d8</color>
     <color name="vrn_brand_ink">#0098d8</color>
     <color name="vrn_accent_text">#002d59</color>
+
+    <!-- Extra tokens (the Modern design uses them: lime for what is valid, the segment track,
+         the inverted card); lite/vrn get matching values. -->
+    <color name="lite_accent">#f1d9dc</color>
+    <color name="lite_accent_ink">#59000a</color>
+    <color name="lite_track">#faf0f1</color>
+    <color name="lite_inverse">#59000a</color>
+    <color name="lite_inverse_ink">#ffffff</color>
+    <color name="vrn_accent">#d9e2f1</color>
+    <color name="vrn_accent_ink">#002d59</color>
+    <color name="vrn_track">#eef2f9</color>
+    <color name="vrn_inverse">#002d59</color>
+    <color name="vrn_inverse_ink">#ffffff</color>
+
+    <!-- "Modern": its own design — warm paper, ink, one blue, lime for what is valid. -->
+    <color name="modern_bg">#f5f4ef</color>
+    <color name="modern_surface">#ffffff</color>
+    <color name="modern_text">#111418</color>
+    <color name="modern_text_heading">#111418</color>
+    <color name="modern_text_muted">#575d65</color>
+    <color name="modern_divider">#dad8cf</color>
+    <color name="modern_hover">#e8e6de</color>
+    <color name="modern_code_bg">#e8e6de</color>
+    <color name="modern_tcard_top">#ffffff</color>
+    <color name="modern_tcard_body">#ffffff</color>
+    <color name="modern_tcard_ink">#111418</color>
+    <color name="modern_ticket_line">#dad8cf</color>
+    <color name="modern_accent">#d7f25c</color>
+    <color name="modern_accent_ink">#111418</color>
+    <color name="modern_track">#e8e6de</color>
+    <color name="modern_inverse">#111418</color>
+    <color name="modern_inverse_ink">#ffffff</color>
+    <color name="modern_brand">#1f4bdb</color>
+    <color name="modern_brand_dark">#111418</color>
+    <color name="modern_brand_soft">#1a1f4bdb</color>
+    <color name="modern_brand_ink">#1f4bdb</color>
+    <color name="modern_accent_text">#111418</color>
 </resources>

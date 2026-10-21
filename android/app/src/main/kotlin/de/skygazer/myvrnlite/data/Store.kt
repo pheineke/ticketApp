@@ -23,7 +23,7 @@ class Prefs(context: Context) {
         get() = sp.getString("theme", "system")!!
         set(v) = sp.edit().putString("theme", v).apply()
 
-    /** "lite" (red myVRN Lite palette) or "vrn" (original VRN blue/navy). */
+    /** "lite" (red myVRN Lite palette), "vrn" (original VRN blue/navy) or "modern" (its own design). */
     var palette: String
         get() = sp.getString("palette", "lite")!!
         set(v) = sp.edit().putString("palette", v).apply()

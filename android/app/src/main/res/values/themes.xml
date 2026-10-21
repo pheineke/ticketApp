@@ -21,6 +21,22 @@
     </style>
 
     <style name="Theme.MyVrn.Lite" parent="Base.MyVrn">
+        <item name="cAccent">@color/lite_accent</item>
+        <item name="cAccentInk">@color/lite_accent_ink</item>
+        <item name="cTrack">@color/lite_track</item>
+        <item name="cInverse">@color/lite_inverse</item>
+        <item name="cInverseInk">@color/lite_inverse_ink</item>
+        <item name="dPanel">@drawable/bg_panel</item>
+        <item name="dCard">@drawable/bg_card</item>
+        <item name="dBtnPrimary">@drawable/btn_primary</item>
+        <item name="dBtnOutline">@drawable/btn_outline</item>
+        <item name="dInput">@drawable/bg_input</item>
+        <item name="dAppBar">@drawable/bg_bar_bottom</item>
+        <item name="dTabBar">@drawable/bg_bar_top</item>
+        <item name="btnOutlineInk">?attr/brandInk</item>
+        <item name="btnMinHeight">44dp</item>
+        <item name="btnTextSize">15sp</item>
+        <item name="modernDesign">false</item>
         <item name="cBg">@color/lite_bg</item>
         <item name="cSurface">@color/lite_surface</item>
         <item name="cText">@color/lite_text</item>
@@ -41,6 +57,22 @@
     </style>
 
     <style name="Theme.MyVrn.Vrn" parent="Base.MyVrn">
+        <item name="cAccent">@color/vrn_accent</item>
+        <item name="cAccentInk">@color/vrn_accent_ink</item>
+        <item name="cTrack">@color/vrn_track</item>
+        <item name="cInverse">@color/vrn_inverse</item>
+        <item name="cInverseInk">@color/vrn_inverse_ink</item>
+        <item name="dPanel">@drawable/bg_panel</item>
+        <item name="dCard">@drawable/bg_card</item>
+        <item name="dBtnPrimary">@drawable/btn_primary</item>
+        <item name="dBtnOutline">@drawable/btn_outline</item>
+        <item name="dInput">@drawable/bg_input</item>
+        <item name="dAppBar">@drawable/bg_bar_bottom</item>
+        <item name="dTabBar">@drawable/bg_bar_top</item>
+        <item name="btnOutlineInk">?attr/brandInk</item>
+        <item name="btnMinHeight">44dp</item>
+        <item name="btnTextSize">15sp</item>
+        <item name="modernDesign">false</item>
         <item name="cBg">@color/vrn_bg</item>
         <item name="cSurface">@color/vrn_surface</item>
         <item name="cText">@color/vrn_text</item>
@@ -58,6 +90,43 @@
         <item name="brandSoft">@color/vrn_brand_soft</item>
         <item name="brandInk">@color/vrn_brand_ink</item>
         <item name="accentText">@color/vrn_accent_text</item>
+    </style>
+
+    <!-- Modern: its own design (Settings > Farben), with its own shapes and fonts. -->
+    <style name="Theme.MyVrn.Modern" parent="Base.MyVrn">
+        <item name="cBg">@color/modern_bg</item>
+        <item name="cSurface">@color/modern_surface</item>
+        <item name="cText">@color/modern_text</item>
+        <item name="cTextHeading">@color/modern_text_heading</item>
+        <item name="cTextMuted">@color/modern_text_muted</item>
+        <item name="cDivider">@color/modern_divider</item>
+        <item name="cHover">@color/modern_hover</item>
+        <item name="cCodeBg">@color/modern_code_bg</item>
+        <item name="cTcardTop">@color/modern_tcard_top</item>
+        <item name="cTcardBody">@color/modern_tcard_body</item>
+        <item name="cTcardInk">@color/modern_tcard_ink</item>
+        <item name="cTicketLine">@color/modern_ticket_line</item>
+        <item name="cAccent">@color/modern_accent</item>
+        <item name="cAccentInk">@color/modern_accent_ink</item>
+        <item name="cTrack">@color/modern_track</item>
+        <item name="cInverse">@color/modern_inverse</item>
+        <item name="cInverseInk">@color/modern_inverse_ink</item>
+        <item name="brand">@color/modern_brand</item>
+        <item name="brandDark">@color/modern_brand_dark</item>
+        <item name="brandSoft">@color/modern_brand_soft</item>
+        <item name="brandInk">@color/modern_brand_ink</item>
+        <item name="accentText">@color/modern_accent_text</item>
+        <item name="dPanel">@drawable/m_panel</item>
+        <item name="dCard">@drawable/m_card</item>
+        <item name="dBtnPrimary">@drawable/m_btn_primary</item>
+        <item name="dBtnOutline">@drawable/m_btn_outline</item>
+        <item name="dInput">@drawable/m_input</item>
+        <item name="dAppBar">@drawable/m_app_bar</item>
+        <item name="dTabBar">@drawable/m_tab_bar</item>
+        <item name="btnOutlineInk">?attr/cTextHeading</item>
+        <item name="btnMinHeight">52dp</item>
+        <item name="btnTextSize">16sp</item>
+        <item name="modernDesign">true</item>
     </style>
 
     <!-- Applied on top of the activity theme, so the palette attributes resolve here too. -->

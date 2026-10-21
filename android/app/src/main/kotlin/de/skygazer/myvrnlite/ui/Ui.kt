@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.PorterDuff
 import android.graphics.Typeface
+import android.graphics.drawable.GradientDrawable
 import android.net.Uri
 import android.os.Build
 import android.util.TypedValue
@@ -33,6 +34,20 @@ fun Context.attrColor(attr: Int): Int {
     theme.resolveAttribute(attr, tv, true)
     return if (tv.resourceId != 0) color(tv.resourceId) else tv.data
 }
+
+/** A drawable resource from the theme (R.attr.dPanel …): the shapes differ per design. */
+fun Context.attrRes(attr: Int): Int {
+    val tv = TypedValue()
+    theme.resolveAttribute(attr, tv, true)
+    return tv.resourceId
+}
+
+/** The Modern design is active (Settings > Farben). */
+val Context.modern: Boolean
+    get() {
+        val tv = TypedValue()
+        return theme.resolveAttribute(R.attr.modernDesign, tv, true) && tv.data != 0
+    }
 
 fun ImageView.tint(color: Int) = setColorFilter(color, PorterDuff.Mode.SRC_IN)
 
@@ -68,6 +83,21 @@ fun Context.styled(style: Int, text: CharSequence? = null): TextView =
 
 fun Context.section(text: CharSequence) = styled(R.style.Text_Section, text)
 
+/** Modern: the page's large title (and a line under it) above the content, instead of in the bar. */
+fun Context.pageHead(title: CharSequence, sub: CharSequence? = null): View = LinearLayout(this).apply {
+    orientation = LinearLayout.VERTICAL
+    setPadding(dp(2), dp(2), dp(2), dp(12))
+    addView(styled(R.style.Text_Heading, title).apply {
+        textSize = 32f
+        typeface = Typeface.DEFAULT_BOLD
+        letterSpacing = -0.02f
+    })
+    if (sub != null) add(styled(R.style.Text, sub).apply {
+        textSize = 15f
+        setTextColor(attrColor(R.attr.cTextMuted))
+    }, top = 4)
+}
+
 fun Context.hint(text: CharSequence) = styled(R.style.Text_Hint, text).apply { setPadding(dp(2), dp(6), dp(2), dp(6)) }
 
 enum class AlertKind { BAD, OK, INFO }
@@ -78,7 +108,14 @@ fun Context.alert(kind: AlertKind, text: CharSequence) = styled(R.style.Text, te
     setPadding(dp(if (kind == AlertKind.INFO) 15 else 12), pad, dp(12), pad)
     when (kind) {
         AlertKind.BAD -> { setBackgroundResource(R.drawable.bg_alert_bad); setTextColor(color(R.color.error)) }
-        AlertKind.OK -> { setBackgroundResource(R.drawable.bg_alert_ok); setTextColor(color(R.color.success)) }
+        AlertKind.OK -> if (modern) {
+            // Modern: what went well in the accent colour (lime).
+            background = GradientDrawable().apply { cornerRadius = dp(14).toFloat(); setColor(attrColor(R.attr.cAccent)) }
+            setTextColor(attrColor(R.attr.cAccentInk))
+        } else {
+            setBackgroundResource(R.drawable.bg_alert_ok)
+            setTextColor(color(R.color.success))
+        }
         AlertKind.INFO -> { setBackgroundResource(R.drawable.bg_alert_info); setTextColor(attrColor(R.attr.cTextHeading)) }
     }
 }
@@ -131,9 +168,9 @@ fun Context.debugPanel(title: String, open: Boolean = false, fill: LinearLayout.
     }
 }
 
-/** Segmented control: one selected option, filled with the brand colour. */
+/** Segmented control: one selected option, filled with the brand colour (Modern: a raised pill on a track). */
 fun Context.segmented(options: List<Pair<String, String>>, selected: String, onSelect: (String) -> Unit): LinearLayout =
-    LinearLayout(this).apply {
+    if (modern) segmentedModern(options, selected, onSelect) else LinearLayout(this).apply {
         setBackgroundResource(R.drawable.bg_seg)
         setPadding(dp(1), dp(1), dp(1), dp(1))  // keep the selected fill inside the border
         val brand = attrColor(R.attr.brand)
@@ -149,5 +186,32 @@ fun Context.segmented(options: List<Pair<String, String>>, selected: String, onS
                 if (on) setBackgroundResource(R.drawable.bg_seg_on)
                 setOnClickListener { if (!on) onSelect(key) }
             }, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
+        }
+    }
+
+private fun Context.segmentedModern(options: List<Pair<String, String>>, selected: String, onSelect: (String) -> Unit): LinearLayout =
+    LinearLayout(this).apply {
+        background = GradientDrawable().apply {
+            cornerRadius = dp(14).toFloat()
+            setColor(attrColor(R.attr.cTrack))
+        }
+        setPadding(dp(4), dp(4), dp(4), dp(4))
+        options.forEachIndexed { i, (key, label) ->
+            val on = key == selected
+            addView(styled(R.style.Text, label).apply {
+                gravity = Gravity.CENTER
+                textSize = 15f
+                typeface = if (on) Typeface.DEFAULT_BOLD else Typeface.DEFAULT
+                setPadding(dp(4), dp(11), dp(4), dp(11))
+                setTextColor(attrColor(if (on) R.attr.cTextHeading else R.attr.cTextMuted))
+                if (on) {
+                    background = GradientDrawable().apply {
+                        cornerRadius = dp(11).toFloat()
+                        setColor(attrColor(R.attr.cSurface))
+                    }
+                    elevation = dp(1).toFloat()
+                }
+                setOnClickListener { if (!on) onSelect(key) }
+            }, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f).apply { if (i > 0) marginStart = dp(4) })
         }
     }

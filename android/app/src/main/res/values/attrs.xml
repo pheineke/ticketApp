@@ -21,4 +21,22 @@
     <attr name="cTcardBody" format="color" />
     <attr name="cTcardInk" format="color" />
     <attr name="cTicketLine" format="color" />
+    <attr name="cAccent" format="color" />
+    <attr name="cAccentInk" format="color" />
+    <attr name="cTrack" format="color" />
+    <attr name="cInverse" format="color" />
+    <attr name="cInverseInk" format="color" />
+    <!-- Shapes per design: panels, buttons, inputs and bars (styles.xml refers to these). -->
+    <attr name="dPanel" format="reference" />
+    <attr name="dCard" format="reference" />
+    <attr name="dBtnPrimary" format="reference" />
+    <attr name="dBtnOutline" format="reference" />
+    <attr name="dInput" format="reference" />
+    <attr name="dAppBar" format="reference" />
+    <attr name="dTabBar" format="reference" />
+    <attr name="btnOutlineInk" format="color" />
+    <attr name="btnMinHeight" format="dimension" />
+    <attr name="btnTextSize" format="dimension" />
+    <!-- Modern: large page titles, the logo, DM Sans (see Fonts.kt). -->
+    <attr name="modernDesign" format="boolean" />
 </resources>

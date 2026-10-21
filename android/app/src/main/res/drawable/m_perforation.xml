@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Modern: the dashed perforation between the code and the ticket's name. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="line">
+    <stroke
+        android:width="2dp"
+        android:color="?attr/cDivider"
+        android:dashWidth="6dp"
+        android:dashGap="5dp" />
+</shape>

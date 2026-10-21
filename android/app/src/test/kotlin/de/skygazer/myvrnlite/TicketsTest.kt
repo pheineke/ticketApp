@@ -2,6 +2,7 @@ package de.skygazer.myvrnlite
 
 import de.skygazer.myvrnlite.data.Dates
 import de.skygazer.myvrnlite.data.Group
+import de.skygazer.myvrnlite.data.Ticket
 import de.skygazer.myvrnlite.data.TicketList
 import org.json.JSONArray
 import org.json.JSONObject
@@ -117,5 +118,28 @@ class TicketListTest {
     fun fallsBackToProductName() {
         val t = TicketList.from(orders(ticket(10, "2026-10-01T00:00:00", "2026-10-31T23:59:59")), false, now).tickets.single()
         assertEquals("Deutschlandticket", t.name)
+    }
+}
+
+/** The Modern ticket card's headline and period (as webapp's ticket_period). */
+class TicketPeriodTest {
+    private fun ticket(from: String, to: String) = Ticket.from(JSONObject(),
+        JSONObject().put("Id", 1).put("TicketName", "Deutschland-Semesterticket").put("ValidFrom", from).put("ValidTo", to),
+        Dates.parse("2026-10-21T12:00:00Z")!!)
+
+    @Test
+    fun calendarMonth() {
+        // 01.10. 00:00 to 01.11. 03:00 Berlin: October, the last day is the 31st.
+        val t = ticket("2026-09-30T22:00:00Z", "2026-11-01T02:00:00Z")
+        assertEquals(9 to 2026, t.month)
+        assertEquals("01.10. – 31.10.2026", t.period)
+    }
+
+    @Test
+    fun notAMonth() {
+        val t = ticket("2026-10-15T08:00:00Z", "2026-10-16T08:00:00Z")
+        assertNull(t.month)
+        assertEquals("15.10. – 16.10.2026", t.period)
+        assertEquals("28.12.2026 – 03.01.2027", ticket("2026-12-28T08:00:00Z", "2027-01-03T20:00:00Z").period)
     }
 }

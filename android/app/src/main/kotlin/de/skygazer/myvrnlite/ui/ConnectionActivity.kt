@@ -23,10 +23,7 @@ class ConnectionActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent(R.layout.activity_connection)
-        titleView.setText(R.string.title_connection)
-        navButton.setImageResource(R.drawable.ic_arrow_back)
-        navButton.contentDescription = getString(R.string.back)
-        navButton.setOnClickListener { finish() }
+        backBar(R.string.title_connection)
         action.visibility = View.GONE
 
         // The results live in the app's Fahrplan state; after a process restart they're gone.

@@ -57,10 +57,11 @@ fun Activity.infoSheet(title: String, paragraphs: List<CharSequence>) {
         }, top = 14)
         add(Button(context, null, 0, R.style.Button).apply {
             setText(R.string.fp_close)
-            setTextColor(attrColor(R.attr.cTcardInk))
+            // Modern: the blue action button; otherwise a light pill in the ticket colours.
+            setTextColor(if (modern) Color.WHITE else attrColor(R.attr.cTcardInk))
             background = GradientDrawable().apply {
-                cornerRadius = dp(26).toFloat()
-                setColor(attrColor(R.attr.cTcardTop))
+                cornerRadius = dp(if (modern) 14 else 26).toFloat()
+                setColor(attrColor(if (modern) R.attr.brand else R.attr.cTcardTop))
             }
             setOnClickListener { dialog.dismiss() }
         }, top = 26)

@@ -1,0 +1,10 @@
+<!-- Modern design: nav_account without its circle (on a soft square instead). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="36dp"
+    android:height="36dp"
+    android:viewportWidth="36"
+    android:viewportHeight="36">
+  <path
+      android:pathData="M21.803,24.971L14.62,24.971l3.6,6.295h7.187l3.6,-6.295 -3.6,-6.295ZM25.403,18.676 L29.003,12.381L25.401,6.086h-7.2l-3.6,6.295h7.2ZM14.603,12.381L7.42,12.381L3.82,18.676l3.6,6.295h7.187L11.02,18.676Z"
+      android:fillColor="#59000a"/>
+</vector>

@@ -1,7 +1,13 @@
 package de.skygazer.myvrnlite.ui
 
+import android.graphics.Outline
+import android.graphics.Typeface
+import android.graphics.drawable.GradientDrawable
 import android.text.InputType
+import android.view.Gravity
 import android.view.View
+import android.view.ViewGroup
+import android.view.ViewOutlineProvider
 import android.view.inputmethod.EditorInfo
 import android.webkit.CookieManager
 import android.widget.Button
@@ -31,6 +37,7 @@ class AccountPage(activity: MainActivity) : Page(activity, R.layout.page_account
     private val codeButton: Button = view.findViewById(R.id.code_button)
     private val profileView: View = view.findViewById(R.id.profile_view)
     private val debug: LinearLayout = view.findViewById(R.id.account_debug)
+    private val modernView: LinearLayout = view.findViewById(R.id.profile_modern)
 
     /** Error of the last login step, shown until the next attempt. */
     private var error: String? = null
@@ -38,6 +45,10 @@ class AccountPage(activity: MainActivity) : Page(activity, R.layout.page_account
 
     init {
         val a = activity
+        if (a.modern) view.findViewById<FrameLayout>(R.id.page_head).apply {
+            addView(a.pageHead(a.getString(R.string.title_account)))
+            visibility = View.VISIBLE
+        }
         remember.isChecked = repo.prefs.remember
         view.findViewById<ImageButton>(R.id.password_toggle).apply {
             tint(a.attrColor(R.attr.cTextMuted))
@@ -76,6 +87,14 @@ class AccountPage(activity: MainActivity) : Page(activity, R.layout.page_account
             setOnClickListener { a.openUrl(URL_CHANGE_LOGIN) }
         }
         view.findViewById<ImageView>(R.id.avatar).tint(a.attrColor(R.attr.brandInk))
+        if (a.modern) view.findViewById<ImageView>(R.id.login_logo).apply {
+            // The Modern logo is an app icon: round its corners.
+            outlineProvider = object : ViewOutlineProvider() {
+                override fun getOutline(view: View, outline: Outline) =
+                    outline.setRoundRect(0, 0, view.width, view.height, view.height * 0.22f)
+            }
+            clipToOutline = true
+        }
     }
 
     private fun login() {
@@ -121,24 +140,158 @@ class AccountPage(activity: MainActivity) : Page(activity, R.layout.page_account
 
         loginForm.visibility = if (!repo.loggedIn && !pending) View.VISIBLE else View.GONE
         codeForm.visibility = if (!repo.loggedIn && pending) View.VISIBLE else View.GONE
-        profileView.visibility = if (repo.loggedIn) View.VISIBLE else View.GONE
+        profileView.visibility = if (repo.loggedIn && !a.modern) View.VISIBLE else View.GONE
+        modernView.visibility = if (repo.loggedIn && a.modern) View.VISIBLE else View.GONE
         for ((button, label) in listOf(loginButton to R.string.login, codeButton to R.string.confirm)) {
             button.isEnabled = !busy
             button.alpha = if (busy) 0.6f else 1f
             button.setText(if (busy) R.string.logging_in else label)
         }
         view.findViewById<ImageView>(R.id.login_logo).setImageResource(when {
+            a.modern -> R.drawable.m_logo
             a.isNight -> R.drawable.vrn_logo_white
             repo.prefs.palette == "vrn" -> R.drawable.vrn_logo_vrn
             else -> R.drawable.vrn_logo_lite
         })
         if (pending) view.findViewById<TextView>(R.id.code_sent).text = a.getString(R.string.code_sent, repo.pendingEmail)
-        if (repo.loggedIn) renderProfile()
+        if (repo.loggedIn) if (a.modern) renderModern() else renderProfile()
 
         debug.removeAllViews()
         if (repo.prefs.debug && repo.loggedIn) {
             debug.add(tokenPanel(), top = 12)
             debug.add(profilePanel(), top = 12)
+        }
+    }
+
+    /** Modern: profile card with initials, the student status as a dark card, grouped rows, logout. */
+    private fun renderModern() {
+        val a = activity
+        val p = repo.profile
+        val mail = p?.email ?: repo.tokens?.claims?.optString("email")?.ifEmpty { null }
+        val fullName = listOfNotNull(p?.title, p?.first, p?.last).joinToString(" ").trim()
+        val initials = ((p?.first?.take(1) ?: "") + (p?.last?.take(1) ?: "")).uppercase().ifEmpty { mail?.take(1)?.uppercase() ?: "?" }
+        modernView.removeAllViews()
+        modernView.add(LinearLayout(a).apply {
+            gravity = Gravity.CENTER_VERTICAL
+            setBackgroundResource(a.attrRes(R.attr.dPanel))
+            setPadding(a.dp(16), a.dp(16), a.dp(16), a.dp(16))
+            addView(a.styled(R.style.Text, initials).apply {
+                gravity = Gravity.CENTER
+                textSize = 20f
+                typeface = Typeface.DEFAULT_BOLD
+                setTextColor(a.attrColor(R.attr.cAccentInk))
+                background = GradientDrawable().apply { shape = GradientDrawable.OVAL; setColor(a.attrColor(R.attr.cAccent)) }
+            }, LinearLayout.LayoutParams(a.dp(56), a.dp(56)))
+            addView(LinearLayout(a).apply {
+                orientation = LinearLayout.VERTICAL
+                setPadding(a.dp(16), 0, 0, 0)
+                addView(a.styled(R.style.Text_Heading, fullName.ifEmpty { mail ?: a.getString(R.string.my_account) }).apply {
+                    textSize = 18f
+                    typeface = Typeface.DEFAULT_BOLD
+                })
+                if (mail != null && fullName.isNotEmpty()) addView(a.styled(R.style.Text, mail).apply {
+                    textSize = 14f
+                    setTextColor(a.attrColor(R.attr.cTextMuted))
+                })
+            }, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
+        })
+        // The student status, inverted: the way to the Hochschul-Login.
+        modernView.add(LinearLayout(a).apply {
+            gravity = Gravity.CENTER_VERTICAL
+            background = GradientDrawable().apply { cornerRadius = a.dp(18).toFloat(); setColor(a.attrColor(R.attr.cInverse)) }
+            setPadding(a.dp(16), a.dp(16), a.dp(16), a.dp(16))
+            val ink = a.attrColor(R.attr.cInverseInk)
+            addView(LinearLayout(a).apply {
+                orientation = LinearLayout.VERTICAL
+                addView(a.styled(R.style.Text, a.getString(R.string.account_student)).apply { textSize = 13f; setTextColor(ink); alpha = 0.75f })
+                addView(a.styled(R.style.Text, a.getString(R.string.shop_semester)).apply {
+                    textSize = 17f
+                    typeface = Typeface.DEFAULT_BOLD
+                    setTextColor(ink)
+                })
+            }, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
+            addView(a.styled(R.style.Text, a.getString(R.string.account_verify_go)).apply {
+                textSize = 13f
+                typeface = Typeface.MONOSPACE
+                setTextColor(ink)
+            })
+            setOnClickListener { a.select(MainActivity.Tab.SHOP) }
+        }, top = 16)
+        val details = buildList {
+            p?.dob?.let { add(Row(R.drawable.mi_account, a.getString(R.string.kv_dob), Dates.formatRaw(it, false))) }
+            if (p?.street != null || p?.city != null) {
+                add(Row(R.drawable.mi_route, a.getString(R.string.kv_address), "${p.street.orEmpty()}, ${p.zip.orEmpty()} ${p.city.orEmpty()}".trim(' ', ',')))
+            }
+            p?.phone?.let { add(Row(R.drawable.mi_info, a.getString(R.string.kv_phone), it)) }
+        }
+        if (details.isNotEmpty()) modernView.add(group(details), top = 16)
+        val result = repo.profileResult
+        if (p == null && result != null && !repo.loadingProfile) modernView.add(a.alert(AlertKind.INFO, a.getString(R.string.profile_failed)), top = 16)
+        modernView.add(group(listOf(
+            Row(R.drawable.mi_shop, a.getString(R.string.nav_shop), a.getString(R.string.nav_shop_sub)) { a.select(MainActivity.Tab.SHOP) },
+            Row(R.drawable.mi_settings, a.getString(R.string.title_settings), a.getString(R.string.account_settings_sub)) {
+                a.select(MainActivity.Tab.SETTINGS)
+            },
+            Row(R.drawable.mi_external, a.getString(R.string.change_login_title), a.getString(R.string.change_login_sub)) { a.openUrl(URL_CHANGE_LOGIN) },
+        )), top = 16)
+        modernView.add(a.hint(a.getString(if (repo.prefs.remember) R.string.remember_active else R.string.remember_inactive)).apply {
+            gravity = Gravity.CENTER
+        }, top = 8)
+        modernView.add(TextView(a).apply {
+            setText(R.string.logout)
+            gravity = Gravity.CENTER
+            textSize = 16f
+            typeface = Typeface.DEFAULT_BOLD
+            setTextColor(a.color(R.color.error))
+            val icon = a.resources.getDrawable(R.drawable.mi_logout, a.theme).mutate()
+            icon.setBounds(0, 0, a.dp(22), a.dp(22))
+            icon.setTint(a.color(R.color.error))
+            setCompoundDrawables(icon, null, null, null)
+            compoundDrawablePadding = a.dp(8)
+            minHeight = a.dp(52)
+            setPadding(a.dp(12), 0, a.dp(12), 0)
+            setBackgroundResource(android.R.drawable.list_selector_background)
+            setOnClickListener {
+                error = null
+                repo.logout()
+                CookieManager.getInstance().removeAllCookies(null)
+            }
+        }, top = 4, width = ViewGroup.LayoutParams.WRAP_CONTENT).apply {
+            (layoutParams as LinearLayout.LayoutParams).gravity = Gravity.CENTER_HORIZONTAL
+        }
+    }
+
+    private class Row(val icon: Int, val title: String, val sub: String, val onClick: (() -> Unit)? = null)
+
+    /** Rows in one rounded box, with hairlines between them and a chevron when they lead somewhere. */
+    private fun group(rows: List<Row>): View {
+        val a = activity
+        return LinearLayout(a).apply {
+            orientation = LinearLayout.VERTICAL
+            setBackgroundResource(a.attrRes(R.attr.dPanel))
+            rows.forEachIndexed { i, r ->
+                if (i > 0) addView(View(a).apply { setBackgroundColor(a.attrColor(R.attr.cDivider)) },
+                    LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, a.dp(1)))
+                addView(LinearLayout(a).apply {
+                    gravity = Gravity.CENTER_VERTICAL
+                    minimumHeight = a.dp(64)
+                    setPadding(a.dp(16), a.dp(8), a.dp(16), a.dp(8))
+                    addView(ImageView(a).apply { setImageResource(r.icon); tint(a.attrColor(R.attr.cTextMuted)) },
+                        LinearLayout.LayoutParams(a.dp(22), a.dp(22)))
+                    addView(LinearLayout(a).apply {
+                        orientation = LinearLayout.VERTICAL
+                        setPadding(a.dp(14), 0, a.dp(8), 0)
+                        addView(a.styled(R.style.Text, r.title).apply { textSize = 16f; setTextColor(a.attrColor(R.attr.cTextHeading)) })
+                        addView(a.styled(R.style.Text, r.sub).apply { textSize = 14f; setTextColor(a.attrColor(R.attr.cTextMuted)) })
+                    }, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
+                    r.onClick?.let { go ->
+                        addView(ImageView(a).apply { setImageResource(R.drawable.mi_chevron); tint(a.attrColor(R.attr.cTextMuted)) },
+                            LinearLayout.LayoutParams(a.dp(18), a.dp(18)))
+                        setBackgroundResource(android.R.drawable.list_selector_background)
+                        setOnClickListener { go() }
+                    }
+                })
+            }
         }
     }
 

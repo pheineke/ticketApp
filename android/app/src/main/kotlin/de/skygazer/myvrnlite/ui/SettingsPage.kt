@@ -15,6 +15,10 @@ class SettingsPage(activity: MainActivity) : Page(activity, R.layout.page_settin
 
     init {
         val a = activity
+        if (a.modern) view.findViewById<FrameLayout>(R.id.page_head).apply {
+            addView(a.pageHead(a.getString(R.string.title_settings)))
+            visibility = View.VISIBLE
+        }
         offlineSwitch.setOnCheckedChangeListener { _, on -> if (on != repo.prefs.offline) repo.setOfflineEnabled(on) }
         debugSwitch.setOnCheckedChangeListener { _, on ->
             if (on != repo.prefs.debug) {
@@ -38,7 +42,8 @@ class SettingsPage(activity: MainActivity) : Page(activity, R.layout.page_settin
         }
         view.findViewById<FrameLayout>(R.id.palette_seg).apply {
             removeAllViews()
-            addView(a.segmented(listOf("lite" to a.getString(R.string.palette_lite), "vrn" to a.getString(R.string.palette_vrn)),
+            addView(a.segmented(listOf("lite" to a.getString(R.string.palette_lite), "vrn" to a.getString(R.string.palette_vrn),
+                "modern" to a.getString(R.string.palette_modern)),
                 prefs.palette) { prefs.palette = it; a.recreate() })
         }
         offlineSwitch.isChecked = prefs.offline

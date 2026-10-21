@@ -132,7 +132,7 @@ private fun Context.summaryLine(j: Journey, extra: String? = null): View = FlowL
 
 /** One connection in the result list. */
 fun Context.journeyRow(j: Journey, onClick: () -> Unit): View = LinearLayout(this).apply {
-    setBackgroundResource(R.drawable.bg_card)
+    setBackgroundResource(attrRes(R.attr.dCard))
     setPadding(dp(14), dp(12), dp(6), dp(12))
     if (j.cancelled) alpha = 0.75f
     addView(timesColumn(j))
@@ -157,7 +157,7 @@ fun Context.journeyRow(j: Journey, onClick: () -> Unit): View = LinearLayout(thi
 
 /** The summary row on top of a connection's detail. */
 fun Context.journeySummary(j: Journey): View = LinearLayout(this).apply {
-    setBackgroundResource(R.drawable.bg_panel)
+    setBackgroundResource(attrRes(R.attr.dPanel))
     setPadding(dp(14), dp(12), dp(10), dp(12))
     addView(timesColumn(j))
     addView(LinearLayout(context).apply {
@@ -210,7 +210,7 @@ class RailView(context: Context, private val kind: Kind, private val lineColor: 
 /** A connection's legs: times | coloured line | stops, rides, footpaths, changes. */
 fun Context.timeline(j: Journey): View = LinearLayout(this).apply {
     orientation = LinearLayout.VERTICAL
-    setBackgroundResource(R.drawable.bg_panel)
+    setBackgroundResource(attrRes(R.attr.dPanel))
     setPadding(dp(6), dp(12), dp(12), dp(12))
     j.legs.forEachIndexed { i, leg ->
         val muted = attrColor(R.attr.cTextMuted)

@@ -118,6 +118,23 @@
     <string name="group_debug">%1$s (%2$d) · Debug %3$s</string>
     <string name="meta_quota">%1$s von %2$s genutzt</string>
     <string name="meta_unknown">Id %1$s</string>
+    <string name="ticket_show">Anzeigen</string>
+    <string name="ticket_photo_id">Nur mit amtlichem Lichtbildausweis gültig</string>
+    <string name="kv_valid_from">Gültig ab</string>
+    <string name="kv_valid_to">Gültig bis</string>
+    <string name="kv_valid_in">Gültig in</string>
+    <string name="valid_in_germany">Deutschland · Nahverkehr</string>
+    <string name="ticket_terms_modern">Keine Mitnahme weiterer Personen. Nicht übertragbar. Es gelten die Tarif- und Beförderungsbestimmungen des jeweiligen Tarifanbieters.</string>
+    <string name="state_current">● Gültig</string>
+    <string name="state_future">○ Zukünftig</string>
+    <plurals name="tickets_valid_count">
+        <item quantity="one">%d gültiges Ticket</item>
+        <item quantity="other">%d gültige Tickets</item>
+    </plurals>
+    <string name="months">Januar,Februar,März,April,Mai,Juni,Juli,August,September,Oktober,November,Dezember</string>
+    <string name="ticket_period">%1$s – %2$s</string>
+    <string name="dticket_label">Deutschlandticket</string>
+    <string name="dticket_where">deutschlandweit</string>
     <string name="ticket_card_no">#%1$d %2$s</string>
     <string name="tickets_check_account">Dir werden nicht alle Tickets angezeigt? Überprüfe in deinem %1$s, ob du eingeloggt bist.</string>
     <string name="tickets_check_account_link">Konto</string>
@@ -200,7 +217,8 @@
     <string name="sec_colors">Farben</string>
     <string name="palette_lite">myVRN Lite</string>
     <string name="palette_vrn">VRN Original</string>
-    <string name="palette_hint">myVRN Lite: VRN-Rot · VRN Original: Navy wie in der offiziellen App. Im dunklen Design wird die Farbe zum Hintergrund.</string>
+    <string name="palette_modern">Modern</string>
+    <string name="palette_hint">myVRN Lite: VRN-Rot · VRN Original: Navy wie in der offiziellen App. Im dunklen Design wird die Farbe zum Hintergrund. Modern: eigenes, schlichtes Design mit großen Titeln und eigenem Logo.</string>
     <string name="sec_offline">Offline</string>
     <string name="offline_title">Tickets offline speichern</string>
     <string name="offline_desc">Speichert gültige Tickets inkl. QR-Code auf diesem Gerät, damit sie ohne Netz angezeigt werden können.</string>
@@ -300,4 +318,8 @@
     <string name="account_student">Studierendenstatus</string>
     <string name="account_student_sub">Für das Deutschland-Semesterticket: per Hochschul-Login verifizieren.</string>
     <string name="account_verify">Verifizieren</string>
+    <string name="account_verify_go">Verifizieren ›</string>
+    <string name="account_settings_sub">Darstellung, Offline, Entwickler</string>
+    <string name="change_login_title">Login-Daten ändern</string>
+    <string name="change_login_sub">Im VRN-Shop</string>
 </resources>

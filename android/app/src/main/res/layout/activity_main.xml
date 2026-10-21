@@ -23,7 +23,7 @@
             android:id="@+id/tab_bar"
             android:layout_width="match_parent"
             android:layout_height="@dimen/tab_bar"
-            android:background="@drawable/bg_bar_top"
+            android:background="?attr/dTabBar"
             android:orientation="horizontal">
 
             <include android:id="@+id/tab_tickets" layout="@layout/tab" />
@@ -66,6 +66,7 @@
                 android:paddingBottom="22dp">
 
                 <ImageView
+                    android:id="@+id/drawer_logo"
                     android:layout_width="wrap_content"
                     android:layout_height="36dp"
                     android:adjustViewBounds="true"
@@ -73,6 +74,7 @@
                     android:src="@drawable/vrn_logo_white" />
 
                 <TextView
+                    android:id="@+id/drawer_appname"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
