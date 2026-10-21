@@ -200,6 +200,9 @@
     <string name="code_hint">Code</string>
     <string name="confirm">Bestätigen</string>
     <string name="cancel">Abbrechen</string>
+    <string name="ok">Okay</string>
+    <string name="restart_title">Darstellung ändern</string>
+    <string name="restart_text">Die App wird neu gestartet, um die neue Darstellung zu übernehmen.</string>
     <string name="err_fill_in">Bitte E-Mail und Passwort eingeben.</string>
     <string name="err_credentials">E-Mail oder Passwort ist falsch.</string>
     <string name="err_locked">Dein Konto ist gesperrt.</string>

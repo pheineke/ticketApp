@@ -1,5 +1,6 @@
 package de.skygazer.myvrnlite.ui
 
+import android.app.AlertDialog
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.Switch
@@ -32,22 +33,34 @@ class SettingsPage(activity: MainActivity) : Page(activity, R.layout.page_settin
         view.findViewById<TextView>(R.id.footer).text = a.getString(R.string.footer, BuildConfig.VERSION_NAME)
     }
 
+    /** Light/dark and the design apply on a restart of the screen: ask first, then [change] and restart. */
+    private fun confirmRestart(change: () -> Unit) {
+        val a = activity
+        AlertDialog.Builder(a).setTitle(R.string.restart_title).setMessage(R.string.restart_text)
+            .setPositiveButton(R.string.ok) { _, _ ->
+                change()
+                a.recreate()
+            }
+            .setNegativeButton(R.string.cancel, null).show()
+    }
+
     override fun render() {
         val a = activity
         val prefs = repo.prefs
         view.findViewById<FrameLayout>(R.id.theme_seg).apply {
             removeAllViews()
             addView(a.segmented(listOf("system" to a.getString(R.string.theme_system), "light" to a.getString(R.string.theme_light),
-                "dark" to a.getString(R.string.theme_dark)), prefs.theme) { prefs.theme = it; a.recreate() })
+                "dark" to a.getString(R.string.theme_dark)), prefs.theme) { confirmRestart { prefs.theme = it } })
         }
         view.findViewById<FrameLayout>(R.id.palette_seg).apply {
             removeAllViews()
             addView(a.segmented(listOf("lite" to a.getString(R.string.palette_lite), "vrn" to a.getString(R.string.palette_vrn),
                 "modern" to a.getString(R.string.palette_modern)),
                 prefs.palette) {
-                prefs.palette = it
-                AppIcon.apply(a, it)
-                a.recreate()
+                confirmRestart {
+                    prefs.palette = it
+                    AppIcon.apply(a, it)
+                }
             })
         }
         offlineSwitch.isChecked = prefs.offline
