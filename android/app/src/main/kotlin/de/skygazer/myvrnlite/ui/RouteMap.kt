@@ -56,16 +56,25 @@ class RouteMap(private val context: Context, private val persistView: Boolean = 
         }
     }
 
-    /** Where the map was last (VRN area the first time). */
+    /** Where the map was last (the VRN area the first time, or if the saved place makes no sense). */
     fun restoreView() {
-        val lat = prefs.getFloat("map_lat", 49.44f).toDouble()
-        val lon = prefs.getFloat("map_lon", 8.2f).toDouble()
-        view.controller.setZoom(prefs.getFloat("map_zoom", 10f).toDouble())
+        var lat = prefs.getFloat("map_lat", HOME_LAT).toDouble()
+        var lon = prefs.getFloat("map_lon", HOME_LON).toDouble()
+        var zoom = prefs.getFloat("map_zoom", HOME_ZOOM).toDouble()
+        // Older versions could save 0,0 (the sea off Africa: a light blue map), see saveView.
+        if (lat !in 34.0..72.0 || lon !in -25.0..45.0 || zoom !in 4.0..19.0) {
+            lat = HOME_LAT.toDouble()
+            lon = HOME_LON.toDouble()
+            zoom = HOME_ZOOM.toDouble()
+        }
+        view.controller.setZoom(zoom)
         view.controller.setCenter(GeoPoint(lat, lon))
     }
 
     fun saveView() {
         if (!persistView) return  // a connection's route isn't where the search map should reopen
+        // Before its first layout (the Fahrplan tab never shown) the map reports 0,0 as its centre.
+        if (view.width == 0 || view.height == 0) return
         val c = view.mapCenter
         prefs.edit().putFloat("map_lat", c.latitude.toFloat()).putFloat("map_lon", c.longitude.toFloat())
             .putFloat("map_zoom", view.zoomLevelDouble.toFloat()).apply()
@@ -202,6 +211,11 @@ class RouteMap(private val context: Context, private val persistView: Boolean = 
     }
 
     companion object {
+        // Where the map opens the first time: the VRN area (Mannheim / Ludwigshafen / Heidelberg and around).
+        private const val HOME_LAT = 49.44f
+        private const val HOME_LON = 8.2f
+        private const val HOME_ZOOM = 10f
+
         private var configured = false
 
         /** osmdroid: our user agent (OSM tile policy), tiles cached in the app's cache dir. */
