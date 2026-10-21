@@ -5,6 +5,7 @@ Three areas, like the app's bottom tab bar:
   Tickets   /tickets, /tickets/<id>   my tickets + QR code (Mentz TicketShop API)
   Konto     /account                  login (browserless, see vrn_client.py) and profile
   Einstellen /settings                theme + debug mode
+  App        /app                     download of the native Android app (APK from downloads/)
 
 Debug mode (Settings) adds the developer tools to each view: raw API responses,
 token details, the alternative login paths (remote WebView via noVNC, manual
@@ -21,6 +22,7 @@ import json
 import os
 import re
 import secrets
+import stat
 import time
 import urllib.parse
 from dataclasses import dataclass, field
@@ -1040,6 +1042,65 @@ def probe():
         payload = None
     sess.probe = api_call(sess, method, (request.form.get("url") or "").strip(), payload)
     return go(sid, "settings", _anchor="probe")
+
+
+# --------------------------------------------------------------------------
+# Android app download
+# --------------------------------------------------------------------------
+# Drop the built APK into this folder (docker-compose mounts ./downloads); the newest
+# *.apk is offered on /app, older ones are listed below it.
+APK_DIR = os.environ.get("APK_DIR", os.path.join(os.path.dirname(os.path.abspath(__file__)), "downloads"))
+APK_MIME = "application/vnd.android.package-archive"
+_apk_hashes: dict[tuple[str, int, int], str] = {}  # (name, mtime_ns, size) -> sha256
+
+
+def _sha256(path: str) -> str:
+    h = hashlib.sha256()
+    with open(path, "rb") as f:
+        for chunk in iter(lambda: f.read(1 << 20), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def list_apks() -> list[dict]:
+    """APKs in APK_DIR, newest first, with size, date and SHA-256."""
+    try:
+        names = [n for n in os.listdir(APK_DIR) if n.lower().endswith(".apk") and not n.startswith(".")]
+    except OSError:
+        return []
+    apks = []
+    for name in names:
+        path = os.path.join(APK_DIR, name)
+        try:
+            st = os.stat(path)
+            if not stat.S_ISREG(st.st_mode):
+                continue
+            key = (name, st.st_mtime_ns, st.st_size)
+            if key not in _apk_hashes:
+                _apk_hashes[key] = _sha256(path)
+        except OSError:
+            continue
+        apks.append({"name": name, "size_mb": st.st_size / 1e6, "sha256": _apk_hashes[key],
+                     "date": datetime.fromtimestamp(st.st_mtime, TZ).strftime("%d.%m.%Y, %H:%M"),
+                     "mtime": st.st_mtime})
+    return sorted(apks, key=lambda a: a["mtime"], reverse=True)
+
+
+@app.route("/app")
+def android_app():
+    sess, sid = get_session()
+    ua = request.headers.get("User-Agent", "")
+    return page(sess, sid, "app.html", active="app", title="Android-App", apks=list_apks(),
+                ios=bool(re.search(r"iPhone|iPad|iPod", ua)))
+
+
+@app.route("/app/download/<name>")
+def android_app_file(name: str):
+    if name not in {a["name"] for a in list_apks()}:
+        abort(404)
+    resp = send_from_directory(APK_DIR, name, as_attachment=True, mimetype=APK_MIME, max_age=0)
+    resp.headers["Cache-Control"] = "no-cache"
+    return resp
 
 
 @app.route("/healthz")

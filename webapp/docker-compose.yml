@@ -12,6 +12,8 @@ services:
     volumes:
       # Persistent logins ("Angemeldet bleiben"): encrypted refresh tokens, see remember.py.
       - ./data:/data
+      # Android app offered on /app: drop the APK into ./downloads (see downloads/README.md).
+      - ./downloads:/app/downloads:ro
     environment:
       VRN_BASE: "https://shop.myvrn.de"
       VRN_CLIENT_ID: "vrn"

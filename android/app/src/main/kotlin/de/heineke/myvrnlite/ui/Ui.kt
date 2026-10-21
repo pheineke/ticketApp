@@ -39,7 +39,7 @@ fun ImageView.tint(color: Int) = setColorFilter(color, PorterDuff.Mode.SRC_IN)
 fun Context.openUrl(url: String) {
     try {
         startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
-    } catch (_: ActivityNotFoundException) {
+    } catch (ignored: ActivityNotFoundException) {
         Toast.makeText(this, R.string.no_browser, Toast.LENGTH_SHORT).show()
     }
 }

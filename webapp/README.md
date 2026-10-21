@@ -45,6 +45,9 @@ The UI follows the original app (colours from `/Layout/ClientTheme`, icons from 
 - **Einstellen** — theme (System/Hell/Dunkel) and **Debug-Modus**. Debug mode adds raw API responses,
   token details + refresh, the alternative logins (remote WebView, manual callback paste), the OIDC
   config/discovery and a free-form request probe to the views.
+- **App** — download page for the native Android app (`../android`). Drop the built APK into
+  `webapp/downloads/` (mounted into the container); the newest `*.apk` is offered with size, date and
+  SHA-256, older ones are listed below. Like every page it sits behind the `ACCESS_PASSWORD` gate.
 
 ### Previous tabs (now behind debug mode)
 

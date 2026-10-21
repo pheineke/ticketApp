@@ -4,7 +4,7 @@
  * - Navigations go to the network; if that fails (no signal), /offline is shown, which
  *   renders the tickets from the browser's own offline copy (localStorage).
  */
-const VERSION = "v12";
+const VERSION = "v13";
 // Show the offline page if a page hasn't loaded within this time (slow/absent mobile data).
 const NAV_TIMEOUT_MS = 2500;
 const SHELL = `shell-${VERSION}`;
@@ -29,6 +29,7 @@ const ASSETS = [
   "/static/icons/home_navigator_privacy_page.svg",
   "/static/icons/home_navigator_settings_page.svg",
   "/static/icons/qr_code.svg",
+  "/static/icons/app_download.svg",
   "/static/icons/vrn/vrn_logo.svg",
   "/static/icons/vrn/icon-192.png",
   "/static/icons/vrn/home_navigator_bulletin_board_page.svg",
@@ -60,6 +61,8 @@ self.addEventListener("fetch", (event) => {
   if (req.method !== "GET") return;
   const url = new URL(req.url);
   if (url.origin !== self.location.origin) return;
+  // APK downloads: straight to the network (large, and must not hit the offline timeout).
+  if (url.pathname.startsWith("/app/download/")) return;
 
   // Pages: always from the network (personal data, never cached). No connection, or no
   // answer within NAV_TIMEOUT_MS -> /offline right away instead of waiting for the

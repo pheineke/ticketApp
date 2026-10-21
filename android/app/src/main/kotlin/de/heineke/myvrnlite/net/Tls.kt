@@ -59,7 +59,7 @@ object Tls {
             } catch (e: CertificateException) {
                 try {
                     bundled.checkServerTrusted(chain, authType)
-                } catch (_: CertificateException) {
+                } catch (ignored: CertificateException) {
                     throw e  // report the system's verdict, it's the more useful one
                 }
             }

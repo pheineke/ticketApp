@@ -44,7 +44,7 @@ object Dates {
             clear()
             set(y, mo - 1, d, h, mi, s)
             set(Calendar.MILLISECOND, ms)
-            try { timeInMillis } catch (_: IllegalArgumentException) { null }  // e.g. 31.02.
+            try { timeInMillis } catch (ignored: IllegalArgumentException) { null }  // e.g. 31.02.
         }
 
     fun format(ms: Long, withTime: Boolean = true): String =

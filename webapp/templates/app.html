@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="app-hero">
+  <img src="{{ icon('icon-192.png') }}" alt="" width="72" height="72">
+  <h1>myVRN Lite für Android</h1>
+  <p>Die eigenständige App: deine Tickets und der Kontroll-Code direkt auf dem Handy, auch ohne Netz.
+    Sie verbindet sich selbst mit myVRN und braucht weder Browser noch diesen Server.</p>
+</div>
+
+{% if ios %}<div class="alert info">Die App gibt es nur für Android. Auf dem iPhone kannst du diese Web-App über „Zum Home-Bildschirm“ wie eine App nutzen.</div>{% endif %}
+
+{% if apks %}
+  {% set apk = apks[0] %}
+  <div class="panel">
+    <a class="btn" href="{{ url_for('android_app_file', name=apk.name) }}" download>
+      <span class="ic download" aria-hidden="true"></span> APK herunterladen</a>
+    <table class="kv" style="margin-top:10px">
+      <tr><td>Datei</td><td>{{ apk.name }}</td></tr>
+      <tr><td>Größe</td><td>{{ '%.1f'|format(apk.size_mb) }} MB</td></tr>
+      <tr><td>Stand</td><td>{{ apk.date }}</td></tr>
+      <tr><td>Voraussetzung</td><td>Android 5.0 oder neuer</td></tr>
+    </table>
+    <div class="hint sha">SHA-256: {{ apk.sha256 }}</div>
+  </div>
+{% else %}
+  <div class="alert info">Gerade steht keine APK zum Download bereit. Schau später noch einmal vorbei.</div>
+{% endif %}
+
+<h2>Installieren</h2>
+<div class="panel">
+  <ol class="steps">
+    <li>APK auf dem Android-Handy herunterladen.</li>
+    <li>Die Datei öffnen. Fragt Android nach, die Installation aus dieser Quelle erlauben
+      („Unbekannte Apps installieren“ für den Browser bzw. „Unbekannte Herkunft“ bis Android 7).</li>
+    <li>In der App mit deinem VRN-Konto anmelden. Die Anmeldung hier im Browser wird nicht übernommen.</li>
+  </ol>
+  <div class="hint">Für ein Update die neue APK einfach über die alte installieren. Meldet Android „App nicht installiert“,
+    ist sie anders signiert: dann die alte Version zuerst deinstallieren.</div>
+</div>
+
+{% if apks|length > 1 %}
+<h2>Ältere Versionen</h2>
+<div class="panel">
+  <table class="kv">
+    {% for a in apks[1:] %}
+      <tr><td><a href="{{ url_for('android_app_file', name=a.name) }}" download>{{ a.name }}</a></td>
+        <td>{{ a.date }} · {{ '%.1f'|format(a.size_mb) }} MB</td></tr>
+    {% endfor %}
+  </table>
+</div>
+{% endif %}
+
+<p class="center hint" style="margin-top:24px">Inoffizieller Client, nur für den privaten Gebrauch · nicht von VRN</p>
+{% endblock %}

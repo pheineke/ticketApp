@@ -98,12 +98,17 @@ object SecureBox {
 class SealedFile(private val file: File) {
     fun read(): String? = if (file.exists()) runCatching { SecureBox.open(file.readText()) }.getOrNull() else null
 
+    /** Runs on an executor, where an exception (full disk, Keystore failure) would kill the app. */
     fun write(text: String) {
-        val tmp = File(file.path + ".tmp")
-        tmp.writeText(SecureBox.seal(text))
-        if (!tmp.renameTo(file)) {
-            file.delete()
-            tmp.renameTo(file)
+        try {
+            val tmp = File(file.path + ".tmp")
+            tmp.writeText(SecureBox.seal(text))
+            if (!tmp.renameTo(file)) {
+                file.delete()
+                tmp.renameTo(file)
+            }
+        } catch (e: Exception) {
+            Log.w("SealedFile", "cannot write ${file.name}", e)
         }
     }
 

@@ -25,6 +25,10 @@ For a smaller, minified release build, create `android/keystore.properties` (git
 with `storeFile`, `storePassword`, `keyAlias` and `keyPassword`, then run
 `./gradlew assembleRelease`. Without that file the release APK is unsigned.
 
+To offer the APK in the web client's **App** tab, copy it to `../webapp/downloads/`
+(e.g. as `myVRN-Lite-1.0.apk`). Keep signing with the same key, or phones can't update over
+the old version.
+
 ## What it does
 
 - **Konto**: e-mail + password login with the e-mail code (2FA) step, "Angemeldet bleiben",

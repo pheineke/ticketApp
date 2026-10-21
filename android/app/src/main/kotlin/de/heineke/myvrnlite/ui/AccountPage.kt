@@ -41,10 +41,13 @@ class AccountPage(activity: MainActivity) : Page(activity, R.layout.page_account
         view.findViewById<ImageButton>(R.id.password_toggle).apply {
             tint(a.color(R.color.text_muted))
             setOnClickListener {
-                val hidden = password.inputType and InputType.TYPE_TEXT_VARIATION_PASSWORD != 0
+                // Compare the whole variation: VISIBLE_PASSWORD (0x90) contains the PASSWORD bit (0x80).
+                val hidden = password.inputType and InputType.TYPE_MASK_VARIATION == InputType.TYPE_TEXT_VARIATION_PASSWORD
                 val cursor = password.selectionEnd
+                val typeface = password.typeface  // setInputType switches password fields to monospace
                 password.inputType = InputType.TYPE_CLASS_TEXT or
                     if (hidden) InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD else InputType.TYPE_TEXT_VARIATION_PASSWORD
+                password.typeface = typeface
                 password.setSelection(cursor)
             }
         }

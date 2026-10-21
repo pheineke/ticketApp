@@ -74,6 +74,8 @@ class Repo(context: Context) {
     var loadingTickets = false
         private set
     private var lastRefresh = 0L
+    /** Bumped on login and logout, so results of calls started before are dropped. */
+    private var session = 0
 
     val qr = HashMap<Long, QrCode>()
     val qrError = HashMap<Long, String>()
@@ -135,8 +137,9 @@ class Repo(context: Context) {
     }
 
     private fun loggedIn(t: Tokens) {
-        val sub = t.claims?.optString("sub")
+        val sub = t.claims?.optString("sub")?.ifEmpty { null }
         if (offlineSub != null && offlineSub != sub) clearData()  // another account's offline copy
+        newSession()
         synchronized(tokenLock) { tokens = t }
         saveTokens(t)
         pendingLogin = null
@@ -148,12 +151,21 @@ class Repo(context: Context) {
     }
 
     fun logout() {
+        newSession()
         synchronized(tokenLock) { tokens = null }
         pendingLogin = null
         pendingEmail = null
         clearData()
         disk.execute { tokenFile.delete() }
         changed()
+    }
+
+    /** Forgets calls in flight: their results belong to the previous login. */
+    private fun newSession() {
+        session++
+        loadingTickets = false
+        loadingProfile = false
+        loadingQr.clear()
     }
 
     private fun clearData() {
@@ -188,7 +200,7 @@ class Repo(context: Context) {
         if (t.expiresAt - System.currentTimeMillis() < 60_000) t = refreshTokens(t)
         return try {
             call(t.accessToken)
-        } catch (_: Unauthorized) {
+        } catch (ignored: Unauthorized) {
             call(refreshTokens(t).accessToken)
         }
     }
@@ -234,7 +246,9 @@ class Repo(context: Context) {
         loadingTickets = true
         lastRefresh = System.currentTimeMillis()
         changed()
+        val s = session
         background({ authed(client::listOrders) }) { r ->
+            if (s != session) return@background
             loadingTickets = false
             r.onSuccess { call ->
                 ordersCall = call
@@ -263,7 +277,9 @@ class Repo(context: Context) {
     private fun prefetchQr() {
         val ids = tickets().usable.mapNotNull { it.id }.take(OFFLINE_MAX_TICKETS)
         if (ids.isEmpty()) return
+        val s = session
         background({ ids.associateWith { runCatching { fetchQr(it) } } }) { r ->
+            if (s != session) return@background
             r.getOrNull()?.forEach { (id, res) -> res.onSuccess { (q, err) -> storeQr(id, q, err) } }
             saveOffline()
         }
@@ -274,7 +290,9 @@ class Repo(context: Context) {
         if (!loggedIn || id in loadingQr || (!force && qr[id]?.code?.isNotEmpty() == true)) return
         loadingQr += id
         changed()
+        val s = session
         background({ fetchQr(id) }) { r ->
+            if (s != session) return@background
             loadingQr -= id
             r.onSuccess { (q, err) ->
                 storeQr(id, q, err)
@@ -309,7 +327,9 @@ class Repo(context: Context) {
         if (!loggedIn || loadingProfile) return
         loadingProfile = true
         changed()
+        val s = session
         background({ authed(client::profile) }) { r ->
+            if (s != session) return@background
             loadingProfile = false
             r.onSuccess {
                 profileResult = it
@@ -351,7 +371,7 @@ class Repo(context: Context) {
     private fun restoreOffline() {
         val json = offlineFile.read()?.let { runCatching { JSONObject(it) }.getOrNull() } ?: return
         val sub = json.optString("sub").ifEmpty { null }
-        if (tokens != null && sub != tokens?.claims?.optString("sub")) {  // not this account's
+        if (tokens != null && sub != tokens?.claims?.optString("sub")?.ifEmpty { null }) {  // not this account's
             offlineFile.delete()
             return
         }

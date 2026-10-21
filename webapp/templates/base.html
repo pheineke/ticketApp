@@ -50,6 +50,9 @@
   <a class="navrow{{ ' on' if active == 'settings' }}" href="{{ url_for('settings') }}">
     <img src="{{ icon('home_navigator_settings_page.svg') }}" alt="">
     <div><div class="t">Einstellungen</div><div class="s">Meine individuellen Einstellungen.</div></div></a>
+  <a class="navrow{{ ' on' if active == 'app' }}" href="{{ url_for('android_app') }}">
+    <span class="navic" aria-hidden="true"><span class="ic download"></span></span>
+    <div><div class="t">Android-App</div><div class="s">myVRN Lite als eigenständige App laden.</div></div></a>
   <a class="navrow" href="https://www.vrn.de/service/kontakt/feedback/index.html" target="_blank" rel="noopener">
     <img src="{{ icon('home_navigator_help_and_contact_page.svg') }}" alt="">
     <div><div class="t">Hilfe &amp; Kontakt</div></div></a>
@@ -66,6 +69,7 @@
     <a class="{{ 'on' if active == 'tickets' }}" href="{{ url_for('tickets') }}"><span class="ic ticket"></span>Tickets</a>
     <a class="{{ 'on' if active == 'account' }}" href="{{ url_for('account') }}"><span class="ic account"></span>Konto</a>
     <a class="{{ 'on' if active == 'settings' }}" href="{{ url_for('settings') }}"><span class="ic gear"></span>Einstellen</a>
+    <a class="{{ 'on' if active == 'app' }}" href="{{ url_for('android_app') }}"><span class="ic download"></span>App</a>
   </div>
 </nav>
 {% endif %}
