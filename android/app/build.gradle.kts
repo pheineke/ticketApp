@@ -11,11 +11,11 @@ val keystoreProps = rootProject.file("keystore.properties").takeIf { it.exists()
 }
 
 android {
-    namespace = "de.heineke.myvrnlite"
+    namespace = "de.skygazer.myvrnlite"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "de.heineke.myvrnlite"
+        applicationId = "de.skygazer.myvrnlite"
         // Android 5.0. Everything below is chosen for it: framework views instead of
         // AndroidX/Compose, OkHttp 4.12, and bundled Let's Encrypt roots (see net/Tls.kt).
         minSdk = 21

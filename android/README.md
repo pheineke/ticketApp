@@ -79,7 +79,7 @@ the old version.
 ## Layout
 
 ```
-app/src/main/kotlin/de/heineke/myvrnlite/
+app/src/main/kotlin/de/skygazer/myvrnlite/
   net/VrnClient.kt   login flow (PKCE, e-mail code), token refresh, ListOrdersV2, QRCode, profile
   net/Efa.kt         journey planner: stop finder, nearby stops, trips (port of webapp/efa.py)
   net/Tls.kt         system + bundled ISRG roots
